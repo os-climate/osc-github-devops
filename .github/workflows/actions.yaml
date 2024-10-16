@@ -377,16 +377,16 @@ jobs:
           check_path: "tests/resources/test-valid-folder-symlink"
 
       # Tests: path-check
-      - name: "Error with path tests (files/folders/symlinks)"
+      - name: "Error with path tests (files/directories/symlinks)"
         id: path-check-errors
         shell: bash
         if: steps.path-check-file.outputs.type != 'file' ||
           steps.path-check-file.outputs.symlink != 'false' ||
-          steps.path-check-folder.outputs.type != 'folder' ||
+          steps.path-check-folder.outputs.type != 'directory' ||
           steps.path-check-folder.outputs.symlink != 'false' ||
           steps.path-check-symlink-file.outputs.type != 'file' ||
           steps.path-check-symlink-file.outputs.symlink != 'true' ||
-          steps.path-check-symlink-folder.outputs.type != 'folder' ||
+          steps.path-check-symlink-folder.outputs.type != 'directory' ||
           steps.path-check-symlink-folder.outputs.symlink != 'true'
         run: |
           # Report errors with path tests
