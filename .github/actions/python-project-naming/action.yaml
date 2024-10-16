@@ -17,12 +17,12 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - uses: os-climate/osc-github-devops/.github/actions/file-exists@main
+    - uses: os-climate/osc-github-devops/.github/actions/path-check@main
       id: setup-py
       with:
         path: "setup-py"
 
-    - uses: os-climate/osc-github-devops/.github/actions/file-exists@main
+    - uses: os-climate/osc-github-devops/.github/actions/path-check@main
       id: pyproject-toml
       with:
         path: "pyproject.toml"
