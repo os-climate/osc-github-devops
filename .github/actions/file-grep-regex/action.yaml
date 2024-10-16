@@ -6,16 +6,16 @@ name: "Extract string from file"
 description: "Uses grep and a regular expression to extract a string from a file"
 
 inputs:
-  FILENAME:
-    description: "File containing text to extract"
-    required: true
-  REGEX:
-    description: "Regular expression used to extract string"
-    required: true
   FLAGS:
     description: "Flags to use with grep command"
     required: false
     default: "-E"
+  REGEX:
+    description: "Regular expression used to extract string"
+    required: true
+  FILENAME:
+    description: "File containing text to extract"
+    required: true
 
 outputs:
   EXTRACTED_STRING:

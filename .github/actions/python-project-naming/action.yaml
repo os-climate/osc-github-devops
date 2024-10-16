@@ -29,14 +29,21 @@ runs:
 
     - name: "Use project name from setup.py"
       if: ${{ steps.setup-py.outputs.present }} == 'true'
+      uses: os-climate/osc-github-devops/.github/actions/file-grep-regex@main
+      with:
+        # https://regex101.com/r/YcYBKD/1
+        flags: "-oP -m1"
+        regex: '(?<=name=")([^"]*)'
+        filename: "setup.py"
 
     - name: "Use project name from pyproject.toml"
       if: ${{ steps.pyproject-toml.outputs.present }} == 'true'
       uses: os-climate/osc-github-devops/.github/actions/file-grep-regex@main
       with:
-        FILENAME: "pyproject.toml"
-        REGEX:
-        FLAGS:
+        # https://regex101.com/r/AZ80qK/1
+        flags: "-oP -m1"
+        regex: '(?<=name = ")([^"]*)'
+        filename: "pyproject.toml"
 
     - name: "Throw error if Python project metadata was NOT found"
       if: ${{ steps.pyproject-toml.outputs.present }} == 'false' &&
@@ -46,14 +53,12 @@ runs:
         # Throw error if Python project metadata was NOT found
         echo "Neither pyproject.toml NOT setup.py were found"; exit 1
 
-    - name: "Set project name from pyproject.toml"
-      if: ${{ steps.check-pyproject-toml.outputs.present }}
-
     - name: "Return extracted values"
       shell: bash
       run: |
         # Return extracted values
 
+        PYTHON_PROJECT_NAME="$EXTRACTED_STRING"
         echo "PYTHON_PROJECT_NAME: $PYTHON_PROJECT_NAME"
 
         # Replace all dashes in the name with underscores
