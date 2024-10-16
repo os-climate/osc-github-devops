@@ -59,4 +59,4 @@ runs:
       with:
         token: ${{ inputs.GITHUB_TOKEN }}
         prerelease: ${{ env.TAG_PRERELEASE }}
-        tag_name: ${{ env.TAG_CREATED }
+        tag_name: ${{ env.TAG_CREATED }}
