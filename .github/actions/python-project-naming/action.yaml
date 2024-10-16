@@ -33,25 +33,25 @@ runs:
       with:
         # https://regex101.com/r/YcYBKD/1
         flags: "-oP -m1"
-        regex: '''(?<=name = ")([^"]*)'''
+        regex: '(?<=name=")([^"]*)'
         filename: "setup.py"
 
     - name: "Use project name from pyproject.toml"
-      if: ${{ steps.pyproject-toml.outputs.type }} != 'file'
+      if: ${{ steps.pyproject-toml.outputs.type }} == 'file'
       uses: os-climate/osc-github-devops/.github/actions/file-grep-regex@main
       with:
         # https://regex101.com/r/AZ80qK/1
         flags: "-oP -m1"
-        regex: '''(?<=name = ")([^"]*)'''
+        regex: '(?<=name = ")([^"]*)'
         filename: "pyproject.toml"
 
     - name: "Throw error if Python project metadata was NOT found"
-      if: ${{ steps.pyproject-toml.outputs.present }} == 'false' &&
-        ${{ steps.setup-py.outputs.present }} == 'false'
+      if: ${{ steps.pyproject-toml.outputs.type }} == 'invalid' &&
+        ${{ steps.setup-py.outputs.type }} == 'invalid'
       shell: bash
       run: |
         # Throw error if Python project metadata was NOT found
-        echo "Neither pyproject.toml NOT setup.py were found"; exit 1
+        echo "Neither pyproject.toml NOR setup.py were found"; exit 1
 
     - name: "Return extracted values"
       shell: bash
