@@ -69,7 +69,7 @@ runs:
         echo "Command: grep $FLAGS $REGEX $FILENAME"
 
         # Extract the string using grep and regex
-        STRING=$(grep "$FLAGS" $REGEX "$FILENAME")
+        STRING=$(grep $FLAGS $REGEX $FILENAME)
         set +o noglob
 
         echo "String extracted: $STRING"
