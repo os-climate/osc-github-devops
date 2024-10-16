@@ -50,13 +50,13 @@ runs:
           fi
         fi
 
+        set -o noglob
         echo "Flags to grep:  ${{ inputs.FLAGS }"
         echo "Regular expression to use: ${{ inputs.REGEX }}"
         echo "File to search: ${{ inputs.FILENAME }}"
         echo "Command: grep ${{ inputs.FLAGS }} ${{ inputs.REGEX }} ${{ inputs.FILENAME }}"
 
         # Extract the string using grep and regex
-        set -o noglob
         STRING=$(grep ${{ inputs.FLAGS }} ${{ inputs.REGEX }} ${{ inputs.FILENAME }})
         set +o noglob
 
