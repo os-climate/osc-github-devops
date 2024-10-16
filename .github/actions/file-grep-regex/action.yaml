@@ -42,16 +42,18 @@ runs:
             echo "Error: invalid arguments specified"
             echo "Usage:  $0 [flags] [regex] [filename]"; exit 1
           else
+            set -o noglob
             FLAGS="$1"
             REGEX="$2"
             FILENAME="$3"
+            set +o noglob
           fi
         else
-          FLAGS="${{ inputs.FLAGS }}"
           set -o noglob
+          FLAGS="${{ inputs.FLAGS }}"
           REGEX="${{ inputs.REGEX }}"
-          set +o noglob
           FILENAME="${{ inputs.FILENAME }}"
+          set +o noglob
         fi
 
         if [ ! -f $FILENAME ]; then
