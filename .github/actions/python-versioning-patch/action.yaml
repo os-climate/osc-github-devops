@@ -5,20 +5,19 @@
 name: "🐍 Patch Python Project Metadata/Version"
 
 inputs:
-  CURRENT:
-    description: "Current version to replace"
-    required: true
-    type: string
-  TARGET:
-    description: "Target/replacement version"
+  STRING:
+    description: "New version string"
     required: true
     type: string
 
 runs:
   using: "composite"
   steps:
-    - id: patch-pyproject-toml
-      name: "Substituting project version string"
+    - name:
+      id: update-version
+      uses: os-climate/osc-github-devops/.github/actions/file-sed-regex@main
+
+    - name: "Substituting project version string"
       shell: bash
       run: |
         # Substituting project version string
@@ -30,27 +29,26 @@ runs:
           echo "Running from a shell, NOT workflow"
           export GITHUB_OUTPUT="/dev/null"
           export GITHUB_ENV="/dev/null"
-          if [ $# -ne 2 ]; then
+          if [ $# -ne 1 ]; then
             echo "Error: invalid arguments specified"
-            echo "Usage:  $0 [current-tag] [target-tag]"; exit 1
+            echo "Usage:  $0 [string]"; exit 1
           else
-            CURRENT="$1"
-            TARGET="$2"
+            STRING="$1"
           fi
         else
-          CURRENT=${{ inputs.CURRENT }}
-          TARGET=${{ inputs.TARGET }}
+          STRING=${{ inputs.STRING }}
         fi
 
-        echo "Search for: $CURRENT  Replace with: $TARGET"
-
-        if [ -z "$CURRENT" ] || [ -z "$TARGET" ]; then
-          echo "Error: one or more required inputs NOT received"
+        if [ -z "$STRING" ]; then
+          echo "Error: string input was NOT received"
           echo "Check the calling workflow syntax and setup..."; exit 1
         fi
+        echo "New version string to insert: $STRING"
 
         # Attempt version string substitution for project
         sed -i -E "s:^version =.*$:version = \"$TARGET\":" pyproject.toml
+
+
 
         # Check to see if the above succeeded
         if !(grep -q "version = \"$TARGET\"" pyproject.toml); then
@@ -58,3 +56,13 @@ runs:
         fi
 
         #SHELLCODEEND
+
+    - name: "Substituting project version string"
+      shell: bash
+      run: |
+        # Validate file was updated
+
+        # Check to see if the above succeeded
+        if !(grep -q "version = \"$TARGET\"" pyproject.toml); then
+          echo "Error: failed version substitution in pyproject.toml"; exit 1
+        fi

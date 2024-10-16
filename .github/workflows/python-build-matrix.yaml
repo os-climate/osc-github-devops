@@ -23,13 +23,9 @@ on:
         required: false
         type: string
         default: "dist"
-      CURRENT_TAG:
-        description: "Current/latest tag from the repository"
-        required: true
-        type: string
       BUILD_TAG:
-        description: "Tag/version for this specific build"
-        required: true
+        description: "Tag version/name for this specific build (semantic)"
+        required: false
         type: string
       SIGSTORE_SIGN:
         description: "Sign build artefacts with Sigstore"
@@ -67,6 +63,30 @@ jobs:
         uses: os-climate/osc-github-devops/.github/actions/python-project-naming@main
         with:
           python-version: ${{ inputs.python_version }}
+
+      - name: "Explicit build versioning"
+        if: inputs.build_tag
+        shell: bash
+        run: |
+          # Explicit build versioning
+          echo "Explicit build versioning: ${{ inputs.build_tag }}"
+          echo "build_tag=${{ inputs.build_tag }}" >> "$GITHUB_ENV"
+
+      - name: "Enumerate build versioning"
+        if: inputs.build_tag
+        shell: bash
+        run: |
+          # Enumerate build versioning
+          echo "Enumerated build versioning: $BUILD_TAG"
+          echo "build_tag=${{ inputs.build_tag }}" >> "$GITHUB_ENV"
+
+      - name: "Patch project versioning metadata"
+        if: env.current-tag != env.build-tag
+        uses: os-climate/osc-github-devops/.github/actions/python-versioning-patch@main
+        with:
+          # Temporary dummy values
+          current: "v0.0.0"
+          target: ${{ inputs.build_tag }}
 
       - name: "Build Python project"
         id: python-matrix-builds

@@ -355,34 +355,54 @@ jobs:
           echo 'String comparison/action logic appears to be broken'
           exit 1
 
-      - name: "Test TOX stanza [specific/individual stanza]"
-        id: tox-stanza-test-individual
+      # Action: path-check
+      - name: "Action: path test [valid file]"
+        id: path-check-file
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/string-in-multiline-text@main
+        uses: os-climate/osc-github-devops/.github/actions/path-check@main
         with:
-          string: "testenv:tests"
-          encoded_text: "${{ steps.tox-stanza.outputs.encoded_stanza }}"
-          substring_match: "false"
-          case_insensitive: "false"
+          check_path: "tests/resources/test-file"
 
-      - name: "Test TOX stanza [multiple matches]"
-        id: tox-stanza-test-multiple
+      - name: "Action: path test [valid folder]"
+        id: path-check-folder
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/string-in-multiline-text@main
+        uses: os-climate/osc-github-devops/.github/actions/path-check@main
         with:
-          string: "testenv:"
-          encoded_text: "${{ steps.tox-stanza.outputs.encoded_stanza }}"
-          substring_match: "true"
-          case_insensitive: "false"
+          check_path: "tests/resources/test-folder"
 
-      - name: "Report Errors in TOX stanza tests"
+      - name: "Action: path test [valid symlink to file]"
+        id: path-check-symlink-file
         # yamllint disable-line rule:line-length
-        if: (steps.tox-stanza-test-individual.outputs.match == 'false' ||
-          steps.tox-stanza-test-individual.outputs.count != '1') ||
-          (steps.tox-stanza-test-multiple.outputs.match == 'false' ||
-          steps.tox-stanza-test-multiple.outputs.count != '5')
+        uses: os-climate/osc-github-devops/.github/actions/path-check@main
+        with:
+          check_path: "tests/resources/test-valid-file-symlink"
+
+      - name: "Action: path test [valid symlink to folder]"
+        id: path-check-symlink-folder
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/path-check@main
+        with:
+          check_path: "tests/resources/test-valid-folder-symlink"
+
+      - name: "Action: path test [invalid symlink]"
+        id: path-check-invalid-symlink
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/path-check@main
+        with:
+          check_path: "tests/resources/test-invalid-symlink"
+
+      # Tests: path-check
+      - name: "Error with path tests (files/folders/symlinks)"
+        id: path-check-errors
         shell: bash
+        if: steps.path-check-file.outputs.type != 'file' ||
+          steps.path-check-file.outputs.symlink != 'false' ||
+          steps.path-check-folder.outputs.type != 'folder' ||
+          steps.path-check-folder.outputs.symlink != 'false' ||
+          steps.path-check-symlink-file.outputs.type != 'file' ||
+          steps.path-check-symlink-file.outputs.symlink != 'true' ||
+          steps.path-check-invalid-symlink.outputs.type != 'invalid' ||
+          steps.path-check-invalid-symlink.outputs.symlink != 'true'
         run: |
-          # Check string-comparison action logic
-          echo 'Parsing of TOX stanza appears to be broken'
-          exit 1
+          # Report errors with path tests
+          echo "One or more path checks failed validation"; exit 1

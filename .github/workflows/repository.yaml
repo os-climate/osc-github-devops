@@ -96,12 +96,6 @@ jobs:
           pypi_production: ${{ secrets.PYPI_PRODUCTION }}
           one_password_development: ${{ secrets.ONE_PASSWORD_DEVELOPMENT }}
 
-  parse-tox-configuration:
-    name: "TOX"
-    needs: repo-metadata
-    if: needs.repo-metadata.outputs.tox  == 'true'
-    uses: os-climate/osc-github-devops/.github/workflows/tox.yaml@main
-
   python-project:
     name: "Gather Python Project Metadata"
     needs: repo-metadata
@@ -129,6 +123,7 @@ jobs:
     with:
       python_version: ${{ matrix.python-version }} # Passed in from matrix job
       default_python: ${{ needs.python-project.outputs.default_python }}
+      build_version: "v5.0.0-dev2"
 
   python-test:
     name: "Test"

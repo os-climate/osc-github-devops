@@ -1,0 +1,72 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+
+name: "🐍 Get Python Project Name"
+description: "Returns the name of the Python Project"
+
+inputs:
+  PYTHON-VERSION:
+    description: "Python version to use"
+    required: false
+    type: string
+    default: "3.11"
+
+outputs:
+  PYTHON_PROJECT_NAME:
+    description: "The name of the Python project from pyproject.toml or setup.py"
+    value: ${{ steps.python-project-name.outputs.python_project_name }}
+  PYTHON_BUILD_NAME:
+    # Any dashes in the name will be replaced with underscores
+    description: "The name of the Python project when built"
+    value: ${{ steps.python-project-name.outputs.python_build_name }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Install PDM"
+      uses: pdm-project/setup-pdm@v4
+      with:
+        python-version: ${{ inputs.python_version }}
+
+    - name: "Extract Python project name"
+      id: python-project-name
+      shell: bash
+      run: |
+        # Extract Python project name
+
+        #SHELLCODESTART
+
+        # Allows for testing from a local shell
+        if [ -z "$GITHUB_OUTPUT" ]; then
+          echo "Running from a shell, NOT workflow"
+          export GITHUB_OUTPUT="/dev/null"
+          export GITHUB_ENV="/dev/null"
+        fi
+
+        if [ -f pyproject.toml ]; then
+          echo "Extracting project name from pyproject.toml."
+          PYTHON_PROJECT_NAME=$(pdm show --name)
+
+        elif [ -f setup.py ]; then
+          echo "Extracting project name from setup.py."
+          pip install -q --upgrade pip
+          pip install --upgrade -q setuptools
+          PYTHON_PROJECT_NAME=$(python ./setup.py --name)
+
+        else
+          echo "Error: neither pyproject.toml not setup.py was found"; exit 1
+        fi
+
+        echo "PYTHON_PROJECT_NAME: $PYTHON_PROJECT_NAME"
+
+        # Make available in the environment
+        echo "python_project_name=$PYTHON_PROJECT_NAME" >> "$GITHUB_ENV"
+        echo "python_project_name=$PYTHON_PROJECT_NAME" >> "$GITHUB_OUTPUT"
+
+        # Replace all dashes in the name with underscores
+        PYTHON_BUILD_NAME=$(echo "$PYTHON_PROJECT_NAME" | tr '-' '_')
+        echo "python_build_name=$PYTHON_BUILD_NAME" >> "$GITHUB_ENV"
+        echo "python_build_name=$PYTHON_BUILD_NAME" >> "$GITHUB_OUTPUT"
+
+        #SHELLCODEEND
