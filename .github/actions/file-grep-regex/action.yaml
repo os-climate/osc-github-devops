@@ -43,9 +43,9 @@ runs:
             echo "Usage:  $0 [flags] [regex] [filename]"; exit 1
           else
             set -o noglob
-            FLAGS="$1"
-            REGEX="$2"
-            FILENAME="$3"
+            FLAGS=$1
+            REGEX=$2
+            FILENAME=$3
             set +o noglob
           fi
         else
