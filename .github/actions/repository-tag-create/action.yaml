@@ -27,8 +27,8 @@ runs:
       run: |
         # Evaluate action/workflow context
 
-        TAG_CREATED="${{ inputs.$TAG_CREATED }}"
-        TAG_PRERELEASE="${{ inputs.$TAG_PRERELEASE }}"
+        TAG_CREATED="${{ inputs.TAG_CREATED }}"
+        TAG_PRERELEASE="${{ inputs.TAG_PRERELEASE }}"
 
         if [ -n "$TAG_CREATED" ]; then
           TAG_CREATED="v0.0.0"
