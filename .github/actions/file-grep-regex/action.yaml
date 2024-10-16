@@ -68,7 +68,7 @@ runs:
 
         # Extract the string using grep and regex
         set -o noglob
-        STRING=$(grep $FLAGS $REGEX $FILENAME)
+        STRING=$(grep "$FLAGS" "$REGEX" "$FILENAME")
         set +o noglob
 
         echo "String extracted: $STRING"
