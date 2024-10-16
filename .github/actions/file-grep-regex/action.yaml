@@ -48,16 +48,27 @@ runs:
             FILENAME="$3"
             set +o noglob
           fi
+        else
+          set -o noglob
+          FLAGS=${{ inputs.FLAGS }}
+          REGEX=${{ inputs.REGEX }}
+          FILENAME=${{ inputs.FILENAME }}
+          set +o noglob
         fi
 
-        set -o noglob
-        echo "Flags to grep:  ${{ inputs.FLAGS }"
-        echo "Regular expression to use: ${{ inputs.REGEX }}"
-        echo "File to search: ${{ inputs.FILENAME }}"
-        echo "Command: grep ${{ inputs.FLAGS }} ${{ inputs.REGEX }} ${{ inputs.FILENAME }}"
+        if [ ! -f "$FILENAME" ]; then
+          echo "Error: file not found [$FILENAME]"; exit 1
+        fi
+
+        echo "Regular expression to use: $REGEX"
+        echo "File to search: $FILENAME"
+        echo "Flags to grep: $FLAGS"
+
+        echo "Command: grep $FLAGS $REGEX $FILENAME"
 
         # Extract the string using grep and regex
-        STRING=$(grep ${{ inputs.FLAGS }} ${{ inputs.REGEX }} ${{ inputs.FILENAME }})
+        set -o noglob
+        STRING=$(grep $FLAGS $REGEX $FILENAME)
         set +o noglob
 
         echo "String extracted: $STRING"
