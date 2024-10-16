@@ -50,13 +50,13 @@ runs:
           fi
         else
           set -o noglob
-          FLAGS="${{ inputs.FLAGS }}"
-          REGEX="${{ inputs.REGEX }}"
-          FILENAME="${{ inputs.FILENAME }}"
+          FLAGS=${{ inputs.FLAGS }}
+          REGEX=${{ inputs.REGEX }}
+          FILENAME=${{ inputs.FILENAME }}
           set +o noglob
         fi
 
-        if [ ! -f $FILENAME ]; then
+        if [ ! -f "$FILENAME" ]; then
           echo "Error: file not found [$FILENAME]"; exit 1
         fi
 
@@ -68,7 +68,7 @@ runs:
 
         # Extract the string using grep and regex
         set -o noglob
-        STRING=$(grep "$FLAGS" "$REGEX" "$FILENAME")
+        STRING=$(grep $FLAGS $REGEX $FILENAME)
         set +o noglob
 
         echo "String extracted: $STRING"
