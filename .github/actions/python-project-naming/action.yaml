@@ -47,7 +47,7 @@ runs:
 
     - name: "Throw error if Python project metadata was NOT found"
       if: steps.pyproject-toml.outputs.type == 'invalid' &&
-        steps.setup-py.outputs.type }} == 'invalid'
+        steps.setup-py.outputs.type == 'invalid'
       shell: bash
       run: |
         # Throw error if Python project metadata was NOT found
