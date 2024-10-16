@@ -10,17 +10,24 @@ inputs:
     required: false
     type: string
     default: "all"
+  CREATE_MISSING:
+    description: "If NO tags found, create default tag v0.0.0"
+    type: boolean
+    default: false
 
 outputs:
-  TAG:
+  TAG_COUNT:
+    description: "The number of tags in this repository"
+    value: ${{ steps.fetch.outputs.count }}
+  CURRENT_TAG:
     # A leading non-numeric "v" character will be stripped
     description: "Return the latest semantic tag from repository"
     value: ${{ steps.results.outputs.tag }}
-  VTAG:
+  CURRENT_VTAG:
     description: "The tag [with v prefix] e.g. v1.2.3"
     value: ${{ steps.results.outputs.vtag }}
-  INVALID:
-    description: "Flag set true if no semantic tags found"
+  CURRENT_TAG_SEMANTIC:
+    description: "Set true if current tag is semantic"
     value: ${{ steps.results.outputs.invalid }}
 
 runs:
@@ -29,6 +36,7 @@ runs:
     - uses: actions/checkout@v4
 
     - name: "Fetch tags"
+      id: fetch
       shell: bash
       if: startsWith(github.ref, 'refs/tags/') != true
       # Don't fetch tags if a tag was pushed, it will result in an error, e.g.
@@ -41,8 +49,25 @@ runs:
         # Workaround for: https://github.com/actions/checkout/issues/1471
         echo "Fetching tags..."
         git fetch --tags
+        TAG_COUNT=$(git tag -l | wc -l)
+        echo "tag_count=$TAG_COUNT" >> "$GITHUB_ENV"
+        echo "tag_count=$TAG_COUNT" >> "$GITHUB_OUTPUT"
+
+    - name: "No tags found/set in this repository"
+      if: env.tag_count == '0'
+      shell: bash
+      run: |
+        echo "Warning: No tags were found in this repository"
+        echo "tag=0.0.0" >> $GITHUB_ENV
+
+    - name: "Create initial tag [OPTIONAL]"
+      if: env.tag_count == '0' && inputs.create_missing == 'true'
+      uses: os-climate/osc-github-devops/.github/actions/repository-tag-create@main
+      with:
+        token: ${{ inputs.GITHUB_TOKEN }}
 
     - name: "Get latest tag"
+      if: env.tag_count != '0'
       id: retrieve
       shell: bash
       run: |
@@ -66,36 +91,27 @@ runs:
         fi
 
         # Report and record result
-        echo "Latest tag: ${TAG_INTERIM} [v${TAG_INTERIM}]"
-        echo "tag_interim=${TAG_INTERIM}" >> $GITHUB_ENV
-        echo "tag_interim=${TAG_INTERIM}" >> $GITHUB_OUTPUT
+        echo "tag: ${TAG_INTERIM} [v${TAG_INTERIM}]"
+        echo "tag=${TAG_INTERIM}" >> $GITHUB_ENV
+        echo "tag=${TAG_INTERIM}" >> $GITHUB_OUTPUT
 
     - name: "Check semantic/validity"
       id: validate
       uses: os-climate/osc-github-devops/.github/actions/semantic-tag-validate@main
       with:
-        tag: ${{ steps.retrieve.outputs.tag_interim }}
+        tag: ${{ env.tag }}
 
-    - name: "Return current tag"
+    - name: "Return current repository semantic tag"
       id: results
       shell: bash
       run: |
-        # Validate supplied (and parsed) tag
-        if [ ${{ steps.validate.outputs.valid }} = "true" ]; then
-          echo "Tag retrieved and is semantic/valid"
-          TAG="${{ steps.retrieve.outputs.tag_interim }}"
-          echo "invalid=false" >> $GITHUB_ENV
-          echo "invalid=false" >> $GITHUB_OUTPUT
-        else
-          echo "No valid semantic tags were found"
-          echo "invalid=true" >> $GITHUB_ENV
-          echo "invalid=true" >> $GITHUB_OUTPUT
-          # Set a placeholder value for the tag
-          TAG="0.0.0"
-        fi
+        # Return current repository semantic tag
 
+        TAG="${{ env.tag }}"
         echo "Tag: $TAG [v$TAG]"
-        echo "tag=${TAG}" >> $GITHUB_ENV
-        echo "tag=${TAG}" >> $GITHUB_OUTPUT
-        echo "vtag=v${TAG}" >> $GITHUB_ENV
-        echo "vtag=v${TAG}" >> $GITHUB_OUTPUT
+        echo "current_tag=${TAG}" >> "$GITHUB_ENV"
+        echo "current_tag=${TAG}" >> "$GITHUB_OUTPUT"
+        echo "current_vtag=v${TAG}" >> "$GITHUB_ENV"
+        echo "current_vtag=v${TAG}" >> "$GITHUB_OUTPUT"
+        echo "current_tag_semantic=${{ steps.validate.outputs.valid }}" >> "$GITHUB_ENV"
+        echo "current_tag_semantic=${{ steps.validate.outputs.valid }}" >> "$GITHUB_OUTPUT"

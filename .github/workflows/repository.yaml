@@ -35,24 +35,16 @@ jobs:
       # Tag metadata
       current_tag: $ {{ steps.tags.outputs.vtag }}
       tag_validity: $ {{ steps.tags.outputs.tag_validity }}
-      development_tag: ${{ steps.tags.outputs.development_tag }}
-      production_tag: ${{ steps.tags.outputs.production_tag }}
-      pre_release: ${{ steps.tags.outputs.prerelease_tag }}
+      development_tag: "v0.1.0" # Placeholder value
+      production_tag: "v0.1.0" # Placeholder value
+      pre_release: "v0.1.0" # Placeholder value
 
     steps:
       - uses: actions/checkout@v4
-
       - name: "Classify repository content"
         id: classify
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/repository-content-classify@main
-
-      - name: "Gather repository tag/versioning"
-        id: tags
-        uses: os-climate/osc-github-devops/.github/actions/repository-tags@main
-        with:
-          create_initial: true
-          github_token: ${{ secrets.GITHUB_TOKEN }}
 
   github-workflow-metadata:
     name: "Gather Workflow Metadata"
