@@ -48,12 +48,6 @@ runs:
             FILENAME="$3"
             set +o noglob
           fi
-        else
-          set -o noglob
-          FLAGS="${{ inputs.FLAGS }}"
-          REGEX="${{ inputs.REGEX }}"
-          FILENAME="${{ inputs.FILENAME }}"
-          set +o noglob
         fi
 
         if [ ! -f "$FILENAME" ]; then
@@ -68,7 +62,7 @@ runs:
 
         # Extract the string using grep and regex
         set -o noglob
-        STRING=$(grep $FLAGS $REGEX $FILENAME)
+        STRING=$(grep ${{ inputs.FLAGS }} ${{ inputs.REGEX }} ${{ inputs.FILENAME }})
         set +o noglob
 
         echo "String extracted: $STRING"
