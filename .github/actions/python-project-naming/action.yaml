@@ -58,7 +58,7 @@ runs:
       run: |
         # Return extracted values
 
-        PYTHON_PROJECT_NAME="${{ vars.extracted_string}}"
+        PYTHON_PROJECT_NAME="${{ env.extracted_string}}"
         echo "PYTHON_PROJECT_NAME: $PYTHON_PROJECT_NAME"
 
         # Replace all dashes in the name with underscores
