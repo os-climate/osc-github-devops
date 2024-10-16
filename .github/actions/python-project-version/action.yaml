@@ -60,4 +60,4 @@ runs:
 
         # Make available to the GitHub environment
         echo "project_version=$PYTHON_PROJECT_VERSION" >> "$GITHUB_ENV"
-        echo "python_version=$PYTHON_PROJECT_VERSION"" >> "$GITHUB_OUTPUT"
+        echo "python_version=$PYTHON_PROJECT_VERSION >> "$GITHUB_OUTPUT"
