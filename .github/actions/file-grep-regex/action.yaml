@@ -66,7 +66,6 @@ runs:
         echo "Regular expression to use: $REGEX"
         echo "File to search: $FILENAME"
         echo "Flags to grep: $FLAGS"
-        echo "Command: grep $FLAGS $REGEX $FILENAME"
 
         # Extract the string using grep and regex
         STRING=$(grep $FLAGS '${{ inputs.REGEX }}' $FILENAME)
