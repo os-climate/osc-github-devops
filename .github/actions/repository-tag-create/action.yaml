@@ -1,0 +1,62 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation
+
+name: "🏷️ Repository Tag Create"
+# Create a tag in the repository
+
+inputs:
+  TAG_CREATED:
+    description: "Tag to create in repository"
+    required: false
+  TAG_PRERELEASE:
+    description: "Tag release as a development release"
+    # Will use context awareness if NOT explicitly set
+    required: false
+    type: boolean
+    default: true
+  GITHUB_TOKEN:
+    description: "Required to push new tags to the repository"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Evaluate action/workflow context"
+      shell: bash
+      run: |
+        # Evaluate action/workflow context
+
+        TAG_CREATED="${{ inputs.$TAG_CREATED }}"
+        TAG_PRERELEASE="${{ inputs.$TAG_PRERELEASE }}"
+
+        if [ -n "$TAG_CREATED" ]; then
+          TAG_CREATED="v0.0.0"
+        fi
+
+        if [ "$TAG_PRERELEASE" = "true" ]; then
+          echo "Tag to create: $TAG_CREATED [development]"
+        else
+          echo "Tag to create: $TAG_CREATED [production]"
+        fi
+
+        # NOT IMPLEMENTED YET
+        # Evaluate commit message contents for release type
+        if [ ${{ contains(github.event.head_commit.message, '[release]') }} ]; then
+          echo "Possible production release?"
+        elif [ ${{ contains(github.event.head_commit.message, '[development]') }} ]; then
+          echo "Possible development release?"
+        fi
+
+        echo "tag_created=$TAG_CREATED" >> "$GITHUB_ENV"
+        echo "tag_created=$TAG_CREATED" >> "$GITHUB_OUTPUT"
+        echo "tag_prerelease=$TAG_PRERELEASE" >> "$GITHUB_ENV"
+        echo "tag_prerelease=$TAG_PRERELEASE" >> "$GITHUB_OUTPUT"
+
+    - name: "Add tag to repository: ${{ env.TAG_CREATED }}"
+      id: create-tag
+      uses: softprops/action-gh-release@v2
+      with:
+        token: ${{ inputs.GITHUB_TOKEN }}
+        prerelease: ${{ env.TAG_PRERELEASE }}
+        tag_name: ${{ env.TAG_CREATED }
