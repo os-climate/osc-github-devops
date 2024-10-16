@@ -2,50 +2,62 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
 
-name: "🐍 Get Python Project Version"
+name: "🐍 Get Python Project Versioning"
 description: "Returns the version of the Python Project"
 
 outputs:
-  PYTHON_PROJECT_VERSION:
+  PROJECT_VERSION:
     description: "The version of the Python project from pyproject.toml or setup.py"
-    value: ${{ steps.python-project-version.outputs.python_project_version }}
+    value: ${{ steps.variables.outputs.python_project_name }}
 
 runs:
   using: "composite"
   steps:
-    - name: "Capture Python project version"
-      id: python-project-version
+    - uses: os-climate/osc-github-devops/.github/actions/path-check@main
+      id: setup-py
+      with:
+        check_path: "setup-py"
+
+    - uses: os-climate/osc-github-devops/.github/actions/path-check@main
+      id: pyproject-toml
+      with:
+        check_path: "pyproject.toml"
+
+    - name: "Use project name from setup.py"
+      if: steps.setup-py.outputs.type == 'file'
+      uses: os-climate/osc-github-devops/.github/actions/file-grep-regex@main
+      with:
+        flags: "-oP -m1"
+        # https://regex101.com/r/QKYHId/1
+        regex: '(?<=version=")([^"]*)'
+        filename: "setup.py"
+
+    - name: "Use project name from pyproject.toml"
+      if: steps.pyproject-toml.outputs.type == 'file'
+      uses: os-climate/osc-github-devops/.github/actions/file-grep-regex@main
+      with:
+        flags: "-oP -m1"
+        # https://regex101.com/r/MWmRge/1
+        regex: '(?<=^version = ")([^"]*)'
+        filename: "pyproject.toml"
+
+    - name: "Throw error if Python project metadata was NOT found"
+      if: steps.pyproject-toml.outputs.type == 'invalid' &&
+        steps.setup-py.outputs.type == 'invalid'
       shell: bash
       run: |
-        # Capture Python project version
+        # Throw error if Python project metadata was NOT found
+        echo "Neither pyproject.toml NOR setup.py were found"; exit 1
 
-        #SHELLCODESTART
+    - name: "Return extracted values"
+      id: variables
+      shell: bash
+      run: |
+        # Return extracted values
 
-        # Allows for testing from a local shell
-        if [ -z "$GITHUB_OUTPUT" ]; then
-          echo "Running from a shell, NOT workflow"
-          export GITHUB_OUTPUT="/dev/null"
-          export GITHUB_ENV="/dev/null"
-        fi
-
-        if [ -f pyproject.toml ]; then
-          echo "Extracting project version from pyproject.toml."
-          PYTHON_PROJECT_VERSION=$(pdm show --version)
-
-        elif [ -f setup.py ]; then
-          echo "Extracting project version from setup.py."
-          pip install -q --upgrade pip
-          pip install --upgrade -q setuptools
-          PYTHON_PROJECT_VERSION=$(python ./setup.py --version)
-
-        else
-          echo "Error: neither pyproject.toml not setup.py was found"; exit 1
-        fi
-
+        PYTHON_PROJECT_VERSION="${{ env.extracted_string}}"
         echo "PYTHON_PROJECT_VERSION: $PYTHON_PROJECT_VERSION"
 
-        # Make available in the environment
-        echo "python_project_version=$PYTHON_PROJECT_VERSION" >> "$GITHUB_ENV"
-        echo "python_project_version=$PYTHON_PROJECT_VERSION" >> "$GITHUB_OUTPUT"
-
-        #SHELLCODEEND
+        # Make available to the GitHub environment
+        echo "project_version=$PYTHON_PROJECT_VERSION" >> "$GITHUB_ENV"
+        echo "python_version=$PYTHON_PROJECT_VERSION"" >> "$GITHUB_OUTPUT"
