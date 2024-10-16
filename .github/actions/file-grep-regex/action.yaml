@@ -33,6 +33,8 @@ runs:
 
         #SHELLCODESTART
 
+        set -xv
+
         # Allows for testing from a local shell
         if [ -z "$GITHUB_OUTPUT" ]; then
           echo "Running from a shell, NOT workflow"
