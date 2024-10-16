@@ -52,9 +52,9 @@ runs:
           fi
         else
           set -o noglob
-          FLAGS=${{ inputs.FLAGS }}
+          FLAGS="${{ inputs.FLAGS }}"
           REGEX=${{ inputs.REGEX }}
-          FILENAME=${{ inputs.FILENAME }}
+          FILENAME="${{ inputs.FILENAME }}"
           set +o noglob
         fi
 
