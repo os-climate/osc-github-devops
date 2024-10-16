@@ -27,15 +27,6 @@ runs:
       with:
         check_path: "pyproject.toml"
 
-    - name: "Use project name from setup.py"
-      if: ${{ steps.setup-py.outputs.type }} == 'file'
-      uses: os-climate/osc-github-devops/.github/actions/file-grep-regex@main
-      with:
-        # https://regex101.com/r/YcYBKD/1
-        flags: "-oP -m1"
-        regex: '(?<=name=")([^"]*)'
-        filename: "setup.py"
-
     - name: "Use project name from pyproject.toml"
       if: ${{ steps.pyproject-toml.outputs.type }} == 'file'
       uses: os-climate/osc-github-devops/.github/actions/file-grep-regex@main
