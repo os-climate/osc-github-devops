@@ -361,7 +361,7 @@ jobs:
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/path-check@main
         with:
-          check_path: "tests/resources/test-file"
+          check_path: "tests/resources/test-folder/test-file"
 
       - name: "Action: path test [valid folder]"
         id: path-check-folder
@@ -401,6 +401,8 @@ jobs:
           steps.path-check-folder.outputs.symlink != 'false' ||
           steps.path-check-symlink-file.outputs.type != 'file' ||
           steps.path-check-symlink-file.outputs.symlink != 'true' ||
+          steps.path-check-symlink-folder.outputs.type != 'folder' ||
+          steps.path-check-symlink-folder.outputs.symlink != 'true' ||
           steps.path-check-invalid-symlink.outputs.type != 'invalid' ||
           steps.path-check-invalid-symlink.outputs.symlink != 'true'
         run: |
