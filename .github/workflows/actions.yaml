@@ -33,6 +33,7 @@ jobs:
       VAULT_ITEM: "op://67hdehutbpddhfbgm6ffjvdsbu/Test Secure Note/notesPlain"
       EXPORT: false
     secrets:
+      # This is needed in either the organisation or repository, else the workflow will fail
       OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.ONE_PASSWORD_DEVELOPMENT }}
 
   test:
@@ -48,6 +49,7 @@ jobs:
           # Does not currently work: https://github.com/actions/checkout/issues/1471
           fetch-tags: true
           # The semantic-tag-current action currently contains a workaround for this behaviour
+
       - name: "Set up Python"
         uses: actions/setup-python@v5
         with:
