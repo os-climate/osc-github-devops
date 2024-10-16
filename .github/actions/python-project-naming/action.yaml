@@ -8,11 +8,11 @@ description: "Returns the name of the Python Project"
 outputs:
   PYTHON_PROJECT_NAME:
     description: "The name of the Python project from pyproject.toml or setup.py"
-    value: ${{ steps.python-project-name.outputs.python_project_name }}
+    value: ${{ steps.variables.outputs.python_project_name }}
   PYTHON_BUILD_NAME:
     # Any dashes in the name will be replaced with underscores
     description: "The name of the Python project when built"
-    value: ${{ steps.python-project-name.outputs.python_build_name }}
+    value: ${{ steps.variables.outputs.python_build_name }}
 
 runs:
   using: "composite"
@@ -31,7 +31,6 @@ runs:
       if: steps.setup-py.outputs.type == 'file'
       uses: os-climate/osc-github-devops/.github/actions/file-grep-regex@main
       with:
-        # https://regex101.com/r/AZ80qK/1
         flags: "-oP -m1"
         regex: '(?<=name=")([^"]*)'
         filename: "setup.py"
@@ -40,7 +39,6 @@ runs:
       if: steps.pyproject-toml.outputs.type == 'file'
       uses: os-climate/osc-github-devops/.github/actions/file-grep-regex@main
       with:
-        # https://regex101.com/r/AZ80qK/1
         flags: "-oP -m1"
         regex: '(?<=name = ")([^"]*)'
         filename: "pyproject.toml"
@@ -54,6 +52,7 @@ runs:
         echo "Neither pyproject.toml NOR setup.py were found"; exit 1
 
     - name: "Return extracted values"
+      id: variables
       shell: bash
       run: |
         # Return extracted values
