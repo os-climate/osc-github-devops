@@ -115,7 +115,7 @@ jobs:
     with:
       python_version: ${{ matrix.python-version }} # Passed in from matrix job
       default_python: ${{ needs.python-project.outputs.default_python }}
-      build_version: "v5.0.0-dev2"
+      build_tag: "v5.0.0-dev2"
 
   python-test:
     name: "Test"
