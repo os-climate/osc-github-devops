@@ -84,8 +84,6 @@ jobs:
         id: project-naming
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/python-project-naming@main
-        with:
-          python-version: ${{ inputs.default_python }}
 
       - name: "Determine versioning type [static|dynamic]"
         id: versioning-type
