@@ -23,25 +23,21 @@ runs:
       with:
         check_path: "pyproject.toml"
 
-    - name: "Select project metadata file"
-      id: source
-      shell: bash
-      run: |
-        # Select project metadata file
-        if [ ${{ steps.pyproject-toml.outputs.type == 'file' }} ]; then
-          echo "filename=pyproject.toml" >> "$GITHUB_OUTPUT"
-          echo "regex='s:^version =.*$:version = "${{ inputs.REPLACEMENT_VERSION }}":' >> "$GITHUB_OUTPUT"
-        elif [ ${{ steps.setup-py.outputs.type == 'file' }} ]; then
-          echo "filename=setup.py" >> "$GITHUB_OUTPUT"
-          echo "regex='s:^version =.*$:version = "${{ inputs.REPLACEMENT_VERSION }}":' >> "$GITHUB_OUTPUT"
-        else
-          echo "Error: Neither pyproject.toml NOR setup.py could be found"; exit 1
-        fi
-
-    - name: Patch version in Python project metadata file"
+    - name: "Patch Python project version: pyproject.toml"
       id: patch-version
+      if: steps.pyproject-toml.outputs.type == 'file'
       uses: os-climate/osc-github-devops/.github/actions/file-sed-regex@main
       with:
         flags: "-i -E"
-        regex: ${{ steps.source.outputs.regex }}
-        filename: ${{ steps.source.outputs.filename }}
+        regex: 's:^version =.*$:version = "${{ inputs.REPLACEMENT_VERSION }}":'
+        filename: "pyproject.toml"
+
+    - name: "Patch Python project version: setup.py"
+      id: patch-version
+      if: steps.setup-py.outputs.type == 'file'
+      uses: os-climate/osc-github-devops/.github/actions/file-sed-regex@main
+      with:
+        flags: "-i -E"
+        # ToDo: This REGEX likely broken, needs to pad whitespace before "version"
+        regex: 's:^version=.*$:version="${{ inputs.REPLACEMENT_VERSION }}":'
+        filename: "pyproject.toml"
