@@ -122,6 +122,7 @@ runs:
         echo "Supported content types are listed in the table below" >> "$GITHUB_STEP_SUMMARY"
 
         echo "| Status | Support Content Type |" >> "$GITHUB_STEP_SUMMARY"
+        echo "| -------- | ------- |" >> "$GITHUB_STEP_SUMMARY"
         echo "| $REPO_PYTHON_PROJECT | Python Project |" >> "$GITHUB_STEP_SUMMARY"
         echo "| $REPO_NODE_JS_PROJECT | Node.js Project |" >> "$GITHUB_STEP_SUMMARY"
         echo "| $REPO_MAVEN_CONFIG | Maven Configuration |" >> "$GITHUB_STEP_SUMMARY"
