@@ -90,4 +90,12 @@ runs:
     - name: "Summary output"
       shell: bash
       run: |
-        echo '### 🐍 Python project name: $PYTHON_PROJECT_NAME' >> $GITHUB_STEP_SUMMARY
+        echo '### 🐍 Python Project'
+
+        echo "Name: ${{ env.python_build_name }}" >> $GITHUB_STEP_SUMMARY
+        if [ ${{ steps.pyproject-toml.outputs.type == 'file' }} ]; then
+          echo "Project description: pyproject.toml"
+
+        elif [ ${{ steps.setup-py.outputs.type == 'file' }} ]; then
+        echo "Project description: setup.py"
+        fi
