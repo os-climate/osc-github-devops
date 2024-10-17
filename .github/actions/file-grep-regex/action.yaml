@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
 
-name: "Extract string from file"
-description: "Uses grep and a regular expression to extract a string from a file"
+name: "Extract string from file using GREP"
+description: "Uses grep, flags, and a regular expression to extract text from a file"
 
 inputs:
   FLAGS:
@@ -20,13 +20,13 @@ inputs:
 outputs:
   EXTRACTED_STRING:
     description: "The string extracted by the regular expression"
-    value: ${{ steps.extract.outputs.extracted_string }}
+    value: ${{ steps.grep.outputs.extracted_string }}
 
 runs:
   using: "composite"
   steps:
     - name: "Extract text/string from file"
-      id: extract
+      id: grep
       shell: bash
       run: |
         # Extract text/string from file
@@ -61,9 +61,9 @@ runs:
         fi
 
         set -o noglob
+        echo "Flags to grep command: $FLAGS"
         echo "Regular expression to use: $REGEX"
         echo "File to search: $FILENAME"
-        echo "Flags to grep: $FLAGS"
 
         # Extract the string using grep and regex
         STRING=$(grep $FLAGS '${{ inputs.REGEX }}' $FILENAME)
