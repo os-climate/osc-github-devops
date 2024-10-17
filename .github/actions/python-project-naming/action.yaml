@@ -59,12 +59,20 @@ runs:
       run: |
         # Return extracted values
 
+        set -xv
+
         # pyproject.toml is preferred source if both files exist
         if [ ${{ steps.pyproject-toml.outputs.type == 'file' }} ]; then
+          echo "Using project name from source: pyproject.toml"
           PYTHON_PROJECT_NAME="${{ steps.pyproject-toml-name.outputs.extracted_string}}"
 
         elif [ ${{ steps.setup-py.outputs.type == 'file' }} ]; then
+          echo "Using project name from source: setup.py"
           PYTHON_PROJECT_NAME="${{ steps.setup-py-name.outputs.extracted_string}}"
+        fi
+
+        if [ -z "$PYTHON_PROJECT_NAME" ]; then
+          echo "The project name extraction failed ❌"; exit 1
         fi
 
         echo "PYTHON_PROJECT_NAME: $PYTHON_PROJECT_NAME"

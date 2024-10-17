@@ -70,7 +70,7 @@ runs:
         set +o noglob
 
         echo "String extracted: $STRING"
-        # Make string available in the environment
+        # Make string available as output
         echo "extracted_string=$STRING" >> "$GITHUB_OUTPUT"
 
         #SHELLCODEEND

@@ -65,4 +65,10 @@ runs:
         echo "type=$TYPE" >> "$GITHUB_OUTPUT"
         echo "symlink=$SYMLINK" >> "$GITHUB_OUTPUT"
 
+        if [ "$TYPE" != "invalid" ]; then
+          echo "Path is valid ✅"
+        else
+          echo "Path is invalid 🚫"
+        fi
+
         #SHELLCODEEND
