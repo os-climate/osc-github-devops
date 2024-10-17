@@ -123,6 +123,7 @@ while read -r LINE; do
         break
 
     elif [[ "$LINE" = *"#SHELLCODESTART"* ]]; then
+        START_MARKER="true"
         EXTRACT="true"
         touch "$SHELL_SCRIPT"
         chmod a+x "$SHELL_SCRIPT"
@@ -142,7 +143,7 @@ if [ -f "$SHELL_SCRIPT" ] && [ "$DEBUG" = "true" ]; then
     echo "Extracted code to file: $SHELL_SCRIPT"
 fi
 
-if [ "$EXTRACT" = "complete" ]; then
+if [ "$START_MARKER" = "true" ] && [ "$EXTRACT" = "complete" ]; then
     echo "Executing extracted shell script/code..."
     # Shell code executed is temporary and cannot be checked by linting
     # https://www.shellcheck.net/wiki/SC1090
@@ -151,6 +152,6 @@ if [ "$EXTRACT" = "complete" ]; then
     shift
     "$SHELL_SCRIPT" "$@"
 else
-    echo "Error: start/stop markers not found in file"
+    echo "Error: the expected start/stop markers were not found"
     exit 1
 fi
