@@ -18,6 +18,7 @@ runs:
       shell: bash
       run: |
         # Run twine check against build artefacts
+        echo -n "Installing Python tool: twine"
         pip install -q --upgrade twine
         echo "Path to check: ${{ inputs.path }}"
         echo "Running: twine check ${{ inputs.path }}/*"

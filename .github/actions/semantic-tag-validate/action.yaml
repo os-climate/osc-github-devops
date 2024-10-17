@@ -55,13 +55,13 @@ runs:
 
         # Validate supplied (and parsed) tag
         if ! [[ "$TAG" =~ $PATTERN ]]; then
-          echo "ERROR: invalid semantic tag"
-          OUTCOME="false"
+          echo "ERROR: invalid semantic tag ❌"
+          semantic="false"
         else
-          echo "Tag is semantic and valid"
-          OUTCOME="true"
+          echo "Tag is semantic/valid ✅"
+          semantic="true"
         fi
 
-        echo "semantic=$OUTCOME" >> $GITHUB_OUTPUT
+        echo "semantic=$semantic" >> $GITHUB_OUTPUT
 
         #SHELLCODEEND
