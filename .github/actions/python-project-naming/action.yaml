@@ -86,16 +86,3 @@ runs:
         echo "python_project_name=$PYTHON_PROJECT_NAME" >> "$GITHUB_OUTPUT"
         echo "python_build_name=$PYTHON_BUILD_NAME" >> "$GITHUB_ENV"
         echo "python_build_name=$PYTHON_BUILD_NAME" >> "$GITHUB_OUTPUT"
-
-    - name: "Summary output"
-      shell: bash
-      run: |
-        echo '### 🐍 Python Project' >> $GITHUB_STEP_SUMMARY
-
-        echo "Python project name: ${{ env.python_project_name }}" >> $GITHUB_STEP_SUMMARY
-        if [ ${{ steps.pyproject-toml.outputs.type == 'file' }} ]; then
-          echo "Project metadata file: pyproject.toml" >> $GITHUB_STEP_SUMMARY
-
-        elif [ ${{ steps.setup-py.outputs.type == 'file' }} ]; then
-        echo "Project metadata file: setup.py" >> $GITHUB_STEP_SUMMARY
-        fi
