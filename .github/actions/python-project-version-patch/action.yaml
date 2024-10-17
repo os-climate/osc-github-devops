@@ -1,0 +1,55 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+
+name: "🐍 Patch Python Project Metadata/Version"
+
+inputs:
+  REPLACEMENT_VERSION:
+    description: "New version string"
+    required: true
+    type: string
+
+runs:
+  using: "composite"
+  steps:
+    - uses: os-climate/osc-github-devops/.github/actions/path-check@main
+      id: setup-py
+      with:
+        check_path: "setup-py"
+
+    - uses: os-climate/osc-github-devops/.github/actions/path-check@main
+      id: pyproject-toml
+      with:
+        check_path: "pyproject.toml"
+
+    - name: "Select project metadata file"
+      id: source
+      shell: bash
+      run: |
+        # Select project metadata file
+        if [ ${{ steps.pyproject-toml.outputs.type == 'file' }} ]; then
+          echo "filename=pyproject.toml" >> "$GITHUB_OUTPUT"
+        elif [ ${{ steps.setup-py.outputs.type == 'file' }} ]; then
+          echo "filename=setup.py" >> "$GITHUB_OUTPUT"
+        else
+          echo "Error: Neither pyproject.toml NOR setup.py could be found"; exit 1
+        fi
+
+    - name: Patch version in Python project metadata file"
+      id: patch-version
+      uses: os-climate/osc-github-devops/.github/actions/file-sed-regex@main
+      with:
+        flags: "-i -E"
+        regex: 's:^version =.*$:version = "${{ inputs.STRING }}":'
+        filename: ${{ steps.source.outputs.filename }}
+
+    - name: "Substituting project version string"
+      shell: bash
+      run: |
+        # Validate file was updated
+
+        # Check to see if the above succeeded
+        if !(grep -q "version = \"$TARGET\"" pyproject.toml); then
+          echo "Error: failed version substitution in pyproject.toml"; exit 1
+        fi
