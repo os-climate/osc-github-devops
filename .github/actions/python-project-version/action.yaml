@@ -8,7 +8,7 @@ description: "Returns the version of the Python Project"
 outputs:
   PYTHON_PROJECT_VERSION:
     description: "The version of the Python project from pyproject.toml or setup.py"
-    value: ${{ steps.variables.outputs.python_project_name }}
+    value: ${{ steps.variables.outputs.python_project_version }}
 
 runs:
   using: "composite"
