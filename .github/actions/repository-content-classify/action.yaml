@@ -88,12 +88,21 @@ runs:
           JUPYTER_NOTEBOOKS="false"
         fi
 
+        ### Set Outputs ###
+
+        echo "python_project=$PYTHON_PROJECT" >> "$GITHUB_OUTPUT"
+        echo "node_js_project=$NODE_JS_PROJECT" >> "$GITHUB_OUTPUT"
+        echo "maven_config=$MAVEN_CONFIG" >> "$GITHUB_OUTPUT"
+        echo "gradle_config=$GRADLE_CONFIG" >> "$GITHUB_OUTPUT"
+        echo "tox_config=$TOX_CONFIG" >> "$GITHUB_OUTPUT"
+        echo "jupyter_notebooks=$JUPYTER_NOTEBOOKS" >> "$GITHUB_OUTPUT"
+
         ### GitHub Summary ###
 
         echo '# 🔍 Repository Inspection' >> "$GITHUB_STEP_SUMMARY"
 
         VARIABLES="PYTHON_PROJECT NODE_JS_PROJECT MAVEN_CONFIG GRADLE_CONFIG TOX_CONFIG JUPYTER_NOTEBOOKS"
-        for in VARIABLES; do
+        for VARIABLE in VARIABLES; do
           if [ "$VARIABLE" = "true"; then
             "$VARIABLE"="✅"
           else
@@ -107,14 +116,5 @@ runs:
         echo "Gradle configuration (Java): $GRADLE_CONFIG" >> "$GITHUB_STEP_SUMMARY"
         echo "Tox configuration: $TOX_CONFIG" >> "$GITHUB_STEP_SUMMARY"
         echo "Jupyter Notebooks: $JUPYTER_NOTEBOOKS" >> "$GITHUB_STEP_SUMMARY"
-
-        ### Set Outputs ###
-
-        echo "python_project=$PYTHON_PROJECT" >> "$GITHUB_OUTPUT"
-        echo "node_js_project=$NODE_JS_PROJECT" >> "$GITHUB_OUTPUT"
-        echo "maven_config=$MAVEN_CONFIG" >> "$GITHUB_OUTPUT"
-        echo "gradle_config=$GRADLE_CONFIG" >> "$GITHUB_OUTPUT"
-        echo "tox_config=$TOX_CONFIG" >> "$GITHUB_OUTPUT"
-        echo "jupyter_notebooks=$JUPYTER_NOTEBOOKS" >> "$GITHUB_OUTPUT"
 
         #SHELLCODEEND
