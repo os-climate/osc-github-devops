@@ -24,6 +24,7 @@ runs:
         check_path: "pyproject.toml"
 
     - name: "Use project version from setup.py"
+      id: setup-py-version
       if: steps.setup-py.outputs.type == 'file'
       uses: os-climate/osc-github-devops/.github/actions/file-grep-regex@main
       with:
@@ -33,6 +34,7 @@ runs:
         filename: "setup.py"
 
     - name: "Use project version from pyproject.toml"
+      id: pyproject-toml-version
       if: steps.pyproject-toml.outputs.type == 'file'
       uses: os-climate/osc-github-devops/.github/actions/file-grep-regex@main
       with:
@@ -58,11 +60,11 @@ runs:
         # pyproject.toml is preferred source if both files exist
         if [ ${{ steps.pyproject-toml.outputs.type == 'file' }} ]; then
           echo "Using project version from source: pyproject.toml"
-          PYTHON_PROJECT_VERSION="${{ steps.pyproject-toml-name.outputs.extracted_string}}"
+          PYTHON_PROJECT_VERSION="${{ steps.pyproject-toml-version.outputs.extracted_string}}"
 
         elif [ ${{ steps.setup-py.outputs.type == 'file' }} ]; then
           echo "Using project version from source: setup.py"
-          PYTHON_PROJECT_VERSION="${{ steps.setup-py-name.outputs.extracted_string}}"
+          PYTHON_PROJECT_VERSION="${{ steps.setup-py-version.outputs.extracted_string}}"
         fi
 
         if [ -z "$PYTHON_PROJECT_VERSION" ]; then
