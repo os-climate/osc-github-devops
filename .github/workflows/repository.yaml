@@ -29,12 +29,12 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       # Content metadata
-      python: ${{ steps.classify.outputs.python }}
-      notebooks: ${{ steps.classify.outputs.notebooks }}
-      tox: ${{ steps.classify.outputs.tox }}
+      python_project: ${{ steps.classify.outputs.python_project }}
+      jupyter_notebooks: ${{ steps.classify.outputs.jupyter_notebooks }}
+      tox_config: ${{ steps.classify.outputs.tox_config }}
       # Tag metadata
-      current_tag: $ {{ steps.tags.outputs.vtag }}
-      tag_validity: $ {{ steps.tags.outputs.tag_validity }}
+      current_tag: "v0.1.0" # Placeholder value
+      tag_validity: "v0.1.0" # Placeholder value
       development_tag: "v0.1.0" # Placeholder value
       production_tag: "v0.1.0" # Placeholder value
       pre_release: "v0.1.0" # Placeholder value
@@ -91,7 +91,7 @@ jobs:
   python-project:
     name: "Gather Python Project Metadata"
     needs: repo-metadata
-    if: needs.repo-metadata.outputs.python  == 'true'
+    if: needs.repo-metadata.outputs.python_project  == 'true'
     uses: os-climate/osc-github-devops/.github/workflows/python-project-setup.yaml@main
     with:
       default_python: "3.10"
@@ -139,7 +139,6 @@ jobs:
       # Needed both here and in the called workflow
       contents: write
     with:
-      pre_release: ${{ needs.repo-metadata.outputs.pre_release }}
       build_tag: ${{ needs.python-build.outputs.build_tag }}
 
   testpypi:
@@ -204,6 +203,7 @@ jobs:
           prefix: "https://test.pypi.org/project"
           # Use project name, e.g. "/ITR"
           string: "/${{ needs.github-workflow-metadata.outputs.repository }}"
+          # TODO - the below is no longer doing tag processing
           suffix: "/${{ needs.repo-metadata.outputs.current_tag }}/"
 
       - name: "Publish to Test PyPI [Trusted Publishing]"
@@ -285,6 +285,7 @@ jobs:
           prefix: "https://pypi.org/project"
           # Use project name, e.g. "/ITR"
           string: "/${{ needs.github-workflow-metadata.outputs.repository }}"
+          # TODO - the below is no longer doing tag processing
           suffix: "/${{ needs.repo-metadata.outputs.current_tag }}/"
 
       - name: "Publish to PyPI [Trusted Publishing]"
@@ -325,7 +326,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.python-project.outputs.matrixjson) }}
     # Don't run when pull request is merged, only if Jupyter Notebooks are present
-    if: needs.repo-metadata.outputs.notebooks  == 'true'
+    if: needs.repo-metadata.outputs.jupyter_notebooks  == 'true'
 
     steps:
       - uses: actions/checkout@v4
@@ -381,7 +382,7 @@ jobs:
     needs:
       - repo-metadata
       - python-project
-    if: needs.repo-metadata.outputs.python  == 'true'
+    if: needs.repo-metadata.outputs.python_project  == 'true'
     runs-on: "ubuntu-latest"
     continue-on-error: true
     strategy:
