@@ -94,16 +94,16 @@ runs:
 
         echo "Python project: $PYTHON_PROJECT" >> "$GITHUB_SUMMARY"
         echo "Node.js project: $NODE_JS_PROJECT" >> "$GITHUB_SUMMARY"
-        echo "Maven configuration (Java): $MAVEN_CONFIG >> "$GITHUB_SUMMARY"
-        echo "Gradle configuration (Java): $GRADLE_CONFIG >> "$GITHUB_SUMMARY"
-        echo "Tox configuration: $TOX_CONFIG >> "$GITHUB_SUMMARY"
-        echo "Jupyter Notebooks: $JUPYTER_NOTEBOOKS >> "$GITHUB_SUMMARY"
+        echo "Maven configuration (Java): $MAVEN_CONFIG" >> "$GITHUB_SUMMARY"
+        echo "Gradle configuration (Java): $GRADLE_CONFIG" >> "$GITHUB_SUMMARY"
+        echo "Tox configuration: $TOX_CONFIG" >> "$GITHUB_SUMMARY"
+        echo "Jupyter Notebooks: $JUPYTER_NOTEBOOKS" >> "$GITHUB_SUMMARY"
 
         ### Set Outputs ###
 
         echo "python_project=$PYTHON_PROJECT" >> "$GITHUB_OUTPUT"
         echo "node_js_project=$NODE_JS_PROJECT" >> "$GITHUB_OUTPUT"
-        echo "maven_config:$MAVEN_CONFIG" >> "$GITHUB_OUTPUT"
+        echo "maven_config=$MAVEN_CONFIG" >> "$GITHUB_OUTPUT"
         echo "gradle_config=$GRADLE_CONFIG" >> "$GITHUB_OUTPUT"
         echo "tox_config=$TOX_CONFIG" >> "$GITHUB_OUTPUT"
         echo "jupyter_notebooks=$JUPYTER_NOTEBOOKS" >> "$GITHUB_OUTPUT"
