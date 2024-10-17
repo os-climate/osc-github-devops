@@ -71,7 +71,6 @@ runs:
           echo "The project name extraction failed ❌"; exit 1
         fi
 
-        PYTHON_PROJECT_VERSION="${{ env.extracted_string}}"
         echo "python_project_version: $PYTHON_PROJECT_VERSION ✅"
 
         # Make available to the GitHub environment
