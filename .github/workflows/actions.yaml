@@ -50,16 +50,16 @@ jobs:
           fetch-tags: true
           # The semantic-tag-current action currently contains a workaround for this behaviour
 
-      - name: "Action: python-project-naming"
-        id: python-project-naming
+      - name: "Action: python-project-name"
+        id: python-project-name
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/python-project-naming@main
+        uses: os-climate/osc-github-devops/.github/actions/python-project-name@main
 
       - name: "Validate: python-project-name"
         shell: bash
         run: |
           # Check output from: python-project-name
-          PYTHON_PROJECT_NAME="${{ steps.python-project-naming.outputs.python_project_name }}"
+          PYTHON_PROJECT_NAME="${{ steps.python-project-name.outputs.python_project_name }}"
           if [ "$PYTHON_PROJECT_NAME" != "osc-github-devops" ]; then
             echo "ERROR: Python project name was not as expected"
             echo "PYTHON_PROJECT_NAME: $PYTHON_PROJECT_NAME"; exit 1
