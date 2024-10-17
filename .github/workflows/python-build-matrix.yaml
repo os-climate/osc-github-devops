@@ -77,11 +77,10 @@ jobs:
           echo "build_tag=${{ inputs.build_tag }}" >> "$GITHUB_ENV"
 
       - name: "Patch project versioning metadata"
-        if: env.current-tag != env.build-tag
+        if: env.python_project_version != inputs.build_tag
         uses: os-climate/osc-github-devops/.github/actions/python-versioning-patch@main
         with:
-          # Temporary dummy values
-          current: "v0.0.0"
+          current: ${{ steps.project-version.outputs.python_project_version }}
           target: ${{ inputs.build_tag }}
 
       # ToDo: add summary output here
