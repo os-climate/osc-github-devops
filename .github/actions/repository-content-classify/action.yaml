@@ -101,20 +101,22 @@ runs:
 
         echo '# 🔍 Repository Inspection' >> "$GITHUB_STEP_SUMMARY"
 
+        # The hack below helps make the displayed output summary pretty
+
         VARIABLES="PYTHON_PROJECT NODE_JS_PROJECT MAVEN_CONFIG GRADLE_CONFIG TOX_CONFIG JUPYTER_NOTEBOOKS"
         for VARIABLE in VARIABLES; do
-          if [ "$VARIABLE" = "true"; then
-            "$VARIABLE"="✅"
+          if [ "$VARIABLE" = "true" ]; then
+            export $VARIABLE="✅"
           else
-            "$VARIABLE"="❌"
+            export $VARIABLE="❌"
           fi
         done
 
-        echo "Python project: $PYTHON_PROJECT" >> "$GITHUB_STEP_SUMMARY"
-        echo "Node.js project: $NODE_JS_PROJECT" >> "$GITHUB_STEP_SUMMARY"
-        echo "Maven configuration (Java): $MAVEN_CONFIG" >> "$GITHUB_STEP_SUMMARY"
-        echo "Gradle configuration (Java): $GRADLE_CONFIG" >> "$GITHUB_STEP_SUMMARY"
-        echo "Tox configuration: $TOX_CONFIG" >> "$GITHUB_STEP_SUMMARY"
-        echo "Jupyter Notebooks: $JUPYTER_NOTEBOOKS" >> "$GITHUB_STEP_SUMMARY"
+        echo "$PYTHON_PROJECT Python Project " >> "$GITHUB_STEP_SUMMARY"
+        echo "$NODE_JS_PROJECT Node.js Project" >> "$GITHUB_STEP_SUMMARY"
+        echo "$MAVEN_CONFIG Maven Configuration (Java)" >> "$GITHUB_STEP_SUMMARY"
+        echo "$GRADLE_CONFIG Gradle Configuration (Java)" >> "$GITHUB_STEP_SUMMARY"
+        echo "$TOX_CONFIG Tox Configuration" >> "$GITHUB_STEP_SUMMARY"
+        echo "$JUPYTER_NOTEBOOKS Jupyter Notebooks" >> "$GITHUB_STEP_SUMMARY"
 
         #SHELLCODEEND
