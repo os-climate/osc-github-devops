@@ -2,28 +2,28 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
 
-name: "🔍 Classify Repository Content"
-description: "Scans repository content and identifies further actions"
+name: "🔍 Repository Inspection"
+description: "Scans repository content and identifies supported content"
 
 outputs:
-  PYTHON:
+  PYTHON_PROJECT:
     description: "Repository contains a Python project with file: pyproject.toml"
-    value: ${{ steps.classification.outputs.python }}
-  NODEJS:
+    value: ${{ steps.classification.outputs.python_project }}
+  NODE_JS_PROJECT:
     description: "Repository contains a Node.js project with file: package.json"
-    value: ${{ steps.classification.outputs.nodejs }}
-  MAVEN:
+    value: ${{ steps.classification.outputs.node_js_project }}
+  MAVEN_CONFIG:
     description: "Repository contains Maven project with file: pom.xml"
-    value: ${{ steps.classification.outputs.maven }}
-  GRADLE:
+    value: ${{ steps.classification.outputs.maven_config }}
+  GRADLE_CONFIG:
     description: "Repository contains Gradle project with file(s): settings.gradle*"
-    value: ${{ steps.classification.outputs.gradle }}
-  NOTEBOOKS:
+    value: ${{ steps.classification.outputs.gradle_config }}
+  JUPYTER_NOTEBOOKS:
     description: "Repository contains Jupyter Notebooks with file(s): *.ipynb"
-    value: ${{ steps.classification.outputs.notebooks }}
-  TOX:
+    value: ${{ steps.classification.outputs.jupyter_notebooks }}
+  TOX_CONFIG:
     description: "Repository contains a TOX configuration file: tox.ini"
-    value: ${{ steps.classification.outputs.tox }}
+    value: ${{ steps.classification.outputs.tox_config }}
 
 runs:
   using: "composite"
@@ -36,50 +36,68 @@ runs:
 
         #SHELLCODESTART
 
-        if [ -f pyproject.toml ]; then
-          echo "Python project metadata found"
-          echo "python=true" >> "$GITHUB_OUTPUT"
+        # Check for Python project metadata files
+        if [ -f pyproject.toml ] || [ -f setup.py ]; then
+          PYTHON_PROJECT="true"
         else
-          echo "python=false" >> "$GITHUB_OUTPUT"
+          PYTHON_PROJECT="false"
         fi
 
+        # Check for Node.JS package description
         if [ -f package.json ]; then
-          echo "Node.js project metadata found"
-          echo "nodejs=true" >> "$GITHUB_OUTPUT"
+          NODE_JS_PROJECT="true"
         else
-          echo "nodejs=false" >> "$GITHUB_OUTPUT"
+          NODE_JS_PROJECT="false"
         fi
 
+        # Check for Maven config: pom.xml
         if [ -f pom.xml ]; then
-          echo "Maven project metadata found"
-          echo "maven=true" >> "$GITHUB_OUTPUT"
+          MAVEN_CONFIG="true"
         else
-          echo "maven=false" >> "$GITHUB_OUTPUT"
+          MAVEN_CONFIG="false"
         fi
 
-        # Check if repository contains Jupyter Notebooks
-        GRADLE=$(find . -name 'settings.gradle*' | wc -l )
-        if [ "$GRADLE" -ne 0 ]; then
-          echo "Gradle configuration found"
-          echo "gradle=true" >> "$GITHUB_OUTPUT"
+        # Check for Gradle settings files: settings.gradle*
+        GRADLE_COUNT=$(find . -name 'settings.gradle*' | wc -l )
+        if [ "$GRADLE_COUNT" -ne 0 ]; then
+          GRADLE_CONFIG="true"
         else
-          echo "gradle=false" >> "$GITHUB_OUTPUT"
+          GRADLE_CONFIG="false"
         fi
 
+        # Check for TOX configuration: tox.ini
         if [ -f tox.ini ]; then
-          echo "TOX configuration found"
-          echo "tox=true" >> "$GITHUB_OUTPUT"
+          TOX_CONFIG="true"
         else
-          echo "tox=false" >> "$GITHUB_OUTPUT"
+          TOX_CONFIG="false"
         fi
 
-        # Check if repository contains Jupyter Notebooks
-        NOTEBOOKS=$(find . -name '*.ipynb' | wc -l )
-        if [ "$NOTEBOOKS" -ne 0 ]; then
-          echo "Jupyter notebooks found"
-          echo "notebooks=true" >> "$GITHUB_OUTPUT"
+        # Check for Jupyter Notebooks: *.ipynb
+        NOTEBOOK_COUNT=$(find . -name '*.ipynb' | wc -l )
+        if [ "$NOTEBOOK_COUNT" -ne 0 ]; then
+          JUPYTER_NOTEBOOKS="true"
         else
-          echo "notebooks=false" >> "$GITHUB_OUTPUT"
+          JUPYTER_NOTEBOOKS="false"
         fi
+
+        ### GitHub Summary ###
+
+        echo '# 🔍 Repository Inspection' >> "$GITHUB_SUMMARY"
+
+        echo "Python project: $PYTHON_PROJECT" >> "$GITHUB_SUMMARY"
+        echo "Node.js project: $NODE_JS_PROJECT" >> "$GITHUB_SUMMARY"
+        echo "Maven configuration (Java): $MAVEN_CONFIG >> "$GITHUB_SUMMARY"
+        echo "Gradle configuration (Java): $GRADLE_CONFIG >> "$GITHUB_SUMMARY"
+        echo "Tox configuration: $TOX_CONFIG >> "$GITHUB_SUMMARY"
+        echo "Jupyter Notebooks: $JUPYTER_NOTEBOOKS >> "$GITHUB_SUMMARY"
+
+        ### Set Outputs ###
+
+        echo "python_project=$PYTHON_PROJECT" >> "$GITHUB_OUTPUT"
+        echo "node_js_project=$NODE_JS_PROJECT" >> "$GITHUB_OUTPUT"
+        echo "maven_config:$MAVEN_CONFIG >> "$GITHUB_OUTPUT"
+        echo "gradle_config=$GRADLE_CONFIG >> "$GITHUB_OUTPUT"
+        echo "tox_config=$TOX_CONFIG >> "$GITHUB_OUTPUT"
+        echo "jupyter_notebooks=$JUPYTER_NOTEBOOKS >> "$GITHUB_OUTPUT"
 
         #SHELLCODEEND
