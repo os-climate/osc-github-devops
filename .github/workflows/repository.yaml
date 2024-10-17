@@ -93,8 +93,6 @@ jobs:
     needs: repo-metadata
     if: needs.repo-metadata.outputs.python_project  == 'true'
     uses: os-climate/osc-github-devops/.github/workflows/python-project-setup.yaml@main
-    with:
-      default_python: "3.10"
 
   python-build:
     name: "Build"
