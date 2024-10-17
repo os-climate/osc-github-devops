@@ -51,11 +51,11 @@ runs:
       run: |
         # Check URL for Validity
         if (wget ${{ inputs.PREFIX }}${{ inputs.STRING }}${{ inputs.SUFFIX }} --spider -q); then
-          echo "URL/location WAS found and valid"
+          echo "URL/location WAS found and valid ✅"
           echo "${{ inputs.PREFIX }}${{ inputs.STRING }}${{ inputs.SUFFIX }}"
           echo "valid=true" >> "$GITHUB_OUTPUT"
         else
-          echo "URL/location was NOT found/valid"
+          echo "URL/location was NOT found/valid ❌"
           echo "${{ inputs.PREFIX }}${{ inputs.STRING }}${{ inputs.SUFFIX }}"
           echo "valid=false" >> "$GITHUB_OUTPUT"
         fi
