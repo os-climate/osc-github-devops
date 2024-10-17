@@ -140,7 +140,7 @@ jobs:
       # Needed both here and in the called workflow
       contents: write
     with:
-      build_tag: ${{ needs.python-build.outputs.build_tag }}
+      build_tag: "v5.0.0-dev2"
 
   testpypi:
     name: "Test Package Publishing"

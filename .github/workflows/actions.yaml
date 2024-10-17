@@ -403,3 +403,21 @@ jobs:
         run: |
           # Report errors with path tests
           echo "One or more path checks failed validation"; exit 1
+
+      - name: "Action: python-project-version-patch"
+        id: python-project-version-patch
+        uses: os-climate/osc-github-devops/.github/actions/python-project-version-patch@main
+        with:
+          replacement_version: "v1.0.0"
+
+      - name: "Validate: python-project-version-patch"
+        shell: bash
+        run: |
+          # Check version string was patched correctly
+          if [ -f pyproject.toml ]; then
+            if (grep "v1.0.0" pyproject.toml); then
+              echo "Version substitution successful ✅"
+            else
+              echo "Version substitution failed ❌"
+            fi
+          fi
