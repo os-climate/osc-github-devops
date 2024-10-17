@@ -28,13 +28,21 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: "Check content types, set output values"
+    - name: "Inpect repository content"
       id: classification
       shell: bash
       run: |
-        # Check content types, set output values
+        # Inpect repository content
 
         #SHELLCODESTART
+
+        # Allows for testing from a local shell
+        if [ -z "$GITHUB_OUTPUT" ]; then
+          echo "Running from a shell, NOT workflow"
+          export GITHUB_OUTPUT="/dev/null"
+          export GITHUB_ENV="/dev/null"
+          export GITHUB_SUMMARY="/dev/null"
+        fi
 
         # Check for Python project metadata files
         if [ -f pyproject.toml ] || [ -f setup.py ]; then
