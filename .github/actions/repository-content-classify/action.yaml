@@ -42,7 +42,8 @@ runs:
           echo "Running from a shell, NOT workflow"
           export GITHUB_OUTPUT="/dev/null"
           export GITHUB_ENV="/dev/null"
-          export GITHUB_STEP_SUMMARY="/dev/null"
+          TMPFILE=$(mktemp -p /tmp --suffix "github-summary-output.txt")
+          export GITHUB_STEP_SUMMARY="$TMPFILE"
         fi
 
         # Check for Python project metadata files
@@ -115,17 +116,22 @@ runs:
           else
             VAR_BOOLEAN="❌"
           fi
-          set $VAR_NAME=$VAR_BOOLEAN
+          export $VAR_NAME=$VAR_BOOLEAN
         done
 
         echo "Supported content types are listed in the table below" >> "$GITHUB_STEP_SUMMARY"
 
-        echo "| Status | Support Content Type | >> "$GITHUB_STEP_SUMMARY"
+        echo "| Status | Support Content Type |" >> "$GITHUB_STEP_SUMMARY"
         echo "| $REPO_PYTHON_PROJECT | Python Project |" >> "$GITHUB_STEP_SUMMARY"
         echo "| $REPO_NODE_JS_PROJECT | Node.js Project |" >> "$GITHUB_STEP_SUMMARY"
         echo "| $REPO_MAVEN_CONFIG | Maven Configuration |" >> "$GITHUB_STEP_SUMMARY"
         echo "| $REPO_GRADLE_CONFIG | Gradle Configuration |" >> "$GITHUB_STEP_SUMMARY"
         echo "| $REPO_TOX_CONFIG | Tox Configuration |" >> "$GITHUB_STEP_SUMMARY"
         echo "| $REPO_JUPYTER_NOTEBOOKS | Jupyter Notebooks |" >> "$GITHUB_STEP_SUMMARY"
+
+        # Displays summary text to the terminal when run from a shell
+        if [ -f "$TMPFILE" ]; then
+          cat "$TMPFILE"
+        fi
 
         #SHELLCODEEND
