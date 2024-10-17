@@ -64,7 +64,8 @@ jobs:
         with:
           python-version: ${{ inputs.python_version }}
 
-      - name: "Explicit build versioning"
+      - name: "Build versioning"
+        id: versioning
         if: inputs.build_tag
         shell: bash
         run: |
@@ -79,6 +80,18 @@ jobs:
           # Temporary dummy values
           current: "v0.0.0"
           target: ${{ inputs.build_tag }}
+
+      # ToDo: add summary output here
+      - name: "Output summary"
+        shell: bash
+        run: |
+          # Python project build summary
+
+          # shellcheck disable=SC2129
+
+          echo "### 🐍 Python project build" >> "$GITHUB_STEP_SUMMARY"
+          echo "Project name: ${{ steps.naming.outputs.python_project_name }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Build version/tag: ${{ steps.versioning.outputs.build_tag }}" >> "$GITHUB_STEP_SUMMARY"
 
       - name: "Build Python project"
         id: python-matrix-builds
