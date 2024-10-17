@@ -99,6 +99,17 @@ runs:
         echo "Tox configuration: $TOX_CONFIG" >> "$GITHUB_STEP_SUMMARY"
         echo "Jupyter Notebooks: $JUPYTER_NOTEBOOKS" >> "$GITHUB_STEP_SUMMARY"
 
+        import * as core from '@actions/core'
+          await core.summary
+          .addHeading('Test Results')
+          .addCodeBlock(generateTestResults(), "js")
+          .addTable([
+            [{data: 'File', header: true}, {data: 'Result', header: true}],
+            ['foo.js', 'Pass ✅'],
+            ['bar.js', 'Fail ❌'],
+            ['test.js', 'Pass ✅']
+          ])
+
         ### Set Outputs ###
 
         echo "python_project=$PYTHON_PROJECT" >> "$GITHUB_OUTPUT"
