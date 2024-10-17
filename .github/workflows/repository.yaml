@@ -29,10 +29,13 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       # Content metadata
-      python_project: ${{ steps.classify.outputs.python_project }}
-      jupyter_notebooks: ${{ steps.classify.outputs.jupyter_notebooks }}
-      tox_config: ${{ steps.classify.outputs.tox_config }}
-      # Tag metadata
+      repo_python_project: ${{ steps.classify.outputs.repo_python_project }}
+      repo_node_js_project: ${{ steps.classify.outputs.repo_node_js_project }}
+      repo_maven_config: ${{ steps.classify.outputs.repo_maven_config }}
+      repo_gradle_config: ${{ steps.classify.outputs.repo_gradle_config }}
+      repo_jupyter_notebooks: ${{ steps.classify.outputs.repo_jupyter_notebooks }}
+      repo_tox_config: ${{ steps.classify.outputs.repo_tox_config }}
+      # Tag metadata - to be removed/replaced
       current_tag: "v0.1.0" # Placeholder value
       tag_validity: "v0.1.0" # Placeholder value
       development_tag: "v0.1.0" # Placeholder value
@@ -91,7 +94,7 @@ jobs:
   python-project:
     name: "Gather Python Project Metadata"
     needs: repo-metadata
-    if: needs.repo-metadata.outputs.python_project  == 'true'
+    if: needs.repo-metadata.outputs.repo_python_project  == 'true'
     uses: os-climate/osc-github-devops/.github/workflows/python-project-setup.yaml@main
 
   python-build:
@@ -324,7 +327,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.python-project.outputs.matrixjson) }}
     # Don't run when pull request is merged, only if Jupyter Notebooks are present
-    if: needs.repo-metadata.outputs.jupyter_notebooks  == 'true'
+    if: needs.repo-metadata.outputs.repo_jupyter_notebooks  == 'true'
 
     steps:
       - uses: actions/checkout@v4
@@ -380,7 +383,7 @@ jobs:
     needs:
       - repo-metadata
       - python-project
-    if: needs.repo-metadata.outputs.python_project  == 'true'
+    if: needs.repo-metadata.outputs.repo_python_project  == 'true'
     runs-on: "ubuntu-latest"
     continue-on-error: true
     strategy:
