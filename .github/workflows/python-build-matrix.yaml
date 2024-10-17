@@ -78,10 +78,9 @@ jobs:
 
       - name: "Patch project versioning metadata"
         if: env.python_project_version != inputs.build_tag
-        uses: os-climate/osc-github-devops/.github/actions/python-versioning-patch@main
+        uses: os-climate/osc-github-devops/.github/actions/python-project-version-patch@main
         with:
-          current: ${{ steps.project-version.outputs.python_project_version }}
-          target: ${{ inputs.build_tag }}
+          replacement_version: ${{ env.build_tag }}
 
       # ToDo: add summary output here
       - name: "Output summary"
