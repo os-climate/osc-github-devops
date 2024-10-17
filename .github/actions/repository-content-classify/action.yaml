@@ -36,14 +36,12 @@ runs:
 
         #SHELLCODESTART
 
-        set -xv
-
         # Allows for testing from a local shell
         if [ -z "$GITHUB_OUTPUT" ]; then
           echo "Running from a shell, NOT workflow"
           export GITHUB_OUTPUT="/dev/null"
           export GITHUB_ENV="/dev/null"
-          export GITHUB_SUMMARY="/dev/null"
+          export GITHUB_STEP_SUMMARY="/dev/null"
         fi
 
         # Check for Python project metadata files
@@ -92,14 +90,14 @@ runs:
 
         ### GitHub Summary ###
 
-        echo '# 🔍 Repository Inspection' >> "$GITHUB_SUMMARY"
+        echo '# 🔍 Repository Inspection' >> "$GITHUB_STEP_SUMMARY"
 
-        echo "Python project: $PYTHON_PROJECT" >> "$GITHUB_SUMMARY"
-        echo "Node.js project: $NODE_JS_PROJECT" >> "$GITHUB_SUMMARY"
-        echo "Maven configuration (Java): $MAVEN_CONFIG" >> "$GITHUB_SUMMARY"
-        echo "Gradle configuration (Java): $GRADLE_CONFIG" >> "$GITHUB_SUMMARY"
-        echo "Tox configuration: $TOX_CONFIG" >> "$GITHUB_SUMMARY"
-        echo "Jupyter Notebooks: $JUPYTER_NOTEBOOKS" >> "$GITHUB_SUMMARY"
+        echo "Python project: $PYTHON_PROJECT" >> "$GITHUB_STEP_SUMMARY"
+        echo "Node.js project: $NODE_JS_PROJECT" >> "$GITHUB_STEP_SUMMARY"
+        echo "Maven configuration (Java): $MAVEN_CONFIG" >> "$GITHUB_STEP_SUMMARY"
+        echo "Gradle configuration (Java): $GRADLE_CONFIG" >> "$GITHUB_STEP_SUMMARY"
+        echo "Tox configuration: $TOX_CONFIG" >> "$GITHUB_STEP_SUMMARY"
+        echo "Jupyter Notebooks: $JUPYTER_NOTEBOOKS" >> "$GITHUB_STEP_SUMMARY"
 
         ### Set Outputs ###
 
