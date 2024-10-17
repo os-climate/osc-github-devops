@@ -2,25 +2,25 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
 
-name: "Run sed against file"
-description: "Uses sed, flags, and a regular expression against a file"
+name: "Perform action on file using SED"
+description: "Uses sed, flags, and a regular expression to work on a file"
 
 inputs:
-  FILENAME:
-    description: "File containing text to extract"
-    required: true
-  REGEX:
-    description: "Regular expression to use"
-    required: true
   FLAGS:
     description: "Flags to use with grep command"
     required: false
     default: "-i"
+  REGEX:
+    description: "Regular expression to use"
+    required: true
+  FILENAME:
+    description: "File containing text to extract"
+    required: true
 
 runs:
   using: "composite"
   steps:
-    - name: "Run sed against file"
+    - name: "Run the SED command on a file"
       id: sed
       shell: bash
       run: |
@@ -37,29 +37,29 @@ runs:
             echo "Error: invalid arguments specified"
             echo "Usage:  $0 [flags] [regex] [filename]"; exit 1
           else
+            set -o noglob
             FLAGS="$1"
             REGEX="$2"
             FILENAME="$3"
+            set +o noglob
           fi
         else
-          FLAGS="${{ inputs.FLAGS }}"
           set -o noglob
+          FLAGS="${{ inputs.FLAGS }}"
           REGEX="${{ inputs.REGEX }}"
-          set +o noglob
           FILENAME="${{ inputs.FILENAME }}"
+          set +o noglob
         fi
 
         if [ ! -f $FILENAME ]; then
           echo "Error: file not found [$FILENAME]"; exit 1
         fi
 
+        set -o noglob
+        echo "Flags to sed command: $FLAGS"
         echo "Regular expression to use: $REGEX"
         echo "File to search: $FILENAME"
-        echo "Flags to sed: $FLAGS"
 
-        echo "Command: sed $FLAGS $REGEX $FILENAME"
-
-        # Run the command
-        sed "$FLAGS" "$REGEX" "$FILENAME"
+        sed "$FLAGS" '${{ inputs.REGEX }}' "$FILENAME"
 
         #SHELLCODEEND
