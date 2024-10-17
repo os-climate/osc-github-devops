@@ -41,15 +41,5 @@ runs:
       uses: os-climate/osc-github-devops/.github/actions/file-sed-regex@main
       with:
         flags: "-i -E"
-        regex: 's:^version =.*$:version = "${{ inputs.STRING }}":'
+        regex: 's:^version =.*$:version = "${{ inputs.REPLACEMENT_VERSION }}":'
         filename: ${{ steps.source.outputs.filename }}
-
-    - name: "Substituting project version string"
-      shell: bash
-      run: |
-        # Validate file was updated
-
-        # Check to see if the above succeeded
-        if !(grep -q "version = \"$TARGET\"" pyproject.toml); then
-          echo "Error: failed version substitution in pyproject.toml"; exit 1
-        fi
