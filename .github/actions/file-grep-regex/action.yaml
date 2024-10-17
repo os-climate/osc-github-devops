@@ -71,7 +71,6 @@ runs:
 
         echo "String extracted: $STRING"
         # Make string available in the environment
-        echo "extracted_string=$STRING" >> "$GITHUB_ENV"
         echo "extracted_string=$STRING" >> "$GITHUB_OUTPUT"
 
         #SHELLCODEEND

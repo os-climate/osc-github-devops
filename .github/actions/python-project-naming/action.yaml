@@ -28,6 +28,7 @@ runs:
         check_path: "pyproject.toml"
 
     - name: "Use project name from setup.py"
+      id: setup-py-name
       if: steps.setup-py.outputs.type == 'file'
       uses: os-climate/osc-github-devops/.github/actions/file-grep-regex@main
       with:
@@ -36,6 +37,7 @@ runs:
         filename: "setup.py"
 
     - name: "Use project name from pyproject.toml"
+      id: pyproject-toml-name
       if: steps.pyproject-toml.outputs.type == 'file'
       uses: os-climate/osc-github-devops/.github/actions/file-grep-regex@main
       with:
@@ -57,7 +59,14 @@ runs:
       run: |
         # Return extracted values
 
-        PYTHON_PROJECT_NAME="${{ env.extracted_string}}"
+        # pyproject.toml is preferred source if both files exist
+        if [ ${{ steps.pyproject-toml.outputs.type == 'file' }} ]; then
+          PYTHON_PROJECT_NAME="${{ steps.pyproject-toml-name.outputs.extracted_string}}"
+
+        elif [ ${{ steps.setup-py.outputs.type == 'file' }} ]; then
+          PYTHON_PROJECT_NAME="${{ steps.setup-py-name.outputs.extracted_string}}"
+        fi
+
         echo "PYTHON_PROJECT_NAME: $PYTHON_PROJECT_NAME"
 
         # Replace all dashes in the name with underscores
