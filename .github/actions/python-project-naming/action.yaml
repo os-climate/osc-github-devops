@@ -86,3 +86,8 @@ runs:
         echo "python_project_name=$PYTHON_PROJECT_NAME" >> "$GITHUB_OUTPUT"
         echo "python_build_name=$PYTHON_BUILD_NAME" >> "$GITHUB_ENV"
         echo "python_build_name=$PYTHON_BUILD_NAME" >> "$GITHUB_OUTPUT"
+
+    - name: "Summary output"
+      shell: bash
+      run: |
+        echo '### 🐍 Python project name: $PYTHON_PROJECT_NAME' >> $GITHUB_STEP_SUMMARY
