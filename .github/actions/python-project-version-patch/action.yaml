@@ -30,10 +30,10 @@ runs:
         # Select project metadata file
         if [ ${{ steps.pyproject-toml.outputs.type == 'file' }} ]; then
           echo "filename=pyproject.toml" >> "$GITHUB_OUTPUT"
-          echo "regex='s:^version =.*$:version = "${{ inputs.REPLACEMENT_VERSION }}":'
+          echo "regex='s:^version =.*$:version = "${{ inputs.REPLACEMENT_VERSION }}":' >> "$GITHUB_OUTPUT"
         elif [ ${{ steps.setup-py.outputs.type == 'file' }} ]; then
           echo "filename=setup.py" >> "$GITHUB_OUTPUT"
-          echo "regex='s:^version =.*$:version = "${{ inputs.REPLACEMENT_VERSION }}":'
+          echo "regex='s:^version =.*$:version = "${{ inputs.REPLACEMENT_VERSION }}":' >> "$GITHUB_OUTPUT"
         else
           echo "Error: Neither pyproject.toml NOR setup.py could be found"; exit 1
         fi
@@ -43,5 +43,5 @@ runs:
       uses: os-climate/osc-github-devops/.github/actions/file-sed-regex@main
       with:
         flags: "-i -E"
-        regex: "${{ steps.source.outputs.regex }}"
+        regex: ${{ steps.source.outputs.regex }}
         filename: ${{ steps.source.outputs.filename }}
