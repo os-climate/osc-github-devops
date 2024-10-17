@@ -6,22 +6,22 @@ name: "🔍 Repository Inspection"
 description: "Scans repository content and identifies supported content"
 
 outputs:
-  PYTHON_PROJECT:
+  REPO_PYTHON_PROJECT:
     description: "Repository contains a Python project with file: pyproject.toml"
     value: ${{ steps.classification.outputs.python_project }}
-  NODE_JS_PROJECT:
+  REPO_NODE_JS_PROJECT:
     description: "Repository contains a Node.js project with file: package.json"
     value: ${{ steps.classification.outputs.node_js_project }}
-  MAVEN_CONFIG:
+  REPO_MAVEN_CONFIG:
     description: "Repository contains Maven project with file: pom.xml"
     value: ${{ steps.classification.outputs.maven_config }}
-  GRADLE_CONFIG:
+  REPO_GRADLE_CONFIG:
     description: "Repository contains Gradle project with file(s): settings.gradle*"
     value: ${{ steps.classification.outputs.gradle_config }}
-  JUPYTER_NOTEBOOKS:
+  REPO_JUPYTER_NOTEBOOKS:
     description: "Repository contains Jupyter Notebooks with file(s): *.ipynb"
     value: ${{ steps.classification.outputs.jupyter_notebooks }}
-  TOX_CONFIG:
+  REPO_TOX_CONFIG:
     description: "Repository contains a TOX configuration file: tox.ini"
     value: ${{ steps.classification.outputs.tox_config }}
 
@@ -32,6 +32,7 @@ runs:
       id: classification
       shell: bash
       run: |
+        #/usr/bin/env bash
         # Inpect repository content
 
         #SHELLCODESTART
@@ -46,56 +47,56 @@ runs:
 
         # Check for Python project metadata files
         if [ -f pyproject.toml ] || [ -f setup.py ]; then
-          PYTHON_PROJECT="true"
+          REPO_PYTHON_PROJECT="true"
         else
-          PYTHON_PROJECT="false"
+          REPO_PYTHON_PROJECT="false"
         fi
 
         # Check for Node.JS package description
         if [ -f package.json ]; then
-          NODE_JS_PROJECT="true"
+          REPO_NODE_JS_PROJECT="true"
         else
-          NODE_JS_PROJECT="false"
+          REPO_NODE_JS_PROJECT="false"
         fi
 
         # Check for Maven config: pom.xml
         if [ -f pom.xml ]; then
-          MAVEN_CONFIG="true"
+          REPO_MAVEN_CONFIG="true"
         else
-          MAVEN_CONFIG="false"
+          REPO_MAVEN_CONFIG="false"
         fi
 
         # Check for Gradle settings files: settings.gradle*
         GRADLE_COUNT=$(find . -name 'settings.gradle*' | wc -l )
         if [ "$GRADLE_COUNT" -ne 0 ]; then
-          GRADLE_CONFIG="true"
+          REPO_GRADLE_CONFIG="true"
         else
-          GRADLE_CONFIG="false"
+          REPO_GRADLE_CONFIG="false"
         fi
 
         # Check for TOX configuration: tox.ini
         if [ -f tox.ini ]; then
-          TOX_CONFIG="true"
+          REPO_TOX_CONFIG="true"
         else
-          TOX_CONFIG="false"
+          REPO_TOX_CONFIG="false"
         fi
 
         # Check for Jupyter Notebooks: *.ipynb
         NOTEBOOK_COUNT=$(find . -name '*.ipynb' | wc -l )
         if [ "$NOTEBOOK_COUNT" -ne 0 ]; then
-          JUPYTER_NOTEBOOKS="true"
+          REPO_JUPYTER_NOTEBOOKS="true"
         else
-          JUPYTER_NOTEBOOKS="false"
+          REPO_JUPYTER_NOTEBOOKS="false"
         fi
 
         ### Set Outputs ###
 
-        echo "python_project=$PYTHON_PROJECT" >> "$GITHUB_OUTPUT"
-        echo "node_js_project=$NODE_JS_PROJECT" >> "$GITHUB_OUTPUT"
-        echo "maven_config=$MAVEN_CONFIG" >> "$GITHUB_OUTPUT"
-        echo "gradle_config=$GRADLE_CONFIG" >> "$GITHUB_OUTPUT"
-        echo "tox_config=$TOX_CONFIG" >> "$GITHUB_OUTPUT"
-        echo "jupyter_notebooks=$JUPYTER_NOTEBOOKS" >> "$GITHUB_OUTPUT"
+        echo "python_project=$REPO_PYTHON_PROJECT" >> "$GITHUB_OUTPUT"
+        echo "node_js_project=$REPO_NODE_JS_PROJECT" >> "$GITHUB_OUTPUT"
+        echo "maven_config=$REPO_MAVEN_CONFIG" >> "$GITHUB_OUTPUT"
+        echo "gradle_config=$REPO_GRADLE_CONFIG" >> "$GITHUB_OUTPUT"
+        echo "tox_config=$REPO_TOX_CONFIG" >> "$GITHUB_OUTPUT"
+        echo "jupyter_notebooks=$REPO_JUPYTER_NOTEBOOKS" >> "$GITHUB_OUTPUT"
 
         ### GitHub Summary ###
 
@@ -103,20 +104,25 @@ runs:
 
         # The hack below helps make the displayed output summary pretty
 
-        VARIABLES="PYTHON_PROJECT NODE_JS_PROJECT MAVEN_CONFIG GRADLE_CONFIG TOX_CONFIG JUPYTER_NOTEBOOKS"
-        for VARIABLE in VARIABLES; do
-          if [ "$VARIABLE" = "true" ]; then
-            export $VARIABLE="✅"
+        for VARIABLE in $(declare | grep REPO); do
+          VAR_NAME=$(echo "$VARIABLE" | awk -F= '{print $1}')
+          VAR_BOOLEAN=$(echo "$VARIABLE" | awk -F= '{print $2}')
+
+          # The string subsitution below makes output easier to read
+          # sed -e 's/true/✅/' -e 's/false/❌/'
+          if [ $VAR_BOOLEAN = "true" ]; then
+            VAR_BOOLEAN="✅"
           else
-            export $VARIABLE="❌"
+            VAR_BOOLEAN="❌"
           fi
+          export $VAR_NAME=$VAR_BOOLEAN
         done
 
-        echo "$PYTHON_PROJECT Python Project " >> "$GITHUB_STEP_SUMMARY"
-        echo "$NODE_JS_PROJECT Node.js Project" >> "$GITHUB_STEP_SUMMARY"
-        echo "$MAVEN_CONFIG Maven Configuration (Java)" >> "$GITHUB_STEP_SUMMARY"
-        echo "$GRADLE_CONFIG Gradle Configuration (Java)" >> "$GITHUB_STEP_SUMMARY"
-        echo "$TOX_CONFIG Tox Configuration" >> "$GITHUB_STEP_SUMMARY"
-        echo "$JUPYTER_NOTEBOOKS Jupyter Notebooks" >> "$GITHUB_STEP_SUMMARY"
+        echo "$REPO_PYTHON_PROJECT Python Project" >> "$GITHUB_STEP_SUMMARY"
+        echo "$REPO_NODE_JS_PROJECT Node.js Project" >> "$GITHUB_STEP_SUMMARY"
+        echo "$REPO_MAVEN_CONFIG Maven Configuration" >> "$GITHUB_STEP_SUMMARY"
+        echo "$REPO_GRADLE_CONFIG Gradle Configuration" >> "$GITHUB_STEP_SUMMARY"
+        echo "$REPO_TOX_CONFIG Tox Configuration" >> "$GITHUB_STEP_SUMMARY"
+        echo "$REPO_JUPYTER_NOTEBOOKS Jupyter Notebooks" >> "$GITHUB_STEP_SUMMARY"
 
         #SHELLCODEEND
