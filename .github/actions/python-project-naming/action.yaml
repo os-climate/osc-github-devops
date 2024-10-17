@@ -92,7 +92,7 @@ runs:
       run: |
         echo '### 🐍 Python Project' >> $GITHUB_STEP_SUMMARY
 
-        echo "Python project name: ${{ env.python_build_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "Python project name: ${{ env.python_project_name }}" >> $GITHUB_STEP_SUMMARY
         if [ ${{ steps.pyproject-toml.outputs.type == 'file' }} ]; then
           echo "Project metadata file: pyproject.toml" >> $GITHUB_STEP_SUMMARY
 
