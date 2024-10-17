@@ -72,14 +72,6 @@ jobs:
           echo "Explicit build versioning: ${{ inputs.build_tag }}"
           echo "build_tag=${{ inputs.build_tag }}" >> "$GITHUB_ENV"
 
-      - name: "Enumerate build versioning"
-        if: inputs.build_tag
-        shell: bash
-        run: |
-          # Enumerate build versioning
-          echo "Enumerated build versioning: $BUILD_TAG"
-          echo "build_tag=${{ inputs.build_tag }}" >> "$GITHUB_ENV"
-
       - name: "Patch project versioning metadata"
         if: env.current-tag != env.build-tag
         uses: os-climate/osc-github-devops/.github/actions/python-versioning-patch@main
