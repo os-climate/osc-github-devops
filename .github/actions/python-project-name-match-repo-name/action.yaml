@@ -14,8 +14,8 @@ runs:
   using: "composite"
   steps:
     - name: "Capture Python project name"
-      id: python-project-naming
-      uses: os-climate/osc-github-devops/.github/actions/python-project-naming@main
+      id: python-project-name
+      uses: os-climate/osc-github-devops/.github/actions/python-project-name@main
 
     - name: "Capture GitHub repository/project name"
       id: compare-naming
@@ -41,7 +41,7 @@ runs:
 
         echo "GITHUB_REPOSITORY_NAME: $GITHUB_REPOSITORY_NAME"
 
-        PYTHON_PROJECT_NAME="${{ steps.python-project-naming.outputs.python_project_name }}"
+        PYTHON_PROJECT_NAME="${{ steps.python-project-name.outputs.python_project_name }}"
         echo "PYTHON_PROJECT_NAME: $PYTHON_PROJECT_NAME"
 
         if [[ "$GITHUB_REPOSITORY_NAME" == "$PYTHON_PROJECT_NAME" ]]; then
