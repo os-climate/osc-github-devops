@@ -82,18 +82,6 @@ jobs:
         with:
           replacement_version: ${{ env.build_tag }}
 
-      # ToDo: add summary output here
-      - name: "Output summary"
-        shell: bash
-        run: |
-          # Python project build summary
-
-          # shellcheck disable=SC2129
-
-          echo "### 🐍 Python project build" >> "$GITHUB_STEP_SUMMARY"
-          echo "Project name: ${{ steps.project-name.outputs.python_project_name }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "Build version: ${{ steps.project-version.outputs.python_project_version }}" >> "$GITHUB_STEP_SUMMARY"
-
       - name: "Build Python project"
         id: python-matrix-builds
         uses: os-climate/osc-github-devops/.github/actions/python-project-build@main

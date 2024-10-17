@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
 
-name: "🐍 Patch Python Project Metadata/Version"
+name: "🐍 Patch Python Project Version String"
 
 inputs:
   REPLACEMENT_VERSION:
@@ -30,8 +30,10 @@ runs:
         # Select project metadata file
         if [ ${{ steps.pyproject-toml.outputs.type == 'file' }} ]; then
           echo "filename=pyproject.toml" >> "$GITHUB_OUTPUT"
+          echo "regex='s:^version =.*$:version = "${{ inputs.REPLACEMENT_VERSION }}":'
         elif [ ${{ steps.setup-py.outputs.type == 'file' }} ]; then
           echo "filename=setup.py" >> "$GITHUB_OUTPUT"
+          echo "regex='s:^version =.*$:version = "${{ inputs.REPLACEMENT_VERSION }}":'
         else
           echo "Error: Neither pyproject.toml NOR setup.py could be found"; exit 1
         fi
@@ -41,5 +43,5 @@ runs:
       uses: os-climate/osc-github-devops/.github/actions/file-sed-regex@main
       with:
         flags: "-i -E"
-        regex: 's:^version =.*$:version = "${{ inputs.REPLACEMENT_VERSION }}":'
+        regex: "${{ steps.source.outputs.regex }}"
         filename: ${{ steps.source.outputs.filename }}

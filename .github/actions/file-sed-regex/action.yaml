@@ -60,6 +60,11 @@ runs:
         echo "Regular expression to use: $REGEX"
         echo "File to search: $FILENAME"
 
-        sed "$FLAGS" '${{ inputs.REGEX }}' "$FILENAME"
+        if (sed "$FLAGS" '${{ inputs.REGEX }}' "$FILENAME"); then
+          echo "sed command was successful ✅ "
+        else
+          echo "sed command exit status: $?"
+          echo "sed command failed ❌"
+        fi
 
         #SHELLCODEEND
