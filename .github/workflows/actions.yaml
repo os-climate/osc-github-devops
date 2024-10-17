@@ -62,15 +62,27 @@ jobs:
           PYTHON_PROJECT_NAME="${{ steps.python-project-name.outputs.python_project_name }}"
           if [ "$PYTHON_PROJECT_NAME" != "osc-github-devops" ]; then
             echo "ERROR: Python project name was not as expected"
-            echo "PYTHON_PROJECT_NAME: $PYTHON_PROJECT_NAME"; exit 1
+            echo "python_project_name: $PYTHON_PROJECT_NAME"; exit 1
           else
-            echo "Returned project name correct: $PYTHON_PROJECT_NAME"
+            echo "Returned project name is correct: $PYTHON_PROJECT_NAME"
           fi
 
       - name: "Action: python-project-version"
         id: python-project-version
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/python-project-version@main
+
+      - name: "Validate: python-project-version"
+        shell: bash
+        run: |
+          # Check output from: python-project-version
+          PYTHON_PROJECT_VERSION="${{ steps.python-project-version.outputs.python_project_version }}"
+          if [ "$PYTHON_PROJECT_VERSION" != "v0.0.4" ]; then
+            echo "ERROR: Python project version was not as expected"
+            echo "python_project_version: $PYTHON_PROJECT_NAME"; exit 1
+          else
+            echo "Returned project version is correct: $PYTHON_PROJECT_NAME"
+          fi
 
       - name: "Action: python-project-name-match-repo-name"
         id: python-project-name-match-repo-name
