@@ -115,7 +115,7 @@ runs:
           else
             VAR_BOOLEAN="❌"
           fi
-          $VAR_NAME=$VAR_BOOLEAN
+          set $VAR_NAME=$VAR_BOOLEAN
         done
 
         echo "Supported content types are listed in the table below" >> "$GITHUB_STEP_SUMMARY"
