@@ -20,7 +20,7 @@ inputs:
 outputs:
   EXTRACTED_STRING:
     description: "The string extracted by the regular expression"
-    value: ${{ steps.extract.outputs.string }}
+    value: ${{ steps.extract.outputs.extracted_string }}
 
 runs:
   using: "composite"
@@ -69,8 +69,12 @@ runs:
         STRING=$(grep $FLAGS '${{ inputs.REGEX }}' $FILENAME)
         set +o noglob
 
-        echo "String extracted: $STRING"
-        # Make string available as output
-        echo "extracted_string=$STRING" >> "$GITHUB_OUTPUT"
+        if [ -z "$STRING" ]; then
+          echo "String extraction failed; no matching value found ❌"; exit 1
+        else
+          # Make string available as action output
+          echo "extracted_string=$STRING" >> "$GITHUB_OUTPUT"
+          echo "Extracted string: $STRING"
+        fi
 
         #SHELLCODEEND
