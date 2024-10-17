@@ -24,7 +24,7 @@ runs:
         check_path: "pyproject.toml"
 
     - name: "Patch Python project version: pyproject.toml"
-      id: patch-version
+      id: patch-version-pyprject-toml
       if: steps.pyproject-toml.outputs.type == 'file'
       uses: os-climate/osc-github-devops/.github/actions/file-sed-regex@main
       with:
@@ -33,7 +33,7 @@ runs:
         filename: "pyproject.toml"
 
     - name: "Patch Python project version: setup.py"
-      id: patch-version
+      id: patch-version-setup-py
       if: steps.setup-py.outputs.type == 'file'
       uses: os-climate/osc-github-devops/.github/actions/file-sed-regex@main
       with:
