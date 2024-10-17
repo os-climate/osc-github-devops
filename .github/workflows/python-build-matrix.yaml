@@ -60,12 +60,12 @@ jobs:
       - name: "Extract python project name"
         id: project-name
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/project-name@main
+        uses: os-climate/osc-github-devops/.github/actions/python-project-name@main
 
       - name: "Extract python project version"
         id: project-version
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/project-version@main
+        uses: os-climate/osc-github-devops/.github/actions/python-project-version@main
 
       - name: "Build versioning"
         id: versioning
