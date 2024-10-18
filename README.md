@@ -6,6 +6,7 @@
 
 <!-- markdownlint-disable-next-line MD013 -->
  [![pre-commit.ci status badge]][pre-commit.ci results page] [![TestPyPI](https://img.shields.io/pypi/v/osc-github-devops?logo=python&label=TestPyPi&logoColor=white&color=32C955&pypiBaseUrl=https://test.pypi.org)](https://test.pypi.org/project/osc-github-devops) [![🧪 GitHub Actions CI/CD workflow tests badge]][GHA workflow runs list] [![Dependabot Updates](https://github.com/os-climate/osc-github-devops/actions/workflows/dependabot/dependabot-updates/badge.svg?logocolor=white)](https://github.com/os-climate/osc-github-devops/actions/workflows/dependabot/dependabot-updates) [![Coverage](https://coverage-badge.samuelcolvin.workers.dev/arfima/osc-github-devops.svg)](https://coverage-badge.samuelcolvin.workers.dev/redirect/arfima/osc-github-devops) [![🔐 CodeQL](https://github.com/os-climate/osc-github-devops/actions/workflows/codeql.yaml/badge.svg)](https://github.com/os-climate/osc-github-devops/actions/workflows/codeql.yaml)
+ [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/{owner}/{repo}/badge)](https://scorecard.dev/viewer/?uri=github.com/{owner}/{repo})
 <!-- prettier-ignore-end -->
 
 ## Composite actions and reusable workflows for Python projects
