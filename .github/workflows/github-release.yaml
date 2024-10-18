@@ -8,7 +8,7 @@ name: "📦 [R] Release to GitHub"
 on:
   workflow_call:
     inputs:
-      PRE_RELEASE:
+      PRERELEASE:
         description: "Mark release as pre-release/development version"
         type: string
         required: false
@@ -17,6 +17,11 @@ on:
         description: "Semantic tag for this release/build"
         type: string
         required: true
+      ARTEFACT_LOCATION:
+        description: "Path/location for build artefacts"
+        type: string
+        required: false
+        default: "dist"
 
 jobs:
   github-release:
@@ -38,7 +43,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ env.python_project_name }}-${{ inputs.build_tag }}
-          path: ${{ env.BUILD_ARTEFACTS }}
+          path: ${{ inputs.artefact_location }}
 
       - name: "Check project version matches pushed tags"
         if: startsWith(github.ref, 'refs/tags/')
@@ -48,14 +53,14 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          prerelease: ${{ inputs.PRE_RELEASE }}
+          prerelease: ${{ inputs.prerelease }}
           tag_name: ${{ inputs.build_tag }}
           name: "${{ env.python_project_name }} ${{ inputs.build_tag }}"
 
           # ToDo: Incorporate release notes, etc.
           # body_path: ${{ github.workspace }}/CHANGELOG.rst
           files: |
-            ${{ env.BUILD_ARTEFACTS }}/*.tar.gz
-            ${{ env.BUILD_ARTEFACTS }}/*.whl
-            ${{ env.BUILD_ARTEFACTS }}/*.zip
-            ${{ env.BUILD_ARTEFACTS }}/*.sigstore*
+            ${{ inputs.artefact_location }}/*.tar.gz
+            ${{ inputs.artefact_location }}/*.whl
+            ${{ inputs.artefact_location }}/*.zip
+            ${{ inputs.artefact_location }}/*.sigstore*

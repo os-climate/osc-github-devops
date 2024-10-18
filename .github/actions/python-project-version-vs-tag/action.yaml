@@ -7,20 +7,21 @@ name: "🐍 Verify Project Version matches Tag"
 outputs:
   MATCH:
     description: "Set true when pushed tags match version from pyproject.toml"
+    type: boolean
     value: ${{ steps.verify.outputs.match }}
 
 runs:
   using: "composite"
   steps:
-    - name: "Get project version from pyproject.toml"
+    - name: "Retrieve project version"
       id: fetch
       uses: os-climate/osc-github-devops/.github/actions/python-project-version@main
 
-    - name: "Check pushed tag against pyproject.toml"
+    - name: "Check tag/versions for consistency"
       id: verify
       shell: bash
       run: |
-        # Check pushed tag against pyproject.toml
+        # Check tag/versions for consistency
 
         #SHELLCODESTART
 

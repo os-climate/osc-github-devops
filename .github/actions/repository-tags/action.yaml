@@ -28,9 +28,9 @@ outputs:
   PRODUCTION_TAG:
     description: "Semantic tag for next production release/build"
     value: ${{ steps.tagging.outputs.production_tag }}
-  PRE_RELEASE:
+  PRERELEASE:
     description: "Set true if this release is a test/development release"
-    value: ${{ steps.this-build.outputs.pre_release }}
+    value: ${{ steps.this-build.outputs.prerelease }}
 
 runs:
   using: "composite"
@@ -65,20 +65,20 @@ runs:
         if [ "$GITHUB_REF_NAME" == "main" ] &&
          [ "$GITHUB_REF_TYPE" == "branch" ] &&
          [ "$GITHUB_EVENT_NAME" == "push" ]; then
-        PRE_RELEASE="true"
+        PRERELEASE="true"
         BUILD_TAG=${{ steps.development-tag.outputs.vtag }}
         elif [ "$GITHUB_REF_NAME" == "main" ] &&
          [ "$GITHUB_REF_TYPE" == "branch" ] &&
          [ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]; then
-        PRE_RELEASE="true"
+        PRERELEASE="true"
         BUILD_TAG=${{ steps.development-tag.outputs.vtag }}
         else
-        PRE_RELEASE="false"
+        PRERELEASE="false"
         BUILD_TAG=${{ steps.production-tag.outputs.vtag }}
         fi
-        echo "pre_release=$PRE_RELEASE"
-        echo "pre_release=$PRE_RELEASE" >> "$GITHUB_ENV"
-        echo "pre_release=$PRE_RELEASE" >> "$GITHUB_OUTPUT"
+        echo "PRERELEASE=$PRERELEASE"
+        echo "PRERELEASE=$PRERELEASE" >> "$GITHUB_ENV"
+        echo "PRERELEASE=$PRERELEASE" >> "$GITHUB_OUTPUT"
         echo "build_tag=$BUILD_TAG"
         echo "build_tag=$BUILD_TAG" >> "$GITHUB_ENV"
         echo "build_tag=$BUILD_TAG" >> "$GITHUB_OUTPUT"
