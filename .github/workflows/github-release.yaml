@@ -69,7 +69,6 @@ jobs:
         shell: bash
         run: |
           # Print summary/job output
-          # shellcheck disable=SC2078
 
           echo "# 🚀 GitHub Release" >> "$GITHUB_STEP_SUMMARY"
           echo "Build version/tag: ${{ inputs.build_tag }}" >> "$GITHUB_STEP_SUMMARY"
