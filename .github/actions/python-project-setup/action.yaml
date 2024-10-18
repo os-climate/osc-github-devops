@@ -21,8 +21,8 @@ outputs:
     description: "Project supported Python versions as JSON"
     value: ${{ steps.versions-matrix.outputs.matrix_json }}
   ARTEFACT_PYTHON:
-    description: "Project supported Python versions as JSON"
-    value: 3.11
+    description: "Python version to use for build (creates artefacts)"
+    value: ${{ steps.artefact-build-python.outputs.artefact_python }}
 
 runs:
   using: "composite"
@@ -38,6 +38,15 @@ runs:
       id: versioning-type
       # yamllint disable-line rule:line-length
       uses: os-climate/osc-github-devops/.github/actions/python-versioning-type@main
+
+    - name: "Artefact/build Python version"
+      id: artefact-build-python
+      shell: bash
+      run: |
+        # Artefact/build Python version
+        ARTEFACT_PYTHON='3.11'
+        echo "Using artefact/build Python version: $ARTEFACT_PYTHON"
+        echo "artefact_python=ARTEFACT_PYTHON" >> "$GITHUB-OUTPUT"
 
     - name: "Extract Python supported versions (JSON)"
       id: versions-matrix
@@ -57,9 +66,9 @@ runs:
         echo "| Project name | ${{ steps.project-naming.outputs.python_project_name }} |" >> "$GITHUB_STEP_SUMMARY"
         echo "| Package name | ${{ steps.project-naming.outputs.python_build_name }} |" >> "$GITHUB_STEP_SUMMARY"
         echo "| Versioning type | ${{ steps.versioning-type.outputs.versioning_type }} |" >> "$GITHUB_STEP_SUMMARY"
-        echo "| Build Python | Tox Configuration |" >> "$GITHUB_STEP_SUMMARY"
+        echo "| Build Python | ${{ steps.artefact-build-python.outputs.artefact_python }} |" >> "$GITHUB_STEP_SUMMARY"
 
         echo "## JSON Output" >> "$GITHUB_STEP_SUMMARY"
 
-        echo "Versions JSON for Matrix jobs" >> "$GITHUB_STEP_SUMMARY"
+        echo "### Versions JSON for Matrix jobs:" >> "$GITHUB_STEP_SUMMARY"
         echo "${{ steps.versions-matrix.outputs.matrix_json }}" >> "$GITHUB_STEP_SUMMARY"
