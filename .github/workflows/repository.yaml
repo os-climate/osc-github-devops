@@ -128,8 +128,8 @@ jobs:
     with:
       python_version: ${{ matrix.python-version }}
 
-  github-release:
-    name: "Publish GitHub Release"
+  release:
+    name: "Release"
     uses: os-climate/osc-github-devops/.github/workflows/github-release.yaml@main
     needs:
       - repository

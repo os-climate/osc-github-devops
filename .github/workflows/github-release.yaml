@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
 
-name: "📦 [R] Release to GitHub"
+name: "📦 [R] GitHub Release"
 # Packages a development/production release on GitHub"
 
 on:
@@ -64,3 +64,16 @@ jobs:
             ${{ inputs.artefact_location }}/*.whl
             ${{ inputs.artefact_location }}/*.zip
             ${{ inputs.artefact_location }}/*.sigstore*
+
+      - name: "Print summary/job output"
+        shell: bash
+        run: |
+          # Print summary/job output
+
+          echo "# 🚀 GitHub Release" >> "$GITHUB_STEP_SUMMARY"
+          echo "Build version/tag: ${{ inputs.build_tag }}" >> "$GITHUB_STEP_SUMMARY"
+          if [ "${{ inputs.prerelease }}" = "true" ]; then
+            echo "Pre-release/Development Build: ✅"
+          else
+            echo "Production/Release Build: ✅"
+          fi
