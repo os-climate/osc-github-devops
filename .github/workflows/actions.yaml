@@ -30,11 +30,11 @@ jobs:
     # Do NOT run until change is merged; secrets will NOT be available and workflow WILL fail
     if: github.event_name != 'pull_request'
     with:
+      ACCESS_TYPE: "development"
       VAULT_ITEM: "op://67hdehutbpddhfbgm6ffjvdsbu/Test Secure Note/notesPlain"
       EXPORT: false
     secrets:
-      # This is needed in either the organisation or repository, else the workflow will fail
-      OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.ONE_PASSWORD_DEVELOPMENT }}
+      ONE_PASSWORD_DEVELOPMENT: ${{ secrets.ONE_PASSWORD_DEVELOPMENT }}
 
   test:
     name: "Synthetic Tests"
