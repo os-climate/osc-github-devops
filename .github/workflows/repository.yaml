@@ -54,6 +54,8 @@ jobs:
     permissions:
       # Required for action to create labels: github-mandatory-labels
       contents: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - name: "Classify repository content"
