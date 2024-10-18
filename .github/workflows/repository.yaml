@@ -13,70 +13,57 @@ on:
       - "!.github/**"
 
 jobs:
-  one-password-verify:
-    name: "1Password"
+  one-password-service:
+    name: "1Password Service [Development]"
     uses: os-climate/osc-github-devops/.github/workflows/one-password-credentials.yaml@main
     # Do NOT run until change is merged; secrets will NOT be available and workflow WILL fail
     if: github.event_name != 'pull_request'
     with:
+      ACCESS_TYPE: "both"
       VAULT_ITEM: "op://67hdehutbpddhfbgm6ffjvdsbu/Test Secure Note/notesPlain"
       EXPORT: false
     secrets:
-      OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.ONE_PASSWORD_DEVELOPMENT }}
+      # Test development credentials
+      ONE_PASSWORD_DEVELOPMENT: ${{ secrets.ONE_PASSWORD_DEVELOPMENT }}
+      ONE_PASSWORD_PRODUCTION: ${{ secrets.ONE_PASSWORD_PRODUCTION }}
 
-  repo-metadata:
-    name: "Inspect Repository"
+  repository:
+    name: "Repository Checks"
     runs-on: ubuntu-latest
     outputs:
-      # Content metadata
+      # Classify repository content
       repo_python_project: ${{ steps.classify.outputs.repo_python_project }}
       repo_node_js_project: ${{ steps.classify.outputs.repo_node_js_project }}
       repo_maven_config: ${{ steps.classify.outputs.repo_maven_config }}
       repo_gradle_config: ${{ steps.classify.outputs.repo_gradle_config }}
       repo_jupyter_notebooks: ${{ steps.classify.outputs.repo_jupyter_notebooks }}
       repo_tox_config: ${{ steps.classify.outputs.repo_tox_config }}
+      # Capture workflow metadata
+      owner: ${{ steps.set.outputs.owner }}
+      repository: ${{ steps.set.outputs.repository }}
+      tagged: ${{ steps.set.outputs.tagged }}
+      # Label verification
+      present: ${{ steps.labelling.outputs.present }}
+      created: ${{ steps.labelling.outputs.created }}
       # Tag metadata - to be removed/replaced
       current_tag: "v0.1.0" # Placeholder value
       tag_validity: "v0.1.0" # Placeholder value
       development_tag: "v0.1.0" # Placeholder value
       production_tag: "v0.1.0" # Placeholder value
       prerelease: "v0.1.0" # Placeholder value
-
+    permissions:
+      # Required for action to create labels: github-mandatory-labels
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - name: "Classify repository content"
         id: classify
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/repository-content-classify@main
-
-  github-workflow-metadata:
-    name: "Gather Workflow Metadata"
-    runs-on: ubuntu-latest
-    outputs:
-      owner: ${{ steps.set.outputs.owner }}
-      repository: ${{ steps.set.outputs.repository }}
-      tagged: ${{ steps.set.outputs.tagged }}
-
-    steps:
       - name: "Capture workflow metadata"
         id: set
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/github-workflow-metadata@main
-
-  verify-github-environment:
-    name: "Verify GitHub Environment"
-    runs-on: ubuntu-latest
-    outputs:
-      present: ${{ steps.labelling.outputs.present }}
-      created: ${{ steps.labelling.outputs.created }}
-    env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    permissions:
-      # Required for action to create labels: github-mandatory-labels
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
 
       - name: "Verify/create release labels"
         id: labelling
@@ -93,16 +80,15 @@ jobs:
 
   python-project:
     name: "Gather Python Project Metadata"
-    needs: repo-metadata
-    if: needs.repo-metadata.outputs.repo_python_project  == 'true'
+    needs: repository
+    if: needs.repository.outputs.repo_python_project  == 'true'
     uses: os-climate/osc-github-devops/.github/workflows/python-project-setup.yaml@main
 
   python-build:
     name: "Build"
     uses: os-climate/osc-github-devops/.github/workflows/python-build-matrix.yaml@main
     needs:
-      - repo-metadata
-      - github-workflow-metadata
+      - repository
       - python-project
     strategy:
       fail-fast: false
@@ -122,7 +108,6 @@ jobs:
     name: "Test"
     uses: os-climate/osc-github-devops/.github/workflows/python-test-matrix.yaml@main
     needs:
-      - github-workflow-metadata
       - python-project
     strategy:
       fail-fast: false
@@ -134,7 +119,7 @@ jobs:
     name: "Publish GitHub Release"
     uses: os-climate/osc-github-devops/.github/workflows/github-release.yaml@main
     needs:
-      - repo-metadata
+      - repository
       - python-build
     permissions:
       # Needed both here and in the called workflow
@@ -145,8 +130,7 @@ jobs:
   testpypi:
     name: "Test Package Publishing"
     needs:
-      - repo-metadata
-      - github-workflow-metadata
+      - repository
       - python-build
     # Only test publishing on merge of pull requests or tag pushes
     if: github.event.pull_request.merged == true || startsWith(github.ref, 'refs/tags/')
@@ -193,7 +177,7 @@ jobs:
         with:
           prefix: "https://test.pypi.org/project"
           # Use project name, e.g. "/ITR"
-          string: "/${{ needs.github-workflow-metadata.outputs.repository }}"
+          string: "/${{ needs.repository.outputs.repository }}"
           suffix: "/"
 
       - name: "Check RELEASE in Test PyPI"
@@ -203,9 +187,9 @@ jobs:
         with:
           prefix: "https://test.pypi.org/project"
           # Use project name, e.g. "/ITR"
-          string: "/${{ needs.github-workflow-metadata.outputs.repository }}"
+          string: "/${{ needs.repository.outputs.repository }}"
           # TODO - the below is no longer doing tag processing
-          suffix: "/${{ needs.repo-metadata.outputs.current_tag }}/"
+          suffix: "/${{ needs.repository.outputs.current_tag }}/"
 
       - name: "Publish to Test PyPI [Trusted Publishing]"
         uses: pypa/gh-action-pypi-publish@release/v1
@@ -247,7 +231,7 @@ jobs:
       startsWith(github.ref, 'refs/tags/') || contains(github.event.head_commit.message, '[release]')
       # github.ref_name != 'main' &&
       # github.ref_name != 'master'
-    needs: [repo-metadata, python-build, github-workflow-metadata, testpypi]
+    needs: [repository, python-build, testpypi]
     runs-on: ubuntu-latest
     environment:
       name: production
@@ -275,7 +259,7 @@ jobs:
         with:
           prefix: "https://pypi.org/project"
           # Use project name, e.g. "/ITR"
-          string: "/${{ needs.github-workflow-metadata.outputs.repository }}"
+          string: "/${{ needs.repository.outputs.repository }}"
           suffix: "/"
 
       - name: "Check for RELEASE in PyPI"
@@ -285,9 +269,9 @@ jobs:
         with:
           prefix: "https://pypi.org/project"
           # Use project name, e.g. "/ITR"
-          string: "/${{ needs.github-workflow-metadata.outputs.repository }}"
+          string: "/${{ needs.repository.outputs.repository }}"
           # TODO - the below is no longer doing tag processing
-          suffix: "/${{ needs.repo-metadata.outputs.current_tag }}/"
+          suffix: "/${{ needs.repository.outputs.current_tag }}/"
 
       - name: "Publish to PyPI [Trusted Publishing]"
         uses: pypa/gh-action-pypi-publish@release/v1
@@ -319,7 +303,7 @@ jobs:
   notebooks:
     name: "Jupyter/Notebooks"
     needs:
-      - repo-metadata
+      - repository
       - python-project
     runs-on: "ubuntu-latest"
     continue-on-error: false
@@ -327,7 +311,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.python-project.outputs.matrixjson) }}
     # Don't run when pull request is merged, only if Jupyter Notebooks are present
-    if: needs.repo-metadata.outputs.repo_jupyter_notebooks  == 'true'
+    if: needs.repository.outputs.repo_jupyter_notebooks  == 'true'
 
     steps:
       - uses: actions/checkout@v4
@@ -381,9 +365,9 @@ jobs:
   security:
     name: "Security/Audit"
     needs:
-      - repo-metadata
+      - repository
       - python-project
-    if: needs.repo-metadata.outputs.repo_python_project  == 'true'
+    if: needs.repository.outputs.repo_python_project  == 'true'
     runs-on: "ubuntu-latest"
     continue-on-error: true
     strategy:
