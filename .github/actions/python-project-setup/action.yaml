@@ -17,9 +17,12 @@ outputs:
   VERSIONING_TYPE:
     description: "Project supported Python versions as JSON"
     value: ${{ steps.versioning-type.outputs.versioning_type }}
-  MATRIXJSON:
+  MATRIX_JSON:
     description: "Project supported Python versions as JSON"
-    value: ${{ steps.versions-matrix.outputs.matrixjson }}
+    value: ${{ steps.versions-matrix.outputs.matrix_json }}
+  ARTEFACT_PYTHON:
+    description: "Project supported Python versions as JSON"
+    value: 3.11
 
 runs:
   using: "composite"

@@ -416,3 +416,6 @@ jobs:
               echo "Version substitution failed ❌"
             fi
           fi
+
+      - name: "Action: python-project-setup"
+        uses: os-climate/osc-github-devops/.github/actions/python-project-setup@main

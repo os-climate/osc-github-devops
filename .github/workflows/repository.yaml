@@ -84,7 +84,18 @@ jobs:
     name: "Python Project"
     needs: repository
     if: needs.repository.outputs.repo_python_project  == 'true'
-    uses: os-climate/osc-github-devops/.github/actions/python-project-setup@main
+    runs-on: ubuntu-latest
+    outputs:
+      # Gather Python project metadata
+      python_project_name: ${{ steps.python_project_metadata.outputs.python_project_name }}
+      python_build_name: ${{ steps.python_project_metadata.outputs.python_build_name }}
+      versioning_type: ${{ steps.python_project_metadata.outputs.versioning_type }}
+      matrix_json: ${{ steps.python_project_metadata.outputs.matrix_json }}
+      artefact_python: ${{ steps.python_project_metadata.outputs.artefact_python }}
+    steps:
+      - name: "Extract Metadata"
+        id: python_project_metadata
+        uses: os-climate/osc-github-devops/.github/actions/python-project-setup@main
 
   python-build:
     name: "Build"
@@ -94,7 +105,7 @@ jobs:
       - python-project
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(needs.python-project.outputs.matrixjson) }}
+      matrix: ${{ fromJson(needs.python-project.outputs.matrix_json) }}
     permissions:
       contents: write
       # Required by SigStore signing action
@@ -113,7 +124,7 @@ jobs:
       - python-project
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(needs.python-project.outputs.matrixjson) }}
+      matrix: ${{ fromJson(needs.python-project.outputs.matrix_json) }}
     with:
       python_version: ${{ matrix.python-version }}
 
@@ -311,7 +322,7 @@ jobs:
     continue-on-error: false
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(needs.python-project.outputs.matrixjson) }}
+      matrix: ${{ fromJson(needs.python-project.outputs.matrix_json) }}
     # Don't run when pull request is merged, only if Jupyter Notebooks are present
     if: needs.repository.outputs.repo_jupyter_notebooks  == 'true'
 
@@ -374,7 +385,7 @@ jobs:
     continue-on-error: true
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(needs.python-project.outputs.matrixjson) }}
+      matrix: ${{ fromJson(needs.python-project.outputs.matrix_json) }}
     steps:
       - name: "Checkout repository"
         uses: actions/checkout@v4
