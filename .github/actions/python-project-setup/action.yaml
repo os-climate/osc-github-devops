@@ -43,3 +43,23 @@ runs:
       id: versions-matrix
       # yamllint disable-line rule:line-length
       uses: os-climate/osc-github-devops/.github/actions/python-versions-matrix@main
+
+    - name: "Display summary output"
+      shell: bash
+      run: |
+        # Display summary output
+        echo "# 🐍 Python Project" >> "$GITHUB_STEP_SUMMARY"
+
+        echo "Gathered Python project metadata"
+
+        echo "| Key | Value |" >> "$GITHUB_STEP_SUMMARY"
+        echo "| -------- | ------- |" >> "$GITHUB_STEP_SUMMARY"
+        echo "| Project name | ${{ steps.project-naming.outputs.python_project_name }} |" >> "$GITHUB_STEP_SUMMARY"
+        echo "| Package name | ${{ steps.project-naming.outputs.python_build_name }} |" >> "$GITHUB_STEP_SUMMARY"
+        echo "| Versioning type | ${{ steps.versioning-type.outputs.versioning_type }} |" >> "$GITHUB_STEP_SUMMARY"
+        echo "| Build Python | Tox Configuration |" >> "$GITHUB_STEP_SUMMARY"
+
+        echo "## JSON Output" >> "$GITHUB_STEP_SUMMARY"
+
+        echo "Versions JSON for Matrix jobs" >> "$GITHUB_STEP_SUMMARY"
+        echo "${{ steps.versions-matrix.outputs.matrix_json }}" >> "$GITHUB_STEP_SUMMARY"
