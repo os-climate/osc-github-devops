@@ -19,8 +19,8 @@ jobs:
     # Do NOT run until change is merged; secrets will NOT be available and workflow WILL fail
     if: github.event_name != 'pull_request'
     with:
-      ACCESS_TYPE: "both"
-      VAULT_ITEM: "op://67hdehutbpddhfbgm6ffjvdsbu/Test Secure Note/notesPlain"
+      ACCESS_TYPE: "production"
+      VAULT_ITEM: "op://hdiyadcjno2knqgvcy4wj5ulya/Test Secure Note/notesPlain"
       EXPORT: false
     secrets:
       # Test development credentials
