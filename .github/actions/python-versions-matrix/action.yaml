@@ -5,9 +5,9 @@
 name: "↗️ Supported Python versions matrix as JSON"
 
 outputs:
-  MATRIXJSON:
+  MATRIX_JSON:
     description: "Parse pyproject.toml and store supported Python versions as JSON"
-    value: ${{ steps.parse-metadata.outputs.matrixjson }}
+    value: ${{ steps.parse-metadata.outputs.matrix_json }}
 
 runs:
   using: "composite"
@@ -94,7 +94,7 @@ runs:
 
         # Main script entry point
 
-        matrixjson() {
+        matrix_json() {
           # Process script arguments
           if [ $# -lt 1 ] || [ $# -gt 3 ]; then
               echo "Usage:    $0  unquoted|single|double [nocommas, brackets]"
@@ -180,13 +180,13 @@ runs:
           return_result "$PYTHON_VERSIONS"
         }
 
-        data=$(matrixjson double brackets)
+        data=$(matrix_json double brackets)
         echo "Matrix versions extracted from pyproject.toml: $data"
-        matrixjson="{\"python-version\": $data}"
+        matrix_json="{\"python-version\": $data}"
         echo "Pretty formatted:"
-        if ! (echo "$matrixjson" | jq); then
+        if ! (echo "$matrix_json" | jq); then
           echo "WARNING: expected output may not be valid JSON"
         fi
-        echo "matrixjson=$matrixjson" >> "$GITHUB_OUTPUT"
+        echo "matrix_json=$matrix_json" >> "$GITHUB_OUTPUT"
         echo "Job output:"
-        echo "  matrixjson = $matrixjson"
+        echo "  matrix_json = $matrix_json"
