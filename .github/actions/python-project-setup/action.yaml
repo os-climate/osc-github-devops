@@ -46,7 +46,7 @@ runs:
         # Artefact/build Python version
         ARTEFACT_PYTHON='3.11'
         echo "Using artefact/build Python version: $ARTEFACT_PYTHON"
-        echo "artefact_python=ARTEFACT_PYTHON" >> "$GITHUB-OUTPUT"
+        echo "artefact_python=$ARTEFACT_PYTHON" >> "$GITHUB-OUTPUT"
 
     - name: "Extract Python supported versions (JSON)"
       id: versions-matrix
