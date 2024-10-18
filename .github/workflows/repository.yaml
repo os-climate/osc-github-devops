@@ -81,10 +81,10 @@ jobs:
           one_password_development: ${{ secrets.ONE_PASSWORD_DEVELOPMENT }}
 
   python-project:
-    name: "Gather Python Project Metadata"
+    name: "Python Project"
     needs: repository
     if: needs.repository.outputs.repo_python_project  == 'true'
-    uses: os-climate/osc-github-devops/.github/workflows/python-project-setup.yaml@main
+    uses: os-climate/osc-github-devops/.github/actions/python-project-setup@main
 
   python-build:
     name: "Build"
