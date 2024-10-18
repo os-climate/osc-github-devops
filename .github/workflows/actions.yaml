@@ -10,16 +10,11 @@ on:
   push:
     branches: ["main", "master"]
     paths: [".github/**"]
+
 #  pull_request:
 #    types: [opened, reopened, edited, synchronize]
 #    paths: [".github/**"]
 #    branches: ["main", "master"]
-
-env:
-  DEFAULT-PYTHON: "3.10"
-  ARTEFACTS: "dist"
-  # Configures publishing to PyPI
-  PUBLISH: "true"
 
 jobs:
   ### Test Individual Composite Actions ###

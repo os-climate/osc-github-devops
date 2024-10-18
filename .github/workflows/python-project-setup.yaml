@@ -8,7 +8,7 @@ name: "🛠️ [R] Python Project Setup"
 on:
   workflow_call:
     inputs:
-      DEFAULT_PYTHON:
+      ARTEFACT_PYTHON:
         description: "Version used to upload/store artefacts for publishing"
         required: false
         type: string
@@ -41,9 +41,9 @@ on:
         value: ${{ jobs.python-project.outputs.matrixjson }}
 
       # Passthrough values
-      DEFAULT_PYTHON:
+      ARTEFACT_PYTHON:
         description: "Version used to upload/store artefacts for publishing"
-        value: ${{ inputs.default_python }}
+        value: ${{ inputs.ARTEFACT_PYTHON }}
       ARTEFACT_LOCATION:
         description: "Build artefacts will be output to this folder/directory"
         value: ${{ inputs.artefact_location }}
@@ -70,15 +70,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: "Setup Python ${{ inputs.default_python }}"
+      - name: "Setup Python ${{ inputs.artefact_python }}"
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ inputs.default_python }}
+          python-version: ${{ inputs.artefact_python }}
 
       - name: "Install PDM tooling"
         uses: pdm-project/setup-pdm@v4
         with:
-          python-version: ${{ inputs.default_python }}
+          python-version: ${{ inputs.artefact_python }}
 
       - name: "Extract Python project naming"
         id: project-naming

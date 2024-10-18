@@ -14,11 +14,11 @@ inputs:
     description: "Purge target artefact path prior to builds"
     required: false
     default: false
-  ATTEST:
+  ATTEST_ARTEFACTS:
     description: "Attest/sign packages during build"
     required: false
     type: string
-    default: true
+    default: false
 
 outputs:
   DATETIME_STAMP:
