@@ -15,29 +15,24 @@ on:
       - "!update-devops-tooling"
       - "!**/update-pdm-lock"
 
+env:
+  default-python: 3.11
+
 jobs:
-  classify-content:
-    name: "Inspect Repository"
-    runs-on: ubuntu-latest
-    outputs:
-      repo_python_project: ${{ steps.classify.outputs.repo_python_project }}
-      repo_jupyter_notebooks: ${{ steps.classify.outputs.repo_jupyter_notebooks }}
+  repository:
+    name: "Repository Inspection"
+    uses: os-climate/osc-github-devops/.github/workflows/repository.yaml@main
+    permissions:
+      # Required for action that creates labels: github-mandatory-labels
+      contents: write
 
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: "Classify content"
-        id: classify
-        # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/repository-content-classify@main
-
-  update-dependencies:
-    name: "Update Python Modules"
+  python-dependencies:
+    name: "Update Python Dependencies"
     needs:
-      - classify-content
+      - repository
     # Only run if Python code is present in repository
-    if: needs.classify-content.outputs.repo_python_project  == 'true' ||
-      needs.classify-content.outputs.repo_jupyter_notebooks  == 'true'
+    if: needs.repository.outputs.repo_python_project  == 'true' ||
+      needs.repository.outputs.repo_jupyter_notebooks  == 'true'
     runs-on: ubuntu-latest
     permissions:
       # IMPORTANT: mandatory to raise the PR
@@ -45,13 +40,10 @@ jobs:
       pull-requests: write
       repository-projects: write
       contents: write
-
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
     steps:
-      - name: "Checkout repository"
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: "Set up Python"
         uses: actions/setup-python@v5

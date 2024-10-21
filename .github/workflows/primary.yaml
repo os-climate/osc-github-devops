@@ -13,7 +13,7 @@ on:
       - "!.github/**"
 
 jobs:
-  one-password-service:
+  one-password:
     name: "1Password"
     uses: os-climate/osc-github-devops/.github/workflows/one-password.yaml@main
     # Do NOT run until change is merged; secrets will NOT be available and workflow WILL fail
@@ -33,6 +33,18 @@ jobs:
     permissions:
       # Required for action that creates labels: github-mandatory-labels
       contents: write
+
+  secrets:
+    name: "Required Credentials"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Check for required secrets/API keys/tokens"
+        uses: os-climate/osc-github-devops/.github/actions/github-mandatory-secrets@main
+        with:
+          # Mandatory secrets/variables to check
+          pypi_development: ${{ secrets.PYPI_DEVELOPMENT }}
+          pypi_production: ${{ secrets.PYPI_PRODUCTION }}
+          one_password_development: ${{ secrets.ONE_PASSWORD_DEVELOPMENT }}
 
   python-project:
     name: "Python Project"
