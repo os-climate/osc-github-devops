@@ -8,22 +8,22 @@ description: "Scans repository content and identifies supported content"
 outputs:
   REPO_PYTHON_PROJECT:
     description: "Repository contains a Python project with file: pyproject.toml"
-    value: ${{ steps.classification.outputs.python_project }}
+    value: ${{ steps.classification.outputs.repo_python_project }}
   REPO_NODE_JS_PROJECT:
     description: "Repository contains a Node.js project with file: package.json"
-    value: ${{ steps.classification.outputs.node_js_project }}
+    value: ${{ steps.classification.outputs.repo_node_js_project }}
   REPO_MAVEN_CONFIG:
     description: "Repository contains Maven project with file: pom.xml"
-    value: ${{ steps.classification.outputs.maven_config }}
+    value: ${{ steps.classification.outputs.repo_maven_config }}
   REPO_GRADLE_CONFIG:
     description: "Repository contains Gradle project with file(s): settings.gradle*"
-    value: ${{ steps.classification.outputs.gradle_config }}
+    value: ${{ steps.classification.outputs.repo_gradle_config }}
   REPO_JUPYTER_NOTEBOOKS:
     description: "Repository contains Jupyter Notebooks with file(s): *.ipynb"
-    value: ${{ steps.classification.outputs.jupyter_notebooks }}
+    value: ${{ steps.classification.outputs.repo_jupyter_notebooks }}
   REPO_TOX_CONFIG:
     description: "Repository contains a TOX configuration file: tox.ini"
-    value: ${{ steps.classification.outputs.tox_config }}
+    value: ${{ steps.classification.outputs.repo_tox_config }}
 
 runs:
   using: "composite"
