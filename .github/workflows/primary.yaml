@@ -28,7 +28,7 @@ jobs:
       ONE_PASSWORD_PRODUCTION: ${{ secrets.ONE_PASSWORD_PRODUCTION }}
 
   repository:
-    name: "Inspect Repository"
+    name: "Repository Checks"
     uses: os-climate/osc-github-devops/.github/workflows/repository.yaml@main
     permissions:
       # Required for action that creates labels: github-mandatory-labels

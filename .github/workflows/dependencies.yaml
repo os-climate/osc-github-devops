@@ -20,7 +20,7 @@ env:
 
 jobs:
   repository:
-    name: "Repository Inspection"
+    name: "Repository Checks"
     uses: os-climate/osc-github-devops/.github/workflows/repository.yaml@main
     permissions:
       # Required for action that creates labels: github-mandatory-labels
