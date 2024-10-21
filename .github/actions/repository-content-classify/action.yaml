@@ -99,6 +99,8 @@ runs:
         echo "tox_config=$REPO_TOX_CONFIG" >> "$GITHUB_OUTPUT"
         echo "jupyter_notebooks=$REPO_JUPYTER_NOTEBOOKS" >> "$GITHUB_OUTPUT"
 
+        set -xv
+
         ### GitHub Summary ###
 
         echo '# 🔍 Repository Content Inspection' >> "$GITHUB_STEP_SUMMARY"
@@ -108,15 +110,12 @@ runs:
         for VARIABLE in $(declare | grep REPO); do
           VAR_NAME=$(echo "$VARIABLE" | awk -F= '{print $1}')
           VAR_BOOLEAN=$(echo "$VARIABLE" | awk -F= '{print $2}')
-
-          # The string subsitution below makes output easier to read
-          # sed -e 's/true/✅/' -e 's/false/❌/'
-          if [ $VAR_BOOLEAN = "true" ]; then
+          if [ "$VAR_BOOLEAN" = "true" ]; then
             VAR_BOOLEAN="✅"
           else
             VAR_BOOLEAN="❌"
           fi
-          export $VAR_NAME=$VAR_BOOLEAN
+          export $VAR_NAME="$VAR_BOOLEAN"
         done
 
         echo "Supported content types are listed in the table below" >> "$GITHUB_STEP_SUMMARY"
