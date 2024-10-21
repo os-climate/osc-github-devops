@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
 
-name: "🔍 Repository Inspection"
+name: "🔍 Repository Checks"
 description: "Scans repository content and identifies supported content"
 
 outputs:
@@ -92,14 +92,12 @@ runs:
 
         ### Set Outputs ###
 
-        echo "python_project=$REPO_PYTHON_PROJECT" >> "$GITHUB_OUTPUT"
-        echo "node_js_project=$REPO_NODE_JS_PROJECT" >> "$GITHUB_OUTPUT"
-        echo "maven_config=$REPO_MAVEN_CONFIG" >> "$GITHUB_OUTPUT"
-        echo "gradle_config=$REPO_GRADLE_CONFIG" >> "$GITHUB_OUTPUT"
-        echo "tox_config=$REPO_TOX_CONFIG" >> "$GITHUB_OUTPUT"
-        echo "jupyter_notebooks=$REPO_JUPYTER_NOTEBOOKS" >> "$GITHUB_OUTPUT"
-
-        set -xv
+        echo "repo_python_project=$REPO_PYTHON_PROJECT" >> "$GITHUB_OUTPUT"
+        echo "repo_node_js_project=$REPO_NODE_JS_PROJECT" >> "$GITHUB_OUTPUT"
+        echo "repo_maven_config=$REPO_MAVEN_CONFIG" >> "$GITHUB_OUTPUT"
+        echo "repo_gradle_config=$REPO_GRADLE_CONFIG" >> "$GITHUB_OUTPUT"
+        echo "repo_tox_config=$REPO_TOX_CONFIG" >> "$GITHUB_OUTPUT"
+        echo "repo_jupyter_notebooks=$REPO_JUPYTER_NOTEBOOKS" >> "$GITHUB_OUTPUT"
 
         ### GitHub Summary ###
 

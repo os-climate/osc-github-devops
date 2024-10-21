@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
 
-name: "🔍 [R] Inspect Repository"
+name: "🔍 [R] Repository Checks"
 
 # yamllint disable-line rule:truthy
 on:
@@ -14,7 +14,7 @@ on:
 
 jobs:
   repository:
-    name: "Content Checks"
+    name: "Inspection"
     runs-on: ubuntu-latest
     outputs:
       # Classify repository content
