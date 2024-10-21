@@ -2,30 +2,26 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
 
-name: "♻️ Python Dependencies"
+name: "♻️ Update Dependencies"
 
 # yamllint disable-line rule:truthy
 on:
   workflow_dispatch:
   schedule:
     - cron: "0 8 1 * *"
-  pull_request:
-    types: [opened, reopened, edited, synchronize, closed]
+  push:
     branches:
-      - "**/**"
+      - "**"
       - "!update-devops-tooling"
       - "!**/update-pdm-lock"
-
-env:
-  DEFAULT-PYTHON: "3.11"
 
 jobs:
   classify-content:
     name: "Inspect Repository"
     runs-on: ubuntu-latest
     outputs:
-      python: ${{ steps.classify.outputs.python }}
-      notebooks: ${{ steps.classify.outputs.notebooks }}
+      repo_python_project: ${{ steps.classify.outputs.repo_python_project }}
+      repo_jupyter_notebooks: ${{ steps.classify.outputs.repo_jupyter_notebooks }}
 
     steps:
       - uses: actions/checkout@v4
@@ -40,7 +36,8 @@ jobs:
     needs:
       - classify-content
     # Only run if Python code is present in repository
-    if: needs.classify-content.outputs.python  == 'true'
+    if: needs.classify-content.outputs.repo_python_project  == 'true' ||
+      needs.classify-content.outputs.repo_jupyter_notebooks  == 'true'
     runs-on: ubuntu-latest
     permissions:
       # IMPORTANT: mandatory to raise the PR
