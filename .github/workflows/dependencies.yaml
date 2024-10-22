@@ -31,8 +31,8 @@ jobs:
     needs:
       - repository
     # Only run if Python code is present in repository
-    if: needs.repository.outputs.repo_python_project  == 'true' ||
-      needs.repository.outputs.repo_jupyter_notebooks  == 'true'
+    if: needs.repository.outputs.python_project  == 'true' ||
+      needs.repository.outputs.jupyter_notebooks  == 'true'
     runs-on: ubuntu-latest
     permissions:
       # IMPORTANT: mandatory to raise the PR

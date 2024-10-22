@@ -1,6 +1,6 @@
 ---
 # SPDX-License-Identifier: Apache-2.0
-# Copyright 2024 The Linux Foundation <mwatkins@linuxfoundation.org>
+# SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 name: "🤖 Dependabot Updates"
 
@@ -9,10 +9,10 @@ updates:
   # prettier-ignore
   - package-ecosystem: "pip"
     # prettier-ignore
-    directory: "/"  # Location of package manifests
+    directory: "/" # Location of package manifests
     commit-message:
       prefix: "[dependabot] Chore:"
-    open-pull-requests-limit: 3
+    open-pull-requests-limit: 1
     schedule:
       interval: "daily"
 
@@ -21,6 +21,6 @@ updates:
     directory: "/"
     commit-message:
       prefix: "[dependabot] Chore:"
-    open-pull-requests-limit: 3
+    open-pull-requests-limit: 1
     schedule:
-      interval: "weekly"
+      interval: "daily"
