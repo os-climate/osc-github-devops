@@ -28,7 +28,7 @@ jobs:
       ONE_PASSWORD_PRODUCTION: ${{ secrets.ONE_PASSWORD_PRODUCTION }}
 
   repository:
-    name: "Repository Checks"
+    name: "Repository"
     uses: os-climate/osc-github-devops/.github/workflows/repository.yaml@main
     permissions:
       # Required for action that creates labels: github-mandatory-labels
@@ -49,7 +49,7 @@ jobs:
   python-project:
     name: "Python Project"
     needs: repository
-    if: needs.repository.outputs.repo_python_project  == 'true'
+    if: needs.repository.outputs.python_project  == 'true'
     runs-on: ubuntu-latest
     outputs:
       # Gather Python project metadata
@@ -290,7 +290,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.python-project.outputs.matrix_json) }}
     # Don't run when pull request is merged, only if Jupyter Notebooks are present
-    if: needs.repository.outputs.repo_jupyter_notebooks  == 'true'
+    if: needs.repository.outputs.jupyter_notebooks  == 'true'
 
     steps:
       - uses: actions/checkout@v4
@@ -346,7 +346,7 @@ jobs:
     needs:
       - repository
       - python-project
-    if: needs.repository.outputs.repo_python_project  == 'true'
+    if: needs.repository.outputs.python_project  == 'true'
     runs-on: "ubuntu-latest"
     continue-on-error: true
     strategy:

@@ -2,19 +2,16 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
 
-name: "🛠️ Gather Workflow Metadata"
-description: "Populates Variables with GitHub Repository/Workflow Metadata"
+name: "🛠️ Repository Metadata"
+description: "Gathers repository metadata"
 
 outputs:
-  OWNER:
+  REPOSITORY_OWNER:
     description: "Returns the name of the GitHub organisation"
-    value: ${{ steps.github.outputs.organisation }}
-  REPOSITORY:
+    value: ${{ steps.github.outputs.repository_owner }}
+  REPOSITORY_NAME:
     description: "Returns the name of the GitHub repository"
-    value: ${{ steps.github.outputs.repository }}
-  TAGPUSH:
-    description: "Set true if semantic tags were an event/trigger"
-    value: ${{ steps.github.outputs.tagpush }}
+    value: ${{ steps.github.outputs.repository_name }}
 
 runs:
   using: "composite"
@@ -24,15 +21,13 @@ runs:
       shell: bash
       run: |
         # GitHub Repository Metadata
-        TAGPUSH="false"
-        echo "tagpush=${TAGPUSH}" >> $GITHUB_OUTPUT
 
         echo "### Repository Data ###"
         echo "GitHub Owner: $GITHUB_REPOSITORY_OWNER"
-        echo "owner=${GITHUB_REPOSITORY_OWNER}" >> "$GITHUB_OUTPUT"
-        REPOSITORY=${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}
-        echo "GitHub Repository: ${REPOSITORY}"
-        echo "repository=${REPOSITORY}" >> "$GITHUB_OUTPUT"
+        echo "repository_owner=${GITHUB_REPOSITORY_OWNER}" >> "$GITHUB_OUTPUT"
+        REPOSITORY_NAME=${GITHUB_REPOSITORY_NAME#$GITHUB_REPOSITORY_OWNER/}
+        echo "GitHub Repository: ${REPOSITORY_NAME}"
+        echo "repository_name=${REPOSITORY_NAME}" >> "$GITHUB_OUTPUT"
 
         if [ ! -z "$GITHUB_TRIGGERING_ACTOR" ]; then
           echo "### User Data ###"
@@ -51,8 +46,12 @@ runs:
         fi
         if [ ! -z "$GITHUB_REF_NAME" ]; then
           echo "GITHUB_REF_NAME: $GITHUB_REF_NAME"
+
+          # TODO: Tag evaluation/posture needs to be moved elsewhere
           if [[ "$GITHUB_REF_NAME" =~ ^v[0-9]+\.[0-9]+ ]]; then
-            echo "tagpush=${TAGPUSH}" >> $GITHUB_OUTPUT
+            echo "TAG_PUSH_EVENT=${TAG_PUSH_EVENT}" >> "$GITHUB_OUTPUT"
+          else
+            TAG_PUSH_EVENT="false" >> "$GITHUB_OUTPUT"
           fi
         fi
         if [ ! -z "$GITHUB_REF_TYPE" ]; then
@@ -63,4 +62,4 @@ runs:
         fi
 
         echo "### Derived Data ###"
-        echo "GitHub event/triggered by tags: $TAGPUSH"
+        echo "GitHub event/triggered by tags: $TAG_PUSH_EVENT"

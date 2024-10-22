@@ -2,37 +2,56 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
 
-name: "🔍 [R] Repository Checks"
+name: "🔍 [R] Repository"
 
 # yamllint disable-line rule:truthy
 on:
   workflow_call:
-  push:
-    paths:
-      - "**"
-      - "!.github/**"
+    outputs:
+      # Basic repository metadata
+      repository_owner:
+        description: "GitHub user or organisation owning the repository"
+        value: ${{ jobs.repository.outputs.repository_owner }}
+      repository_name:
+        description: "The Repository name"
+        value: ${{ jobs.repository.outputs.repository_name }}
+
+      # tag_push_event: ${{ steps.repository.outputs.tagged }}
+
+      # Repository content classifications
+      python_project:
+        value: ${{ jobs.repository.outputs.python_project }}
+      node_js_project:
+        value: ${{ jobs.repository.outputs.node_js_project }}
+      maven_config:
+        value: ${{ jobs.repository.outputs.maven_config }}
+      gradle_config:
+        value: ${{ jobs.repository.outputs.gradle_config }}
+      jupyter_notebooks:
+        value: ${{ jobs.repository.outputs.jupyter_notebooks }}
+      tox_config:
+        value: ${{ jobs.repository.outputs.tox_config }}
 
 jobs:
   repository:
-    name: "Inspection"
+    name: "Check Content"
     runs-on: ubuntu-latest
     outputs:
-      # Classify repository content
-      repo_python_project: ${{ steps.classify.outputs.repo_python_project }}
-      repo_node_js_project: ${{ steps.classify.outputs.repo_node_js_project }}
-      repo_maven_config: ${{ steps.classify.outputs.repo_maven_config }}
-      repo_gradle_config: ${{ steps.classify.outputs.repo_gradle_config }}
-      repo_jupyter_notebooks: ${{ steps.classify.outputs.repo_jupyter_notebooks }}
-      repo_tox_config: ${{ steps.classify.outputs.repo_tox_config }}
+      # Repository metadata
+      repository_owner: ${{ steps.repository.outputs.repository_owner }}
+      repository_name: ${{ steps.repository.outputs.repository_name }}
 
-      # Capture workflow metadata
-      owner: ${{ steps.repository.outputs.owner }}
-      repository: ${{ steps.repository.outputs.repository }}
-      tagged: ${{ steps.repository.outputs.tagged }}
+      # Classify content
+      python_project: ${{ steps.content.outputs.python_project }}
+      node_js_project: ${{ steps.content.outputs.node_js_project }}
+      maven_config: ${{ steps.content.outputs.maven_config }}
+      gradle_config: ${{ steps.content.outputs.gradle_config }}
+      jupyter_notebooks: ${{ steps.content.outputs.jupyter_notebooks }}
+      tox_config: ${{ steps.content.outputs.tox_config }}
 
       # Label verification
-      present: ${{ steps.labelling.outputs.present }}
-      created: ${{ steps.labelling.outputs.created }}
+      present: ${{ steps.labels.outputs.present }}
+      created: ${{ steps.labels.outputs.created }}
 
       # Tag metadata - to be removed/replaced
       current_tag: "v0.1.0" # Placeholder value
@@ -49,17 +68,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: "Classify repository content"
-        id: classify
-        # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/repository-content-classify@main
-
-      - name: "Capture workflow metadata"
+      - name: "Repository metadata"
         id: repository
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/github-workflow-metadata@main
+        uses: os-climate/osc-github-devops/.github/actions/repository-metadata@main
 
-      - name: "Verify/create release labels"
-        id: labelling
+      - name: "Classify content"
+        id: content
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/github-mandatory-labels@main
+        uses: os-climate/osc-github-devops/.github/actions/repository-content@main
+
+      - name: "Verify/create labels"
+        id: labels
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/github-labels@main
