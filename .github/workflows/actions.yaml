@@ -19,7 +19,7 @@ on:
 jobs:
   ### Test Individual Composite Actions ###
 
-  one-password-test:
+  one-password:
     name: "1Password"
     uses: os-climate/osc-github-devops/.github/workflows/one-password.yaml@main
     # Do NOT run until change is merged; secrets will NOT be available and workflow WILL fail
@@ -32,13 +32,13 @@ jobs:
       ONE_PASSWORD_DEVELOPMENT: ${{ secrets.ONE_PASSWORD_DEVELOPMENT }}
 
   repository:
-    name: "Repository"
+    name: "Repository Content"
     uses: os-climate/osc-github-devops/.github/workflows/repository.yaml@main
     permissions:
       # Required for action that creates labels: github-mandatory-labels
       contents: write
 
-  test:
+  tests:
     name: "Synthetic Tests"
     runs-on: ubuntu-latest
     # if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
@@ -267,11 +267,6 @@ jobs:
           prefix: "https://test.pypi.org/project"
           string: "/ITR"
           suffix: "/"
-
-      - name: "Action: github-workflow-metadata"
-        id: github-workflow-metadata
-        # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/github-workflow-metadata@main
 
       - name: "Action: github-mandatory-labels"
         id: github-mandatory-labels

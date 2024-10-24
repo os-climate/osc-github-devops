@@ -15,9 +15,6 @@ on:
       - "!update-devops-tooling"
       - "!**/update-pdm-lock"
 
-env:
-  default-python: 3.11
-
 jobs:
   repository:
     name: "Repository Checks"
@@ -47,13 +44,10 @@ jobs:
 
       - name: "Set up Python"
         uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.default-python }}
 
       - name: "Update Python dependencies"
         uses: pdm-project/update-deps-action@v1.9
         with:
-          python-version: ${{ env.default-python }}
           sign-off-commit: "true"
           token: ${{ github.token }}
           commit-message: "Chore: Update dependencies and pdm.lock [skip ci]"
