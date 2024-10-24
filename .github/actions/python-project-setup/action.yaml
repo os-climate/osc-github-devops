@@ -66,8 +66,8 @@ runs:
         echo "| Project name | ${{ steps.project-naming.outputs.python_project_name }} |" >> "$GITHUB_STEP_SUMMARY"
         echo "| Package name | ${{ steps.project-naming.outputs.python_build_name }} |" >> "$GITHUB_STEP_SUMMARY"
         echo "| Versioning type | ${{ steps.versioning-type.outputs.versioning_type }} |" >> "$GITHUB_STEP_SUMMARY"
-        echo "| Build Python | ${{ steps.artefact-build-python.outputs.build_python_version }}
-         \ |" >> "$GITHUB_STEP_SUMMARY"
+        echo "| Build Python | ${{ steps.artefact-build-python.outputs.build_python_version }} |" \
+          >> "$GITHUB_STEP_SUMMARY"
 
         echo "## JSON Output" >> "$GITHUB_STEP_SUMMARY"
 
