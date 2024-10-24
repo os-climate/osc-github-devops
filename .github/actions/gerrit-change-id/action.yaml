@@ -64,6 +64,7 @@ runs:
         # Displays summary text to the terminal when run from a shell
         if [ -f "$TMPFILE" ]; then
           cat "$TMPFILE"
+          rm "$TMPFILE"
         fi
 
         #SHELLCODEEND
