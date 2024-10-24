@@ -2,18 +2,13 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
 
-name: "🧱 [R] Python Build (Matrix)"
+name: "🧱 [R] Python Build"
 # Builds a project for any number of specified Python versions"
 
 on:
   workflow_call:
     inputs:
-      PYTHON_VERSION:
-        # Usually specified/extracted from the file: pyproject.toml
-        description: "Python matrix versions to use for test builds (in JSON)"
-        required: true
-        type: string
-      ARTEFACT_PYTHON:
+      BUILD_PYTHON_VERSION:
         description: "Version used to upload/store artefacts for publishing"
         required: false
         type: string
@@ -36,10 +31,10 @@ on:
         description: "Sign build artefacts with Sigstore"
         required: false
         type: boolean
-        default: false
+        default: true
 
 jobs:
-  python-build-matrix:
+  python-build:
     name: Python Project
     runs-on: "ubuntu-latest"
     permissions:
@@ -52,15 +47,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: "Set up Python ${{ inputs.python_version }}"
+      - name: "Set up Python ${{ inputs.build_python_version }}"
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ inputs.python_version }}
+          python-version: ${{ inputs.build_python_version }}
 
       - name: "Install PDM tooling"
         uses: pdm-project/setup-pdm@v4
         with:
-          python-version: ${{ inputs.python_version }}
+          python-version: ${{ inputs.build_python_version }}
 
       - name: "Extract python project name"
         id: project-name
@@ -89,14 +84,14 @@ jobs:
 
       - name: "Build Python project [ with attestation ]"
         id: python-build-attest
-        if: ( inputs.python_version == inputs.ARTEFACT_PYTHON ) && inputs.ATTEST_ARTEFACTS
+        if: inputs.ATTEST_ARTEFACTS
         uses: os-climate/osc-github-devops/.github/actions/python-project-build@main
         with:
           attest_artefacts: "true"
 
       - name: "Build Python project [ no attestation ]"
         id: python-build
-        if: ( inputs.python_version != inputs.ARTEFACT_PYTHON ) || inputs.ATTEST_ARTEFACTS == 'false'
+        if: inputs.ATTEST_ARTEFACTS == 'false'
         uses: os-climate/osc-github-devops/.github/actions/python-project-build@main
 
       - name: "Validate artefacts with Twine"
@@ -106,7 +101,6 @@ jobs:
 
       - name: "Upload build artefacts"
         uses: actions/upload-artifact@v4
-        if: inputs.python_version == inputs.ARTEFACT_PYTHON
         with:
           name: ${{ env.python_project_name }}-${{ inputs.build_tag }}
           path: ${{ inputs.ARTEFACT_LOCATION }}
@@ -115,7 +109,7 @@ jobs:
       #  GitHub attestations are now used in favour of standard SigStore signing
       - name: "Sign packages with SigStore"
         uses: sigstore/gh-action-sigstore-python@v3.0.0
-        if: inputs.python_version == inputs.ARTEFACT_PYTHON && inputs.SIGSTORE_SIGN
+        if: inputs.SIGSTORE_SIGN
         env:
           package-path: ${{ inputs.ARTEFACT_LOCATION }}
         with:

@@ -57,7 +57,7 @@ jobs:
       python_build_name: ${{ steps.python_project_metadata.outputs.python_build_name }}
       versioning_type: ${{ steps.python_project_metadata.outputs.versioning_type }}
       matrix_json: ${{ steps.python_project_metadata.outputs.matrix_json }}
-      artefact_python: ${{ steps.python_project_metadata.outputs.artefact_python }}
+      build_python_version: ${{ steps.python_project_metadata.outputs.build_python_version }}
     steps:
       - name: "Extract Metadata"
         id: python_project_metadata
@@ -65,7 +65,7 @@ jobs:
 
   python-build:
     name: "Build"
-    uses: os-climate/osc-github-devops/.github/workflows/python-build-matrix.yaml@main
+    uses: os-climate/osc-github-devops/.github/workflows/python-build.yaml@main
     needs:
       - repository
       - python-project
@@ -79,8 +79,7 @@ jobs:
       # Required for attestations
       attestations: write
     with:
-      python_version: ${{ matrix.python-version }} # Passed in from matrix job
-      artefact_python: ${{ needs.python-project.outputs.artefact_python }}
+      build_python_version: ${{ needs.python-project.outputs.build_python_version }}
       build_tag: "v5.0.0-dev2"
 
   python-test:
