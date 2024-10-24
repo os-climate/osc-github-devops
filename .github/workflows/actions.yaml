@@ -31,6 +31,13 @@ jobs:
     secrets:
       ONE_PASSWORD_DEVELOPMENT: ${{ secrets.ONE_PASSWORD_DEVELOPMENT }}
 
+  repository:
+    name: "Repository"
+    uses: os-climate/osc-github-devops/.github/workflows/repository.yaml@main
+    permissions:
+      # Required for action that creates labels: github-mandatory-labels
+      contents: write
+
   test:
     name: "Synthetic Tests"
     runs-on: ubuntu-latest
@@ -96,11 +103,6 @@ jobs:
             echo "Project name matched repository name, as expected"
             echo "MATCHES_REPO_NAME: $MATCHES_REPO_NAME"
           fi
-
-      - name: "Action: repository-classify-content"
-        id: repository-classify-content
-        # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/repository-content-classify@main
 
       - name: "Extract TOX stanza"
         id: tox-stanza
