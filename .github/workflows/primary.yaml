@@ -31,7 +31,7 @@ jobs:
     name: "Repository"
     uses: os-climate/osc-github-devops/.github/workflows/repository.yaml@main
     permissions:
-      # Required for action that creates labels: github-mandatory-labels
+      # Required for action that creates labels: github-labels
       contents: write
 
   secrets:
@@ -39,7 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Check for required secrets/API keys/tokens"
-        uses: os-climate/osc-github-devops/.github/actions/github-mandatory-secrets@main
+        uses: os-climate/osc-github-devops/.github/actions/github-secrets@main
         with:
           # Mandatory secrets/variables to check
           pypi_development: ${{ secrets.PYPI_DEVELOPMENT }}

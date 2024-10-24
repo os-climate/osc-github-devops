@@ -268,21 +268,21 @@ jobs:
           string: "/ITR"
           suffix: "/"
 
-      - name: "Action: github-mandatory-labels"
-        id: github-mandatory-labels
+      - name: "Action: github-labels"
+        id: github-labels
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/github-mandatory-labels@main
+        uses: os-climate/osc-github-devops/.github/actions/github-labels@main
 
-      - name: "Validate: github-mandatory-labels"
+      - name: "Validate: github-labels"
         shell: bash
         run: |
-          # Check output from: github-mandatory-labels
-          if [ "${{ steps.github-mandatory-labels.outputs.present }}" = 'true' ]; then
+          # Check output from: github-labels
+          if [ "${{ steps.github-labels.outputs.present }}" = 'true' ]; then
             echo "Labels are reported present:"
             if (gh label list | grep release); then
               exit 0
             fi
-          elif [ "${{ steps.github-mandatory-labels.outputs.created }}" = 'true' ]; then
+          elif [ "${{ steps.github-labels.outputs.created }}" = 'true' ]; then
             echo "Labels are reported present:"
             if (gh label list | grep release); then
               exit 0
@@ -293,8 +293,8 @@ jobs:
             exit 1
           fi
 
-      - name: "Action: github-mandatory-secrets"
-        uses: os-climate/osc-github-devops/.github/actions/github-mandatory-secrets@main
+      - name: "Action: github-secrets"
+        uses: os-climate/osc-github-devops/.github/actions/github-secrets@main
         # Do NOT run until change is merged; secrets will NOT be available and workflow WILL fail
         if: github.event_name != 'pull_request'
         # continue-on-error: true
