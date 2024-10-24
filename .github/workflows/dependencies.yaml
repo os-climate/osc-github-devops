@@ -52,9 +52,8 @@ jobs:
 
       - name: "Update Python dependencies"
         uses: pdm-project/update-deps-action@v1.9
-        env:
-          python-version: ${{ env.default-python }}
         with:
+          python-version: ${{ env.default-python }}
           sign-off-commit: "true"
           token: ${{ github.token }}
           commit-message: "Chore: Update dependencies and pdm.lock [skip ci]"
