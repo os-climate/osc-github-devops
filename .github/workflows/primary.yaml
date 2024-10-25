@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
 
-name: "🤖 DevOps Automation"
+name: "🤖 [DM] DevOps Automation"
 
 # yamllint disable-line rule:truthy
 on:
@@ -69,9 +69,6 @@ jobs:
     needs:
       - repository
       - python-project
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJson(needs.python-project.outputs.matrix_json) }}
     permissions:
       contents: write
       # Required by SigStore signing action
@@ -87,6 +84,7 @@ jobs:
     uses: os-climate/osc-github-devops/.github/workflows/python-test-matrix.yaml@main
     needs:
       - python-project
+      - python-build
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.python-project.outputs.matrix_json) }}
@@ -99,6 +97,8 @@ jobs:
     needs:
       - repository
       - python-build
+      - python-test
+      - python-security
     permissions:
       # Needed both here and in the called workflow
       contents: write
@@ -110,6 +110,8 @@ jobs:
     needs:
       - repository
       - python-build
+      - python-test
+      - python-security
     # Only test publishing on merge of pull requests or tag pushes
     if: github.event.pull_request.merged == true || startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
@@ -209,7 +211,7 @@ jobs:
       startsWith(github.ref, 'refs/tags/') || contains(github.event.head_commit.message, '[release]')
       # github.ref_name != 'main' &&
       # github.ref_name != 'master'
-    needs: [repository, python-build, testpypi]
+    needs: [repository, python-build, python-test, python-security, testpypi]
     runs-on: ubuntu-latest
     environment:
       name: production
@@ -340,7 +342,7 @@ jobs:
       #     path: /tmp/*.log
       #     retention-days: 14
 
-  security:
+  python-security:
     name: "Security/Audit"
     needs:
       - repository
