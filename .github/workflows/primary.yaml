@@ -280,11 +280,51 @@ jobs:
           # Defined/stored in 1Password
           password: ${{ secrets.PYPI_PRODUCTION }}
 
+  python-security:
+    name: "Security/Audit"
+    needs:
+      - repository
+      - python-project
+      - python-build
+    if: needs.repository.outputs.python_project  == 'true'
+    runs-on: "ubuntu-latest"
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.python-project.outputs.matrix_json) }}
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
+
+      - name: "Set up Python ${{ matrix.python-version }}"
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: "Install PDM tooling"
+        uses: pdm-project/setup-pdm@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: "Install dependencies"
+        run: |
+          pip install -q --upgrade pip
+          pdm lock
+          pdm export -o requirements.txt
+          python -m pip install -q -r requirements.txt
+          python -m pip install -q .
+          pip install --upgrade -q setuptools
+          pdm list --graph
+
+      - name: "Perform package auditing"
+        uses: pypa/gh-action-pip-audit@v1.1.0
+
   notebooks:
     name: "Jupyter/Notebooks"
     needs:
       - repository
       - python-project
+      - python-build
     runs-on: "ubuntu-latest"
     continue-on-error: false
     strategy:
@@ -341,41 +381,3 @@ jobs:
       #     name: debug-logs
       #     path: /tmp/*.log
       #     retention-days: 14
-
-  python-security:
-    name: "Security/Audit"
-    needs:
-      - repository
-      - python-project
-    if: needs.repository.outputs.python_project  == 'true'
-    runs-on: "ubuntu-latest"
-    continue-on-error: true
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJson(needs.python-project.outputs.matrix_json) }}
-    steps:
-      - name: "Checkout repository"
-        uses: actions/checkout@v4
-
-      - name: "Set up Python ${{ matrix.python-version }}"
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: "Install PDM tooling"
-        uses: pdm-project/setup-pdm@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: "Install dependencies"
-        run: |
-          pip install -q --upgrade pip
-          pdm lock
-          pdm export -o requirements.txt
-          python -m pip install -q -r requirements.txt
-          python -m pip install -q .
-          pip install --upgrade -q setuptools
-          pdm list --graph
-
-      - name: "Perform package auditing"
-        uses: pypa/gh-action-pip-audit@v1.1.0
