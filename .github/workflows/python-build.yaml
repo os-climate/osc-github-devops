@@ -114,5 +114,5 @@ jobs:
       - name: "Upload build artefacts"
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.python_project_name }}-${{ inputs.build_tag }}
           path: ${{ inputs.ARTEFACT_LOCATION }}
+          if-no-files-found: error
