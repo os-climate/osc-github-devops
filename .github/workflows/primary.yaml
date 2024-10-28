@@ -91,8 +91,8 @@ jobs:
     with:
       python_version: ${{ matrix.python-version }}
 
-  release:
-    name: "Release"
+  github-release:
+    name: "GitHub Release"
     if: startsWith(github.ref, 'refs/tags/') || contains(github.event.head_commit.message, '[release]')
     uses: os-climate/osc-github-devops/.github/workflows/github-release.yaml@main
     needs:
@@ -106,207 +106,29 @@ jobs:
     with:
       build_tag: "v5.0.0-dev2"
 
-  testpypi:
-    name: "Test Package Publishing"
+  pypi-test:
+    name: "PyPI Publish [Test]"
+    uses: os-climate/osc-github-devops/.github/workflows/pypi-publish.yaml@main
     needs:
       - repository
       - python-build
       - python-test
       - python-security
-    # Only test publishing on merge of pull requests or tag pushes
-    # if: github.event.pull_request.merged == true || startsWith(github.ref, 'refs/tags/')
-    runs-on: ubuntu-latest
-    environment:
-      name: development
-    permissions:
-      # IMPORTANT: mandatory for trusted publishing
-      id-token: write
-    steps:
-      - name: "Download build artefacts"
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ github.ref_name }}
-          path: ${{ env.BUILD_ARTEFACTS }}
-
-      - name: "Manicure artefacts directory"
-        id: files
-        run: |
-          # Remove file types unsupported by the Python Package Index
-          if [ ! -d ${{ env.BUILD_ARTEFACTS }} ]; then
-            echo "Early exit; build artefacts path NOT found: ${{ env.BUILD_ARTEFACTS }}"
-            exit 0
-          fi
-          if [ -f ${{ env.BUILD_ARTEFACTS }}/buildvars.txt ]; then
-            rm ${{ env.BUILD_ARTEFACTS }}/buildvars.txt
-          else
-            echo "No buildvars.txt file to purge"
-          fi
-          # Remove outputs related to SigStore signing
-          if test -n "$(find ${{ env.BUILD_ARTEFACTS }} -maxdepth 1 -name '**.sigstore*' -print -quit)"
-          then
-            echo "Found SigStore signing artefacts to purge"
-            rm ${{ env.BUILD_ARTEFACTS }}/*.sigstore*
-          else
-            echo "No SigStore signing artefacts to purge"
-          fi
-
-      - name: "Check PROJECT in Test PyPI"
-        id: testpypi-project-url-check
-        # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/url-validity-check@main
-        with:
-          prefix: "https://test.pypi.org/project"
-          # Use project name, e.g. "/ITR"
-          string: "/${{ needs.repository.outputs.repository }}"
-          suffix: "/"
-
-      - name: "Check RELEASE in Test PyPI"
-        id: testpypi-release-url-check
-        # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/url-validity-check@main
-        with:
-          prefix: "https://test.pypi.org/project"
-          # Use project name, e.g. "/ITR"
-          string: "/${{ needs.repository.outputs.repository }}"
-          # TODO - the below is no longer doing tag processing
-          suffix: "/${{ needs.repository.outputs.current_tag }}/"
-
-      #- name: "Publish to Test PyPI [Trusted Publishing]"
-      #  uses: pypa/gh-action-pypi-publish@release/v1
-      # Primary/default method uses trusted publishing
-      # yamllint disable-line rule:line-length
-      #  if: steps.testpypi-project-url-check.outputs.valid == 'true' && steps.testpypi-release-url-check.outputs.valid == 'false'
-      #  with:
-      #    repository-url: https://test.pypi.org/legacy/
-      # Show checksum values
-      #    print-hash: true
-      #    packages-dir: ${{ env.BUILD_ARTEFACTS }}
-      # We already validate earlier in the pipeline
-      #    verify-metadata: false
-      # Test releases are always debugged
-      #    verbose: true
-
-      - name: "Use Service Account [ Production ]"
-        id: one-password-pypi-test
-        uses: 1password/load-secrets-action@v2
-        with:
-          # Export loaded secrets as environment variables
-          export-env: true
-        env:
-          PYPI_TEST_CREDENTIAL: "op://hdiyadcjno2knqgvcy4wj5ulya/tm2ffuusrynfivtcsnamginhm4/password"
-          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.one_password_production }}
-
-      - name: "Publish to Test PyPI [1Password: API Key]"
-        uses: pypa/gh-action-pypi-publish@release/v1
-        # Fallback method uses static organisation credentials
-        # Used initially when trusted publishing is unavailable
-        if: steps.testpypi-project-url-check.outputs.valid == 'false'
-        with:
-          repository-url: https://test.pypi.org/legacy/
-          # Show checksum values
-          print-hash: true
-          packages-dir: ${{ env.BUILD_ARTEFACTS }}
-          # We already validate earlier in the pipeline
-          verify-metadata: false
-          # Test releases are always debugged
-          verbose: true
-          # Organisation secret/variable
-          # Defined/stored in 1Password
-          password: ${{ env.PYPI_TEST_CREDENTIAL }}
-
-      #- name: "Publish to Test PyPI [Fallback: API Key]"
-      #  uses: pypa/gh-action-pypi-publish@release/v1
-      # Fallback method uses static organisation credentials
-      # Used initially when trusted publishing is unavailable
-      #  if: steps.testpypi-project-url-check.outputs.valid == 'false'
-      #  with:
-      #    repository-url: https://test.pypi.org/legacy/
-      # Show checksum values
-      #    print-hash: true
-      #    packages-dir: ${{ env.BUILD_ARTEFACTS }}
-      # We already validate earlier in the pipeline
-      #    verify-metadata: false
-      # Test releases are always debugged
-      #    verbose: true
-      # Organisation secret/variable
-      # Defined/stored in 1Password
-      #    password: ${{ secrets.PYPI_DEVELOPMENT }}
+    with:
+      build_tag: "v5.0.0-dev2"
 
   pypi:
-    name: "Publish Package"
-    if:
-      # Only publish on tag pushes or when a release is explicitly requested
-      startsWith(github.ref, 'refs/tags/') || contains(github.event.head_commit.message, '[release]')
-      # github.ref_name != 'main' &&
-      # github.ref_name != 'master'
-    needs: [repository, python-build, python-test, python-security, testpypi]
-    runs-on: ubuntu-latest
-    environment:
-      name: production
-    permissions:
-      # IMPORTANT: mandatory for trusted publishing
-      id-token: write
-    steps:
-      - name: "Download build artefacts"
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ github.ref_name }}
-          path: ${{ env.BUILD_ARTEFACTS }}
-
-      - name: "Remove unsupported artefacts/files"
-        run: |
-          # Remove unsupported artefacts/files
-          if (ls ${{ env.BUILD_ARTEFACTS }}/*.sigstore*); then
-            rm ${{ env.BUILD_ARTEFACTS }}/*.sigstore*
-          fi
-
-      - name: "Check if PROJECT in PyPI"
-        id: pypi-project-url-check
-        # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/url-validity-check@main
-        with:
-          prefix: "https://pypi.org/project"
-          # Use project name, e.g. "/ITR"
-          string: "/${{ needs.repository.outputs.repository }}"
-          suffix: "/"
-
-      - name: "Check for RELEASE in PyPI"
-        id: pypi-release-url-check
-        # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/url-validity-check@main
-        with:
-          prefix: "https://pypi.org/project"
-          # Use project name, e.g. "/ITR"
-          string: "/${{ needs.repository.outputs.repository }}"
-          # TODO - the below is no longer doing tag processing
-          suffix: "/${{ needs.repository.outputs.current_tag }}/"
-
-      - name: "Publish to PyPI [Trusted Publishing]"
-        uses: pypa/gh-action-pypi-publish@release/v1
-        # Primary/default method uses trusted publishing
-        # yamllint disable-line rule:line-length
-        if: steps.pypi-project-url-check.outputs.valid == 'true' && steps.pypi-release-url-check.outputs.valid == 'false'
-        with:
-          # Show checksum values
-          print-hash: true
-          packages-dir: ${{ env.BUILD_ARTEFACTS }}
-          # We already validate earlier in the pipeline
-          verify-metadata: false
-
-      - name: "Publish to PyPI [Fallback: API Key]"
-        uses: pypa/gh-action-pypi-publish@release/v1
-        # Fallback method uses static organisation credentials
-        # Used initially when trusted publishing is unavailable
-        if: steps.pypi-project-url-check.outputs.valid == 'false'
-        with:
-          # Show checksum values
-          print-hash: true
-          packages-dir: ${{ env.BUILD_ARTEFACTS }}
-          # We already validate earlier in the pipeline
-          verify-metadata: false
-          # Organisation secret/variable
-          # Defined/stored in 1Password
-          password: ${{ secrets.PYPI_PRODUCTION }}
+    name: "PyPI Publish"
+    uses: os-climate/osc-github-devops/.github/workflows/pypi-publish.yaml@main
+    needs:
+      - repository
+      - python-build
+      - python-test
+      - python-security
+      - pypi-test
+    with:
+      test: false
+      build_tag: "v5.0.0-dev2"
 
   python-security:
     name: "Security/Audit"

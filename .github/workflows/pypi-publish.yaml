@@ -1,0 +1,157 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+
+name: "📦 [R] PyPI Publish"
+# Publishes a Python package to PyPI"
+
+on:
+  workflow_call:
+    inputs:
+      TEST:
+        description: "Release to test instance of PyPI"
+        type: boolean
+        required: false
+        default: true
+      BUILD_TAG:
+        description: "Semantic tag for this release/build"
+        type: string
+        required: true
+      ARTEFACT_LOCATION:
+        description: "Path/location for build artefacts"
+        type: string
+        required: false
+        default: "dist"
+
+jobs:
+  pypi-publish:
+    name: "PyPI Publish"
+    runs-on: "ubuntu-latest"
+    environment:
+      name: development
+
+    steps:
+      - name: "Extract project/repository naming"
+        id: naming
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/python-project-name@main
+
+      - name: "⬇ Download build artefacts"
+        uses: actions/download-artifact@v4
+        with:
+          path: ${{ inputs.artefact_location }}
+
+      - name: "Check project version matches pushed tags"
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: os-climate/osc-github-devops/.github/actions/python-project-version-vs-tag@main
+
+      - name: "Manicure artefacts directory"
+        id: files
+        run: |
+          # Remove file types unsupported by the Python Package Index
+          if [ ! -d ${{ env.BUILD_ARTEFACTS }} ]; then
+            echo "Early exit; build artefacts path NOT found: ${{ env.BUILD_ARTEFACTS }}"
+            exit 0
+          fi
+          if [ -f ${{ env.BUILD_ARTEFACTS }}/buildvars.txt ]; then
+            rm ${{ env.BUILD_ARTEFACTS }}/buildvars.txt
+          else
+            echo "No buildvars.txt file to purge"
+          fi
+          # Remove outputs related to SigStore signing
+          if test -n "$(find ${{ env.BUILD_ARTEFACTS }} -maxdepth 1 -name '**.sigstore*' -print -quit)"
+          then
+            echo "Found SigStore signing artefacts to purge"
+            rm ${{ env.BUILD_ARTEFACTS }}/*.sigstore*
+          else
+            echo "No SigStore signing artefacts to purge"
+          fi
+
+      - name: "Check PROJECT in Test PyPI"
+        id: testpypi-project-url-check
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/url-validity-check@main
+        with:
+          prefix: "https://test.pypi.org/project"
+          # Use project name, e.g. "/ITR"
+          string: "/${{ steps.naming.outputs.python_project_name }}"
+          suffix: "/"
+
+      - name: "Check RELEASE in Test PyPI"
+        id: testpypi-release-url-check
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/url-validity-check@main
+        with:
+          prefix: "https://test.pypi.org/project"
+          # Use project name, e.g. "/ITR"
+          string: "/${{ steps.naming.outputs.python_project_name }}"
+          # TODO - the below is no longer doing tag processing
+          suffix: "/${{ inputs.build_tag }}/"
+
+      #- name: "Publish to Test PyPI [Trusted Publishing]"
+      #  uses: pypa/gh-action-pypi-publish@release/v1
+      # Primary/default method uses trusted publishing
+      # yamllint disable-line rule:line-length
+      #  if: steps.testpypi-project-url-check.outputs.valid == 'true' && steps.testpypi-release-url-check.outputs.valid == 'false'
+      #  with:
+      #    repository-url: https://test.pypi.org/legacy/
+      # Show checksum values
+      #    print-hash: true
+      #    packages-dir: ${{ env.BUILD_ARTEFACTS }}
+      # We already validate earlier in the pipeline
+      #    verify-metadata: false
+      # Test releases are always debugged
+      #    verbose: true
+
+      - name: "Use Service Account [ Production ]"
+        id: one-password-pypi-test
+        uses: 1password/load-secrets-action@v2
+        with:
+          # Export loaded secrets as environment variables
+          export-env: true
+        env:
+          PYPI_TEST_CREDENTIAL: "op://hdiyadcjno2knqgvcy4wj5ulya/tm2ffuusrynfivtcsnamginhm4/password"
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.one_password_production }}
+
+      - name: "Publish to Test PyPI [1Password: API Key]"
+        uses: pypa/gh-action-pypi-publish@release/v1
+        # Fallback method uses static organisation credentials
+        # Used initially when trusted publishing is unavailable
+        if: steps.testpypi-project-url-check.outputs.valid == 'false'
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          # Show checksum values
+          print-hash: true
+          packages-dir: ${{ env.BUILD_ARTEFACTS }}
+          # We already validate earlier in the pipeline
+          verify-metadata: false
+          # Test releases are always debugged
+          verbose: true
+          # Organisation secret/variable
+          # Defined/stored in 1Password
+          password: ${{ env.PYPI_TEST_CREDENTIAL }}
+
+      #- name: "Publish to Test PyPI [Fallback: API Key]"
+      #  uses: pypa/gh-action-pypi-publish@release/v1
+      # Fallback method uses static organisation credentials
+      # Used initially when trusted publishing is unavailable
+      #  if: steps.testpypi-project-url-check.outputs.valid == 'false'
+      #  with:
+      #    repository-url: https://test.pypi.org/legacy/
+      # Show checksum values
+      #    print-hash: true
+      #    packages-dir: ${{ env.BUILD_ARTEFACTS }}
+      # We already validate earlier in the pipeline
+      #    verify-metadata: false
+      # Test releases are always debugged
+      #    verbose: true
+      # Organisation secret/variable
+      # Defined/stored in 1Password
+      #    password: ${{ secrets.PYPI_DEVELOPMENT }}
+
+      - name: "Print summary/job output"
+        shell: bash
+        run: |
+          # Print summary/job output
+
+          echo "# 🚀 PyPI Publish" >> "$GITHUB_STEP_SUMMARY"
