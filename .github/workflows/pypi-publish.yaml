@@ -74,34 +74,23 @@ jobs:
         id: files
         run: |
           # Remove file types unsupported by the Python Package Index
-          if [ ! -d ${{ env.BUILD_ARTEFACTS }} ]; then
-            echo "Early exit; build artefacts path NOT found: ${{ env.BUILD_ARTEFACTS }}"
+          if [ ! -d ${{ env.ARTEFACT_LOCATION }} ]; then
+            echo "Early exit; build artefacts path NOT found: ${{ env.ARTEFACT_LOCATION }}"
             exit 0
           fi
-          if [ -f ${{ env.BUILD_ARTEFACTS }}/buildvars.txt ]; then
-            rm ${{ env.BUILD_ARTEFACTS }}/buildvars.txt
+          if [ -f ${{ env.ARTEFACT_LOCATION }}/buildvars.txt ]; then
+            rm ${{ env.ARTEFACT_LOCATION }}/buildvars.txt
           else
             echo "No buildvars.txt file to purge"
           fi
           # Remove outputs related to SigStore signing
-          if test -n "$(find ${{ env.BUILD_ARTEFACTS }} -maxdepth 1 -name '**.sigstore*' -print -quit)"
+          if test -n "$(find ${{ env.ARTEFACT_LOCATION }} -maxdepth 1 -name '**.sigstore*' -print -quit)"
           then
             echo "Found SigStore signing artefacts to purge"
-            rm ${{ env.BUILD_ARTEFACTS }}/*.sigstore*
+            rm ${{ env.ARTEFACT_LOCATION }}/*.sigstore*
           else
             echo "No SigStore signing artefacts to purge"
           fi
-          # Remove test coverage reports
-          if test -n "$(find ${{ env.BUILD_ARTEFACTS }} -maxdepth 1 -name 'test_coverage*' -print -quit)"
-          then
-            echo "Found test coverage reports to purge"
-            rm ${{ env.BUILD_ARTEFACTS }}/test_coverage*
-          else
-            echo "No test coverage reports to purge"
-          fi
-          echo "Debugging; here are the contents of: ${{ env.BUILD_ARTEFACTS }}"
-          ls ${{ env.BUILD_ARTEFACTS }}
-          rm dist/test* > /dev/null 2>&1
 
       - name: "Check PROJECT in Test PyPI"
         id: testpypi-project-url-check
@@ -135,7 +124,7 @@ jobs:
       #    repository-url: https://test.pypi.org/legacy/
       # Show checksum values
       #    print-hash: true
-      #    packages-dir: ${{ env.BUILD_ARTEFACTS }}
+      #    packages-dir: ${{ env.ARTEFACT_LOCATION }}
       # We already validate earlier in the pipeline
       #    verify-metadata: false
       # Test releases are always debugged
@@ -161,7 +150,7 @@ jobs:
           repository-url: "${{ env.PUBLISH_URL }}/legacy/"
           # Show checksum values
           print-hash: true
-          packages-dir: ${{ env.BUILD_ARTEFACTS }}
+          packages-dir: ${{ env.ARTEFACT_LOCATION }}
           # We already validate earlier in the pipeline
           verify-metadata: false
           # Test releases are always debugged
@@ -179,7 +168,7 @@ jobs:
       #    repository-url: https://test.pypi.org/legacy/
       # Show checksum values
       #    print-hash: true
-      #    packages-dir: ${{ env.BUILD_ARTEFACTS }}
+      #    packages-dir: ${{ env.ARTEFACT_LOCATION }}
       # We already validate earlier in the pipeline
       #    verify-metadata: false
       # Test releases are always debugged
