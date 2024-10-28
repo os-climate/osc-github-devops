@@ -105,7 +105,13 @@ runs:
 
         # The hack below helps make the displayed output summary pretty
 
-        for VARIABLE in $(declare | grep REPO); do
+        VARIABLES="PYTHON_PROJECT NODE_JS_PROJECT MAVEN_CONFIG GRADLE_CONFIG TOX_CONFIG JUPYTER_NOTEBOOKS"
+
+        declare
+
+        # Temporarily reverty to hard-wired variable names while testing
+        # for VARIABLE in $(declare | grep REPO); do
+        for VARIABLE in "$VARIABLES"; do
           VAR_NAME=$(echo "$VARIABLE" | awk -F= '{print $1}')
           VAR_BOOLEAN=$(echo "$VARIABLE" | awk -F= '{print $2}')
           if [ "$VAR_BOOLEAN" = "true" ]; then
