@@ -91,6 +91,14 @@ jobs:
           else
             echo "No SigStore signing artefacts to purge"
           fi
+          # Remove test coverage reports
+          if test -n "$(find ${{ env.BUILD_ARTEFACTS }} -maxdepth 1 -name 'test_coverage*' -print -quit)"
+          then
+            echo "Found test coverage reports to purge"
+            rm ${{ env.BUILD_ARTEFACTS }}/test_coverage*
+          else
+            echo "No SigStore signing artefacts to purge"
+          fi
 
       - name: "Check PROJECT in Test PyPI"
         id: testpypi-project-url-check
@@ -132,7 +140,7 @@ jobs:
 
       - name: "Use Service Account [ Production ]"
         id: one-password-pypi-test
-        if: steps.parameters.outputs.use_one_password == 'true'
+        if: env.use_one_password == 'true'
         uses: 1password/load-secrets-action@v2
         with:
           # Export loaded secrets as environment variables
