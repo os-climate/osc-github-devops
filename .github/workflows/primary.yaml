@@ -93,6 +93,7 @@ jobs:
 
   release:
     name: "Release"
+    if: startsWith(github.ref, 'refs/tags/') || contains(github.event.head_commit.message, '[release]')
     uses: os-climate/osc-github-devops/.github/workflows/github-release.yaml@main
     needs:
       - repository
@@ -113,7 +114,7 @@ jobs:
       - python-test
       - python-security
     # Only test publishing on merge of pull requests or tag pushes
-    if: github.event.pull_request.merged == true || startsWith(github.ref, 'refs/tags/')
+    # if: github.event.pull_request.merged == true || startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     environment:
       name: development
@@ -171,22 +172,32 @@ jobs:
           # TODO - the below is no longer doing tag processing
           suffix: "/${{ needs.repository.outputs.current_tag }}/"
 
-      - name: "Publish to Test PyPI [Trusted Publishing]"
-        uses: pypa/gh-action-pypi-publish@release/v1
-        # Primary/default method uses trusted publishing
-        # yamllint disable-line rule:line-length
-        if: steps.testpypi-project-url-check.outputs.valid == 'true' && steps.testpypi-release-url-check.outputs.valid == 'false'
-        with:
-          repository-url: https://test.pypi.org/legacy/
-          # Show checksum values
-          print-hash: true
-          packages-dir: ${{ env.BUILD_ARTEFACTS }}
-          # We already validate earlier in the pipeline
-          verify-metadata: false
-          # Test releases are always debugged
-          verbose: true
+      #- name: "Publish to Test PyPI [Trusted Publishing]"
+      #  uses: pypa/gh-action-pypi-publish@release/v1
+      # Primary/default method uses trusted publishing
+      # yamllint disable-line rule:line-length
+      #  if: steps.testpypi-project-url-check.outputs.valid == 'true' && steps.testpypi-release-url-check.outputs.valid == 'false'
+      #  with:
+      #    repository-url: https://test.pypi.org/legacy/
+      # Show checksum values
+      #    print-hash: true
+      #    packages-dir: ${{ env.BUILD_ARTEFACTS }}
+      # We already validate earlier in the pipeline
+      #    verify-metadata: false
+      # Test releases are always debugged
+      #    verbose: true
 
-      - name: "Publish to Test PyPI [Fallback: API Key]"
+      - name: "Use Service Account [ Production ]"
+        id: one-password-pypi-test
+        uses: 1password/load-secrets-action@v2
+        with:
+          # Export loaded secrets as environment variables
+          export-env: true
+        env:
+          PYPI_TEST_CREDENTIAL: "op://hdiyadcjno2knqgvcy4wj5ulya/tm2ffuusrynfivtcsnamginhm4/password"
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.one_password_production }}
+
+      - name: "Publish to Test PyPI [1Password: API Key]"
         uses: pypa/gh-action-pypi-publish@release/v1
         # Fallback method uses static organisation credentials
         # Used initially when trusted publishing is unavailable
@@ -202,7 +213,25 @@ jobs:
           verbose: true
           # Organisation secret/variable
           # Defined/stored in 1Password
-          password: ${{ secrets.PYPI_DEVELOPMENT }}
+          password: ${{ env.PYPI_TEST_CREDENTIAL }}
+
+      #- name: "Publish to Test PyPI [Fallback: API Key]"
+      #  uses: pypa/gh-action-pypi-publish@release/v1
+      # Fallback method uses static organisation credentials
+      # Used initially when trusted publishing is unavailable
+      #  if: steps.testpypi-project-url-check.outputs.valid == 'false'
+      #  with:
+      #    repository-url: https://test.pypi.org/legacy/
+      # Show checksum values
+      #    print-hash: true
+      #    packages-dir: ${{ env.BUILD_ARTEFACTS }}
+      # We already validate earlier in the pipeline
+      #    verify-metadata: false
+      # Test releases are always debugged
+      #    verbose: true
+      # Organisation secret/variable
+      # Defined/stored in 1Password
+      #    password: ${{ secrets.PYPI_DEVELOPMENT }}
 
   pypi:
     name: "Publish Package"
