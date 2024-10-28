@@ -75,20 +75,20 @@ jobs:
         id: files
         run: |
           # Remove file types unsupported by the Python Package Index
-          if [ ! -d ${{ env.ARTEFACT_LOCATION }} ]; then
-            echo "Early exit; build artefacts path NOT found: ${{ env.ARTEFACT_LOCATION }}"
+          if [ ! -d  ${{ inputs.artefact_location }} ]; then
+            echo "Early exit; build artefacts path NOT found:  ${{ inputs.artefact_location }}"
             exit 0
           fi
-          if [ -f ${{ env.ARTEFACT_LOCATION }}/buildvars.txt ]; then
-            rm ${{ env.ARTEFACT_LOCATION }}/buildvars.txt
+          if [ -f  ${{ inputs.artefact_location }}/buildvars.txt ]; then
+            rm ${{ inputs.artefact_location }}/buildvars.txt
           else
             echo "No buildvars.txt file to purge"
           fi
           # Remove outputs related to SigStore signing
-          if test -n "$(find ${{ env.ARTEFACT_LOCATION }} -maxdepth 1 -name '**.sigstore*' -print -quit)"
+          if test -n "$(find ${{ inputs.artefact_location }} -maxdepth 1 -name '*.sigstore*' -print -quit)"
           then
             echo "Found SigStore signing artefacts to purge"
-            rm ${{ env.ARTEFACT_LOCATION }}/*.sigstore*
+            rm  ${{ inputs.artefact_location }}/*.sigstore*
           else
             echo "No SigStore signing artefacts to purge"
           fi
