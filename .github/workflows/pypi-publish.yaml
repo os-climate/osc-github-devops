@@ -64,6 +64,7 @@ jobs:
       - name: "⬇ Download build artefacts"
         uses: actions/download-artifact@v4
         with:
+          name: ${{ env.python_project_name }}
           path: ${{ inputs.artefact_location }}
 
       - name: "Check project version matches pushed tags"
