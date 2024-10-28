@@ -21,6 +21,10 @@ on:
         type: string
         required: false
         default: "dist"
+    secrets:
+      ONE_PASSWORD_PRODUCTION:
+        description: "1Password service account credential"
+        required: false
 
 jobs:
   pypi-publish:
@@ -37,10 +41,11 @@ jobs:
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/python-project-name@main
 
-      - name: "Build publishing URL"
+      - name: "Set workflow parameters and variables"
+        id: parameters
         shell: bash
         run: |
-          # Build publishing URL
+          # Set workflow parameters and variables
           if [ -z ${{ inputs.TEST }} ]; then
             PUBLISH_URL="https://pypi.org/"
             PYPI_CREDENTIAL="op://hdiyadcjno2knqgvcy4wj5ulya/vds5rebqxeqfrjqwpszxxicmzq/password"
@@ -51,6 +56,10 @@ jobs:
           echo "Using publishing URL/prefix: $PUBLISH_URL"
           echo "PUBLISH_URL=$PUBLISH_URL" >> "$GITHUB_ENV"
           echo "PYPI_CREDENTIAL=$PYPI_CREDENTIAL" >> "$GITHUB_ENV"
+          if [ -n ${{ secrets.ONE_PASSWORD_PRODUCTION }} ]; then
+            echo "1Password service account credential is available"
+            echo "use_one_password=true" >> "$GITHUB_ENV"
+          fi
 
       - name: "⬇ Download build artefacts"
         uses: actions/download-artifact@v4
@@ -123,6 +132,7 @@ jobs:
 
       - name: "Use Service Account [ Production ]"
         id: one-password-pypi-test
+        if: steps.parameters.outputs.use_one_password == 'true'
         uses: 1password/load-secrets-action@v2
         with:
           # Export loaded secrets as environment variables
