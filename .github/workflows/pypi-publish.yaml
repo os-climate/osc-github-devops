@@ -97,8 +97,11 @@ jobs:
             echo "Found test coverage reports to purge"
             rm ${{ env.BUILD_ARTEFACTS }}/test_coverage*
           else
-            echo "No SigStore signing artefacts to purge"
+            echo "No test coverage reports to purge"
           fi
+          echo "Debugging; here are the contents of: ${{ env.BUILD_ARTEFACTS }}"
+          ls ${{ env.BUILD_ARTEFACTS }}
+          rm dist/test* > /dev/null 2>&1
 
       - name: "Check PROJECT in Test PyPI"
         id: testpypi-project-url-check
