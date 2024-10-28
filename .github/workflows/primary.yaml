@@ -107,7 +107,7 @@ jobs:
       build_tag: "v5.0.0-dev2"
 
   pypi-test:
-    name: "PyPI Publish [Test]"
+    name: "[Test]"
     uses: os-climate/osc-github-devops/.github/workflows/pypi-publish.yaml@main
     needs:
       - repository
@@ -118,7 +118,7 @@ jobs:
       build_tag: "v5.0.0-dev2"
 
   pypi:
-    name: "PyPI Publish"
+    name: "[Production]"
     uses: os-climate/osc-github-devops/.github/workflows/pypi-publish.yaml@main
     needs:
       - repository
