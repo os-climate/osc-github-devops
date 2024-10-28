@@ -9,10 +9,9 @@ on:
   workflow_call:
     inputs:
       TEST:
-        description: "Release to test instance of PyPI"
+        description: "URL/prefix for package index"
         type: boolean
         required: false
-        default: true
       BUILD_TAG:
         description: "Semantic tag for this release/build"
         type: string
@@ -31,10 +30,24 @@ jobs:
       name: development
 
     steps:
+      # Need repository content to extract project name
+      - uses: actions/checkout@v4
       - name: "Extract project/repository naming"
         id: naming
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/python-project-name@main
+
+      - name: "Build publishing URL"
+        shell: bash
+        run: |
+          # Build publishing URL
+          if [ -z ${{ inputs.TEST }} ]; then
+            PUBLISH_URL="https://pypi.org/"
+          else
+            PUBLISH_URL="https://test.pypi.org/"
+          fi
+          echo "Using publishing URL/prefix: $PUBLISH_URL"
+          echo "PUBLISH_URL=$PUBLISH_URL" >> "$GITHUB_ENV"
 
       - name: "⬇ Download build artefacts"
         uses: actions/download-artifact@v4
@@ -72,7 +85,8 @@ jobs:
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/url-validity-check@main
         with:
-          prefix: "https://test.pypi.org/project"
+          prefix: "${{ env.PUBLISH_URL }}/project"
+          # prefix: "https://test.pypi.org/project"
           # Use project name, e.g. "/ITR"
           string: "/${{ steps.naming.outputs.python_project_name }}"
           suffix: "/"
@@ -82,7 +96,8 @@ jobs:
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/url-validity-check@main
         with:
-          prefix: "https://test.pypi.org/project"
+          prefix: "${{ env.PUBLISH_URL }}/project"
+          # prefix: "https://test.pypi.org/project"
           # Use project name, e.g. "/ITR"
           string: "/${{ steps.naming.outputs.python_project_name }}"
           # TODO - the below is no longer doing tag processing
@@ -119,7 +134,7 @@ jobs:
         # Used initially when trusted publishing is unavailable
         if: steps.testpypi-project-url-check.outputs.valid == 'false'
         with:
-          repository-url: https://test.pypi.org/legacy/
+          repository-url: "${{ env.PUBLISH_URL }}/legacy/"
           # Show checksum values
           print-hash: true
           packages-dir: ${{ env.BUILD_ARTEFACTS }}
