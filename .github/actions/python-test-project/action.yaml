@@ -88,5 +88,5 @@ runs:
       if: inputs.REPORT_ARTEFACT == 'true'
       with:
         name: test_coverage_report-${{ inputs.PYTHON_VERSION }}.zip
-        path: test_coverage_report-${{ inputs.PYTHON_VERSION }}.zip
+        path: coverage_reports/
         retention-days: 90

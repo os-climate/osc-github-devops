@@ -21,6 +21,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: "Show artefact directory contents"
+        shell: bash
+        run: |
+          # Show artefact directory contents
+          # ToDo: REMOVE!!!
+          ls dist/ || true
+
       - name: "Set up Python ${{ inputs.python_version }}"
         uses: actions/setup-python@v5
         with:
