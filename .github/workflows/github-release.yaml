@@ -62,7 +62,6 @@ jobs:
           files: |
             ${{ inputs.artefact_location }}/*.tar.gz
             ${{ inputs.artefact_location }}/*.whl
-            ${{ inputs.artefact_location }}/*.zip
             ${{ inputs.artefact_location }}/*.sigstore*
 
       - name: "Print summary/job output"

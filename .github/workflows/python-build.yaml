@@ -99,12 +99,6 @@ jobs:
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/python-twine-check@main
 
-      - name: "Upload build artefacts"
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.python_project_name }}-${{ inputs.build_tag }}
-          path: ${{ inputs.ARTEFACT_LOCATION }}
-
       # This step optional and must be explicitly requested (passed the relevant input)
       #  GitHub attestations are now used in favour of standard SigStore signing
       - name: "Sign packages with SigStore"
@@ -116,3 +110,9 @@ jobs:
           inputs: >-
             ./${{ inputs.ARTEFACT_LOCATION }}/*.tar.gz
             ./${{ inputs.ARTEFACT_LOCATION }}/*.whl
+
+      - name: "Upload build artefacts"
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.python_project_name }}-${{ inputs.build_tag }}
+          path: ${{ inputs.ARTEFACT_LOCATION }}
