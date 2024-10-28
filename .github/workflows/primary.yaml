@@ -34,7 +34,7 @@ jobs:
       # Required for action that creates labels: github-labels
       contents: write
 
-  secrets:
+  check-secrets:
     name: "Required Credentials"
     runs-on: ubuntu-latest
     steps:
@@ -107,7 +107,7 @@ jobs:
       build_tag: "v5.0.0-dev2"
 
   pypi-test:
-    name: "[Test]"
+    name: "Publish [Test]"
     uses: os-climate/osc-github-devops/.github/workflows/pypi-publish.yaml@main
     needs:
       - repository
@@ -116,9 +116,11 @@ jobs:
       - python-security
     with:
       build_tag: "v5.0.0-dev2"
+    secrets:
+      ONE_PASSWORD_PRODUCTION: ${{ secrets.ONE_PASSWORD_PRODUCTION }}
 
   pypi:
-    name: "[Production]"
+    name: "Publish"
     uses: os-climate/osc-github-devops/.github/workflows/pypi-publish.yaml@main
     needs:
       - repository
@@ -129,6 +131,8 @@ jobs:
     with:
       test: false
       build_tag: "v5.0.0-dev2"
+    secrets:
+      ONE_PASSWORD_PRODUCTION: ${{ secrets.ONE_PASSWORD_PRODUCTION }}
 
   python-security:
     name: "Security/Audit"

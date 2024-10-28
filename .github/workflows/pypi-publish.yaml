@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
 
-name: "📦 [R] PyPI Publish"
+name: "📦 [R] PyPI"
 # Publishes a Python package to PyPI"
 
 on:
@@ -43,11 +43,14 @@ jobs:
           # Build publishing URL
           if [ -z ${{ inputs.TEST }} ]; then
             PUBLISH_URL="https://pypi.org/"
+            PYPI_CREDENTIAL="op://hdiyadcjno2knqgvcy4wj5ulya/vds5rebqxeqfrjqwpszxxicmzq/password"
           else
             PUBLISH_URL="https://test.pypi.org/"
+            PYPI_CREDENTIAL="op://hdiyadcjno2knqgvcy4wj5ulya/tm2ffuusrynfivtcsnamginhm4/password"
           fi
           echo "Using publishing URL/prefix: $PUBLISH_URL"
           echo "PUBLISH_URL=$PUBLISH_URL" >> "$GITHUB_ENV"
+          echo "PYPI_CREDENTIAL=$PYPI_CREDENTIAL" >> "$GITHUB_ENV"
 
       - name: "⬇ Download build artefacts"
         uses: actions/download-artifact@v4
@@ -125,7 +128,7 @@ jobs:
           # Export loaded secrets as environment variables
           export-env: true
         env:
-          PYPI_TEST_CREDENTIAL: "op://hdiyadcjno2knqgvcy4wj5ulya/tm2ffuusrynfivtcsnamginhm4/password"
+          PYPI_CREDENTIAL: "${{ env.PYPI_CREDENTIAL}}"
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.one_password_production }}
 
       - name: "Publish to Test PyPI [1Password: API Key]"
@@ -144,7 +147,7 @@ jobs:
           verbose: true
           # Organisation secret/variable
           # Defined/stored in 1Password
-          password: ${{ env.PYPI_TEST_CREDENTIAL }}
+          password: "${{ env.PYPI_CREDENTIAL}}"
 
       #- name: "Publish to Test PyPI [Fallback: API Key]"
       #  uses: pypa/gh-action-pypi-publish@release/v1
