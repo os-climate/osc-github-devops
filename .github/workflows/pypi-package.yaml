@@ -183,5 +183,8 @@ jobs:
         shell: bash
         run: |
           # Print summary/job output
-
-          echo "# 🚀 PyPI Publish" >> "$GITHUB_STEP_SUMMARY"
+          if [ ${{ inputs.TEST }} = "true" ]; then
+            echo "Successfully tested publishing to PyPI" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "# 🚀 Published Release to PyPI" >> "$GITHUB_STEP_SUMMARY"
+          fi
