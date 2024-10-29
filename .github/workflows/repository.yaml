@@ -16,8 +16,6 @@ on:
         description: "The Repository name"
         value: ${{ jobs.repository.outputs.repository_name }}
 
-      # tag_push_event: ${{ steps.repository.outputs.tagged }}
-
       # Repository content classifications
       python_project:
         value: ${{ jobs.repository.outputs.python_project }}
@@ -31,6 +29,12 @@ on:
         value: ${{ jobs.repository.outputs.jupyter_notebooks }}
       tox_config:
         value: ${{ jobs.repository.outputs.tox_config }}
+
+      # Tags for subsequent actions
+      pushed_tag:
+        value: ${{ jobs.repository.outputs.pushed_tag }}
+      build_tag:
+        value: ${{ jobs.repository.outputs.build_tag }}
 
 jobs:
   repository:
@@ -49,16 +53,13 @@ jobs:
       jupyter_notebooks: ${{ steps.content.outputs.jupyter_notebooks }}
       tox_config: ${{ steps.content.outputs.tox_config }}
 
+      # Tags that were pushed to the repository
+      pushed_tag: ${{ steps.content.outputs.pushed_tag }}
+      build_tag: ${{ steps.content.outputs.build_tag }}
+
       # Label verification
       # present: ${{ steps.labels.outputs.present }}
       # created: ${{ steps.labels.outputs.created }}
-
-      # Tag metadata - to be removed/replaced
-      current_tag: "v0.1.0" # Placeholder value
-      tag_validity: "v0.1.0" # Placeholder value
-      development_tag: "v0.1.0" # Placeholder value
-      production_tag: "v0.1.0" # Placeholder value
-      prerelease: "v0.1.0" # Placeholder value
 
     permissions:
       # Required for action to create labels: github-mandatory-labels
@@ -84,19 +85,44 @@ jobs:
         # if: contains(github.event.head_commit.message, '[release]')
         uses: os-climate/osc-github-devops/.github/actions/semantic-tag-validate@main
         with:
-          tag: startsWith(github.ref, 'refs/tags/')
+          tag: ${{ github.ref_name }}
 
-      - name: "Output pushed tag"
-        id: tag-output
+      - name: "Pushed tag"
         if: startsWith(github.ref, 'refs/tags/')
+        id: pushed-tag
         run: |
-          # Output pushed tag
-          echo "Tag push: ${{ github.ref_name }}"
+          # Pushed tag values
           if [ ${{ steps.tag-validate.outputs.semantic }} == 'true' ]; then
-            echo "Tag passed semantic check"
-            echo "pushed_tag=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
-            echo "### Semantic tag pushed: ${{ github.ref_name }}" >> "$GITHUB_STEP_SUMMARY"
+            pushed_tag="${{ github.ref_name }}"
+            echo "Pushed semantic tag: $pushed_tag ✅"
+            echo "Pushed semantic tag: $pushed_tag ✅" >> "$GITHUB_STEP_SUMMARY"
+            echo "pushed_tag=$pushed_tag" >> "$GITHUB_ENV"
+            echo "pushed_tag=$pushed_tag" >> "$GITHUB_OUTPUT"
+          else
+            echo "The pushed tag was NOT semantic: ${{ github.ref_name }} ❌"
+            echo "The pushed tag was NOT semantic: ${{ github.ref_name }} ❌" >> "$GITHUB_STEP_SUMMARY"
+            exit 1
           fi
+
+      #- name: "Generate build tag"
+      #  id: development-tag
+      #  uses: os-climate/osc-github-devops/.github/actions/semantic-tag-development@main
+      #  with:
+      #    tag: startsWith(github.ref, 'refs/tags/')
+
+      - name: "Build tag"
+        id: build-tag
+        run: |
+          # Build tag
+          if [ -n ${{ env.pushed_tag }} ]; then
+            build_tag="${{ env.pushed_tag }}"
+          else
+            # ToDo: Replace with development tag
+            build_tag="v5.0.0-dev4"
+          fi
+          echo "Build tag: $build_tag ✅"
+          echo "build tag: $build_tag ✅" >> "$GITHUB_STEP_SUMMARY"
+          echo "build_tag=$build_tag" >> "$GITHUB_OUTPUT"
 
       #- name: "Verify/create labels"
       #  id: labels
