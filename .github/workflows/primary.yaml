@@ -109,7 +109,7 @@ jobs:
       build_tag: "v5.0.0-dev2"
 
   pypi-test:
-    name: "Publish [Test]"
+    name: "Test"
     uses: os-climate/osc-github-devops/.github/workflows/pypi-publish.yaml@main
     needs:
       - repository
@@ -122,7 +122,7 @@ jobs:
       ONE_PASSWORD_PRODUCTION: ${{ secrets.ONE_PASSWORD_PRODUCTION }}
 
   pypi:
-    name: "Publish"
+    name: "Release"
     if: startsWith(github.ref, 'refs/tags/') || contains(github.event.head_commit.message, '[release]')
     uses: os-climate/osc-github-devops/.github/workflows/pypi-publish.yaml@main
     needs:
@@ -139,53 +139,15 @@ jobs:
 
   python-security:
     name: "Security/Audit"
+    uses: os-climate/osc-github-devops/.github/workflows/python-security-matrix.yaml@main
     needs:
-      - repository
       - python-project
       - python-build
-    if: needs.repository.outputs.python_project  == 'true'
-    runs-on: "ubuntu-latest"
-    continue-on-error: true
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.python-project.outputs.matrix_json) }}
-    steps:
-      - name: "Checkout repository"
-        uses: actions/checkout@v4
-
-      - name: "⬇ Download build artefacts"
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ env.python_project_name }}
-          path: "dist"
-          # path: ${{ inputs.artefact_location }}
-
-      - name: "Set up Python ${{ matrix.python-version }}"
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      # - name: "Install PDM tooling"
-      #   uses: pdm-project/setup-pdm@v4
-      #   with:
-      #     python-version: ${{ matrix.python-version }}
-
-      - name: "Install package"
-        run: |
-          pip install -q --upgrade pip
-          # pdm lock
-          # pdm export -o requirements.txt
-          # python -m pip install -q -r requirements.txt
-          # python -m pip install -q .
-          # pip install --upgrade -q setuptools
-          for file in dist/*.whl; do
-                  pip install "$file"
-          done
-          # Finish by diplaying the packages in scope
-          pdm list --graph
-
-      - name: "Auditing with: pip audit"
-        uses: pypa/gh-action-pip-audit@v1.1.0
+    with:
+      python_version: ${{ matrix.python-version }}
 
   notebooks:
     name: "Jupyter/Notebooks"

@@ -3,7 +3,7 @@
 # SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
 
 name: "📦 [R] GitHub Release"
-# Packages a development/production release on GitHub"
+# Packages a development/production release on GitHub
 
 on:
   workflow_call:
