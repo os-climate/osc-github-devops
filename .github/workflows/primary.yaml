@@ -80,7 +80,7 @@ jobs:
       attestations: write
     with:
       build_python_version: ${{ needs.python-project.outputs.build_python_version }}
-      build_tag: "v5.0.0-dev3"
+      build_tag: ${{ needs.repository.outputs.build_tag }}
 
   python-test:
     name: "Test"
@@ -136,7 +136,7 @@ jobs:
       # Needed both here and in the called workflow
       contents: write
     with:
-      build_tag: "v5.0.0-dev3"
+      build_tag: ${{ needs.repository.outputs.build_tag }}
 
   pypi-test:
     name: "Test"
@@ -148,7 +148,7 @@ jobs:
       - python-security
     with:
       test: true
-      build_tag: "v5.0.0-dev3"
+      build_tag: ${{ needs.repository.outputs.build_tag }}
     secrets:
       ONE_PASSWORD_PRODUCTION: ${{ secrets.ONE_PASSWORD_PRODUCTION }}
 
@@ -163,6 +163,6 @@ jobs:
       - python-security
       - pypi-test
     with:
-      build_tag: "v5.0.0-dev3"
+      build_tag: ${{ needs.repository.outputs.build_tag }}
     secrets:
       ONE_PASSWORD_PRODUCTION: ${{ secrets.ONE_PASSWORD_PRODUCTION }}
