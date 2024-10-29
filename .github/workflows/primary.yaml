@@ -79,7 +79,7 @@ jobs:
       attestations: write
     with:
       build_python_version: ${{ needs.python-project.outputs.build_python_version }}
-      build_tag: "v5.0.0-dev2"
+      build_tag: "v5.0.0-dev3"
 
   python-test:
     name: "Test"
@@ -106,10 +106,10 @@ jobs:
       # Needed both here and in the called workflow
       contents: write
     with:
-      build_tag: "v5.0.0-dev2"
+      build_tag: "v5.0.0-dev3"
 
   pypi-test:
-    name: "Tests"
+    name: "Test"
     uses: os-climate/osc-github-devops/.github/workflows/pypi-release.yaml@main
     needs:
       - repository
@@ -117,7 +117,7 @@ jobs:
       - python-test
       - python-security
     with:
-      build_tag: "v5.0.0-dev2"
+      build_tag: "v5.0.0-dev3"
     secrets:
       ONE_PASSWORD_PRODUCTION: ${{ secrets.ONE_PASSWORD_PRODUCTION }}
 
@@ -133,12 +133,12 @@ jobs:
       - pypi-test
     with:
       test: false
-      build_tag: "v5.0.0-dev2"
+      build_tag: "v5.0.0-dev3"
     secrets:
       ONE_PASSWORD_PRODUCTION: ${{ secrets.ONE_PASSWORD_PRODUCTION }}
 
   python-security:
-    name: "Security/Audit"
+    name: "Security"
     uses: os-climate/osc-github-devops/.github/workflows/python-security.yaml@main
     needs:
       - python-project
@@ -150,64 +150,13 @@ jobs:
       python_version: ${{ matrix.python-version }}
 
   notebooks:
-    name: "Jupyter/Notebooks"
+    name: "Jupyter Notebooks"
+    uses: os-climate/osc-github-devops/.github/workflows/jupyter-notebooks.yaml@main
     needs:
       - repository
       - python-project
       - python-build
-    runs-on: "ubuntu-latest"
-    continue-on-error: false
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.python-project.outputs.matrix_json) }}
-    # Don't run when pull request is merged, only if Jupyter Notebooks are present
     if: needs.repository.outputs.jupyter_notebooks  == 'true'
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: "Setup Python"
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: "Set up Python ${{ matrix.python-version }}"
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: "Install PDM tooling"
-        uses: pdm-project/setup-pdm@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: "Install notebook/test dependencies"
-        run: |
-          # Install notebook/test dependencies
-          python -m pip install -q --upgrade pip
-          pdm export -o requirements.txt
-          if [ -f requirements.txt ]; then
-            pip install -r requirements.txt
-          fi
-          pip install -q .
-          pip install -q pytest nbmake
-
-      - name: "Testing Jupyter notebooks"
-        run: |
-          # Testing Jupyter notebooks
-          # Consider enabling the line below when debugging/testing
-          # find . -name '*.ipynb'
-          echo "Running command: pytest --nbmake -- **/*.ipynb"
-          pytest --nbmake src/*/*.ipynb --cov=src/devops_reusable_workflows
-          # Might need an __init__.py file in tests folder for notebooks there to be tested?
-          # https://stackoverflow.com/questions/47287721/coverage-py-warning-no-data-was-collected-no-data-collected
-          # pytest --nbmake tests/test_*.ipynb --cov=tests
-
-      # TEMP DISABLED - NEED TO CHECK - WHERE ARE THESE LOGS GENERATED???
-      # - name: "Upload Logs"
-      #   if: always()
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: debug-logs
-      #     path: /tmp/*.log
-      #     retention-days: 14
