@@ -54,8 +54,8 @@ jobs:
       tox_config: ${{ steps.content.outputs.tox_config }}
 
       # Tags that were pushed to the repository
-      pushed_tag: ${{ steps.content.outputs.pushed_tag }}
-      build_tag: ${{ steps.content.outputs.build_tag }}
+      pushed_tag: ${{ steps.pushed-tag.outputs.pushed_tag }}
+      build_tag: ${{ steps.build-tag.outputs.build_tag }}
 
       # Label verification
       # present: ${{ steps.labels.outputs.present }}
@@ -95,7 +95,7 @@ jobs:
           if [ ${{ steps.tag-validate.outputs.semantic }} == 'true' ]; then
             pushed_tag="${{ github.ref_name }}"
             echo "Pushed semantic tag: $pushed_tag ✅"
-            echo "Pushed semantic tag: $pushed_tag ✅" >> "$GITHUB_STEP_SUMMARY"
+            echo "Pushed tag: $pushed_tag ✅" >> "$GITHUB_STEP_SUMMARY"
             echo "pushed_tag=$pushed_tag" >> "$GITHUB_ENV"
             echo "pushed_tag=$pushed_tag" >> "$GITHUB_OUTPUT"
           else
@@ -117,11 +117,10 @@ jobs:
           if [ -z ${{ env.pushed_tag }} ]; then
             # ToDo: Replace with development tag
             build_tag="v5.0.0-dev4"
+            echo "Build tag: $build_tag ✅"
           else
             build_tag="${{ env.pushed_tag }}"
           fi
-          echo "Build tag: $build_tag ✅"
-          echo "build tag: $build_tag ✅" >> "$GITHUB_STEP_SUMMARY"
           echo "build_tag=$build_tag" >> "$GITHUB_OUTPUT"
 
       #- name: "Verify/create labels"
