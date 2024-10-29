@@ -49,8 +49,9 @@ jobs:
       - name: "Install build products/dependencies"
         run: |
           # Install build products/dependencies
-          # Note: setuptools must explicitly be updated otherwise it WILL be flagged
-          pip install -q --upgrade pip setuptools
+          echo "Upgrading: pip, setuptools"
+          python -m pip install -q --upgrade pip setuptools
+          echo "Installing built package(s) and dependencies"
           for wheel in ${{ inputs.artefact_location }}/*.whl; do
                   pip install -q "$wheel"
           done
