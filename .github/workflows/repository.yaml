@@ -50,8 +50,8 @@ jobs:
       tox_config: ${{ steps.content.outputs.tox_config }}
 
       # Label verification
-      present: ${{ steps.labels.outputs.present }}
-      created: ${{ steps.labels.outputs.created }}
+      # present: ${{ steps.labels.outputs.present }}
+      # created: ${{ steps.labels.outputs.created }}
 
       # Tag metadata - to be removed/replaced
       current_tag: "v0.1.0" # Placeholder value
@@ -78,7 +78,27 @@ jobs:
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/repository-content@main
 
-      - name: "Verify/create labels"
-        id: labels
-        # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/github-labels@main
+      - name: "Verify pushed tag"
+        id: tag-validate
+        if: startsWith(github.ref, 'refs/tags/')
+        # if: contains(github.event.head_commit.message, '[release]')
+        uses: os-climate/osc-github-devops/.github/actions/semantic-tag-validate@mail
+        with:
+          tag: startsWith(github.ref, 'refs/tags/')
+
+      - name: "Output pushed tag"
+        id: tag-output
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          # Output pushed tag
+          echo "Tag push: ${{ github.ref_name }}"
+          if [ ${{ steps.tag-validate.outputs.semantic }} == 'true' ]; then
+            echo "Tag passed semantic check"
+            echo "pushed_tag=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+            echo "### Semantic tag pushed: ${{ github.ref_name }}" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      #- name: "Verify/create labels"
+      #  id: labels
+      #  # yamllint disable-line rule:line-length
+      #  uses: os-climate/osc-github-devops/.github/actions/github-labels@main

@@ -21,7 +21,7 @@ outputs:
     value: ${{ steps.repository-tags.outputs.vtag }}
   TAG_VALIDITY:
     description: "Flags if the current repository tag is NOT semantic"
-    value: ${{ steps.repository-tags.outputs.tag_validity }}
+    value: ${{ steps.repository-tags.outputs.current_tag_semantic }}
   DEVELOPMENT_TAG:
     description: "Semantic tag for next development release/build"
     value: ${{ steps.tagging.outputs.development_tag }}

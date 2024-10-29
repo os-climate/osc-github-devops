@@ -28,7 +28,7 @@ outputs:
     value: ${{ steps.results.outputs.vtag }}
   CURRENT_TAG_SEMANTIC:
     description: "Set true if current tag is semantic"
-    value: ${{ steps.results.outputs.invalid }}
+    value: ${{ steps.results.outputs.semantic }}
 
 runs:
   using: "composite"
@@ -113,5 +113,5 @@ runs:
         echo "current_tag=${TAG}" >> "$GITHUB_OUTPUT"
         echo "current_vtag=v${TAG}" >> "$GITHUB_ENV"
         echo "current_vtag=v${TAG}" >> "$GITHUB_OUTPUT"
-        echo "current_tag_semantic=${{ steps.validate.outputs.valid }}" >> "$GITHUB_ENV"
-        echo "current_tag_semantic=${{ steps.validate.outputs.valid }}" >> "$GITHUB_OUTPUT"
+        echo "current_tag_semantic=${{ steps.validate.outputs.semantic }}" >> "$GITHUB_ENV"
+        echo "current_tag_semantic=${{ steps.validate.outputs.semantic }}" >> "$GITHUB_OUTPUT"
