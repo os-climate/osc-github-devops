@@ -38,8 +38,8 @@ jobs:
             echo "Installing dependencies from: requirements.txt"
             pip install -q -r requirements.txt
           fi
-          echo "Installing: pytest, nbmake"
-          pip install -q pytest nbmake
+          echo "Installing: pytest, pytest-cov, nbmake"
+          pip install -q pytest pytest-cov nbmake
 
       - name: "Testing Jupyter Notebooks"
         run: |
