@@ -51,19 +51,12 @@ jobs:
       # with:
       # python-version: ${{ inputs.python_version }}
 
-      - name: "Install package"
+      - name: "Install packages"
         run: |
           pip install -q --upgrade pip
-          # pdm lock
-          # pdm export -o requirements.txt
-          # python -m pip install -q -r requirements.txt
-          # python -m pip install -q .
-          # pip install --upgrade -q setuptools
           for wheel in ${{ inputs.artefact_location }}/*.whl; do
                   pip install "$wheel"
           done
-          # Finish by diplaying the packages in scope
-          pdm list --graph
 
       - name: "Auditing with: pip audit"
         uses: pypa/gh-action-pip-audit@v1.1.0

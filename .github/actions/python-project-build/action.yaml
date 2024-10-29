@@ -95,6 +95,13 @@ runs:
         fi
         echo "Build succeeded"
 
+    - name: "Package dependency graph"
+      id: show-graph
+      shell: bash
+      run: |
+        # Package dependency graph
+        pdm list --graph
+
     - name: "Capture build artefact names"
       id: artefact-naming
       shell: bash
