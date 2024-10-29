@@ -114,11 +114,11 @@ jobs:
         id: build-tag
         run: |
           # Build tag
-          if [ -n ${{ env.pushed_tag }} ]; then
-            build_tag="${{ env.pushed_tag }}"
-          else
+          if [ -z ${{ env.pushed_tag }} ]; then
             # ToDo: Replace with development tag
             build_tag="v5.0.0-dev4"
+          else
+            build_tag="${{ env.pushed_tag }}"
           fi
           echo "Build tag: $build_tag ✅"
           echo "build tag: $build_tag ✅" >> "$GITHUB_STEP_SUMMARY"
