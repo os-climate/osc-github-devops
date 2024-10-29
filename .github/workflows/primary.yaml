@@ -123,6 +123,7 @@ jobs:
 
   pypi:
     name: "Publish"
+    if: startsWith(github.ref, 'refs/tags/') || contains(github.event.head_commit.message, '[release]')
     uses: os-climate/osc-github-devops/.github/workflows/pypi-publish.yaml@main
     needs:
       - repository
@@ -152,6 +153,13 @@ jobs:
       - name: "Checkout repository"
         uses: actions/checkout@v4
 
+      - name: "⬇ Download build artefacts"
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.python_project_name }}
+          path: "dist"
+          # path: ${{ inputs.artefact_location }}
+
       - name: "Set up Python ${{ matrix.python-version }}"
         uses: actions/setup-python@v5
         with:
@@ -162,17 +170,19 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: "Install dependencies"
+      - name: "Install package"
         run: |
           pip install -q --upgrade pip
-          pdm lock
-          pdm export -o requirements.txt
-          python -m pip install -q -r requirements.txt
-          python -m pip install -q .
-          pip install --upgrade -q setuptools
+          # pdm lock
+          # pdm export -o requirements.txt
+          # python -m pip install -q -r requirements.txt
+          # python -m pip install -q .
+          # pip install --upgrade -q setuptools
+          pip install dist/*.whl
+          # Finish by diplaying the packages in scope
           pdm list --graph
 
-      - name: "Perform package auditing"
+      - name: "Auditing with: pip audit"
         uses: pypa/gh-action-pip-audit@v1.1.0
 
   notebooks:
