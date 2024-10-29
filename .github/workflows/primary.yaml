@@ -165,10 +165,10 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: "Install PDM tooling"
-        uses: pdm-project/setup-pdm@v4
-        with:
-          python-version: ${{ matrix.python-version }}
+      # - name: "Install PDM tooling"
+      #   uses: pdm-project/setup-pdm@v4
+      #   with:
+      #     python-version: ${{ matrix.python-version }}
 
       - name: "Install package"
         run: |
@@ -178,7 +178,9 @@ jobs:
           # python -m pip install -q -r requirements.txt
           # python -m pip install -q .
           # pip install --upgrade -q setuptools
-          pip install dist/*.whl
+          for file in dist/*.whl; do
+                  pip install "$file"
+          done
           # Finish by diplaying the packages in scope
           pdm list --graph
 
