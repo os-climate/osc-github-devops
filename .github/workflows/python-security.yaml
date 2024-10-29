@@ -46,17 +46,18 @@ jobs:
         with:
           python-version: ${{ inputs.python_version }}
 
-      # - name: "Install PDM tooling"
-      #   uses: pdm-project/setup-pdm@v4
-      # with:
-      # python-version: ${{ inputs.python_version }}
-
-      - name: "Install packages"
+      - name: "Install build products/dependencies"
         run: |
-          pip install -q --upgrade pip
+          # Install build products/dependencies
+          # Note: setuptools must explicitly be updated otherwise it WILL be flagged
+          pip install -q --upgrade pip setuptools
           for wheel in ${{ inputs.artefact_location }}/*.whl; do
-                  pip install "$wheel"
+                  pip install -q "$wheel"
           done
+          if [ -f requirements.txt ]; then
+            echo "Installing dependencies from: requirements.txt"
+            pip install -q -r requirements.txt
+          fi
 
       - name: "Auditing with: pip audit"
         uses: pypa/gh-action-pip-audit@v1.1.0
