@@ -109,8 +109,8 @@ jobs:
       build_tag: "v5.0.0-dev2"
 
   pypi-test:
-    name: "Test"
-    uses: os-climate/osc-github-devops/.github/workflows/pypi-publish.yaml@main
+    name: "Tests"
+    uses: os-climate/osc-github-devops/.github/workflows/pypi-release.yaml @main
     needs:
       - repository
       - python-build
@@ -124,7 +124,7 @@ jobs:
   pypi:
     name: "Release"
     if: startsWith(github.ref, 'refs/tags/') || contains(github.event.head_commit.message, '[release]')
-    uses: os-climate/osc-github-devops/.github/workflows/pypi-publish.yaml@main
+    uses: os-climate/osc-github-devops/.github/workflows/pypi-release.yaml @main
     needs:
       - repository
       - python-build
