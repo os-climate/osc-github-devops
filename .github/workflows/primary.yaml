@@ -139,7 +139,7 @@ jobs:
 
   python-security:
     name: "Security/Audit"
-    uses: os-climate/osc-github-devops/.github/workflows/python-security-matrix.yaml@main
+    uses: os-climate/osc-github-devops/.github/workflows/python-security.yaml@main
     needs:
       - python-project
       - python-build
