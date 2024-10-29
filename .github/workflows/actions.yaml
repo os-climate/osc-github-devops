@@ -140,11 +140,11 @@ jobs:
         run: |
           # Check output from: semantic-tag-validate [semantic/junk]
           ERRORS="false"
-          if [ "${{ steps.semantic-tag-validate-good.outputs.valid }}" != "true" ]; then
+          if [ "${{ steps.semantic-tag-validate-good.outputs.semantic }}" != "true" ]; then
             echo "Errors with: semantic-tag-validate v1.2.3"
             ERRORS="true"
           fi
-          if [ "${{ steps.semantic-tag-validate-junk.outputs.valid }}" != "false" ]; then
+          if [ "${{ steps.semantic-tag-validate-junk.outputs.semantic }}" != "false" ]; then
             echo "Errors with: semantic-tag-production v1.not-valid.3.garbage"
             ERRORS="true"
           fi

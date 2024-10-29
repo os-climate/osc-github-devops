@@ -10,7 +10,7 @@ inputs:
     required: true
 
 outputs:
-  VALID:
+  SEMANTIC:
     description: "True if tag matches semantic versioning check"
     value: ${{ steps.validate.outputs.semantic }}
 

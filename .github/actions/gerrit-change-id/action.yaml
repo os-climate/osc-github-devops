@@ -6,14 +6,11 @@ name: "🏷️ Gerrit Change-Id"
 
 outputs:
   CHANGE_ID_LINE:
-    description: "True if tag matches semantic versioning check"
-    value: ${{ steps.validate.outputs.semantic }}
+    description: "Entire line string for Change-Id message"
+    value: ${{ steps.validate.outputs.change_id_line }}
   CHANGE_ID_VALUE:
-    description: "True if tag matches semantic versioning check"
-    value: ${{ steps.validate.outputs.semantic }}
-  CHANGE_ID_SHA:
-    description: "True if tag matches semantic versioning check"
-    value: ${{ steps.validate.outputs.semantic }}
+    description: "Just the SHA value with prefix (letter I)"
+    value: ${{ steps.validate.outputs.change_id_value }}
 
 runs:
   using: "composite"
