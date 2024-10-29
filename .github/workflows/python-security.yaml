@@ -1,0 +1,69 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+
+name: "📦 [R] Python Audit"
+# Packages a development/production release on GitHub"
+
+on:
+  workflow_call:
+    inputs:
+      PYTHON_VERSION:
+        # Usually specified/extracted from the file: pyproject.toml
+        description: "Python matrix versions to use for test builds (in JSON)"
+        required: true
+        type: string
+      ARTEFACT_LOCATION:
+        description: "Path/location for build artefacts"
+        type: string
+        required: false
+        default: "dist"
+
+jobs:
+  python-audit:
+    name: "Python Audit"
+    runs-on: "ubuntu-latest"
+    permissions:
+      contents: write
+
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
+
+      - name: "Extract project/repository naming"
+        id: naming
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/python-project-name@main
+
+      - name: "⬇ Download build artefacts"
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.python_project_name }}
+          path: ${{ inputs.artefact_location }}
+
+      - name: "Set up Python ${{ inputs.python_version }}"
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python_version }}
+
+      # - name: "Install PDM tooling"
+      #   uses: pdm-project/setup-pdm@v4
+      # with:
+      # python-version: ${{ inputs.python_version }}
+
+      - name: "Install package"
+        run: |
+          pip install -q --upgrade pip
+          # pdm lock
+          # pdm export -o requirements.txt
+          # python -m pip install -q -r requirements.txt
+          # python -m pip install -q .
+          # pip install --upgrade -q setuptools
+          for wheel in ${{ inputs.artefact_location }}/*.whl; do
+                  pip install "$wheel"
+          done
+          # Finish by diplaying the packages in scope
+          pdm list --graph
+
+      - name: "Auditing with: pip audit"
+        uses: pypa/gh-action-pip-audit@v1.1.0
