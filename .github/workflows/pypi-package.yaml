@@ -68,17 +68,6 @@ jobs:
           name: ${{ env.python_project_name }}
           path: ${{ inputs.artefact_location }}
 
-      - name: "Check project version matches pushed tags"
-        id: check-project
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: os-climate/osc-github-devops/.github/actions/python-project-version-vs-tag@main
-
-      - name: "Pushed tag != project metadata"
-        if: startsWith(github.ref, 'refs/tags/') && steps.check-project.outputs.match != true
-        run: |
-          # Pushed tag != project metadata
-          echo "### Pushed tag does not match pyproject.toml ❌" >> "$GITHUB_STEP_SUMMARY"
-
       - name: "Manicure artefacts directory"
         id: files
         run: |
