@@ -94,7 +94,7 @@ jobs:
       python_version: ${{ matrix.python-version }}
 
   github-release:
-    name: "GitHub Release"
+    name: "Release"
     if: startsWith(github.ref, 'refs/tags/') || contains(github.event.head_commit.message, '[release]')
     uses: os-climate/osc-github-devops/.github/workflows/github-release.yaml@main
     needs:
