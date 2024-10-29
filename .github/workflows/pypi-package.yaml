@@ -12,6 +12,7 @@ on:
         description: "URL/prefix for package index"
         type: boolean
         required: false
+        default: false
       BUILD_TAG:
         description: "Semantic tag for this release/build"
         type: string
@@ -47,10 +48,10 @@ jobs:
         run: |
           # Set workflow parameters and variables
           if [ -z ${{ inputs.TEST }} ]; then
-            PUBLISH_URL="https://pypi.org/"
+            PUBLISH_URL="https://pypi.org"
             PYPI_CREDENTIAL="op://hdiyadcjno2knqgvcy4wj5ulya/vds5rebqxeqfrjqwpszxxicmzq/password"
           else
-            PUBLISH_URL="https://test.pypi.org/"
+            PUBLISH_URL="https://test.pypi.org"
             PYPI_CREDENTIAL="op://hdiyadcjno2knqgvcy4wj5ulya/tm2ffuusrynfivtcsnamginhm4/password"
           fi
           echo "Using publishing URL/prefix: $PUBLISH_URL"

@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
 
-name: "🤖 [DM] DevOps Automation"
+name: "🤖 DevOps Automation"
 
 # yamllint disable-line rule:truthy
 on:
@@ -10,6 +10,7 @@ on:
   push:
     paths:
       - "**"
+      - "!.github/**"
       - "!.*"
       - "!pdm.lock"
       - "!tox.ini"
@@ -87,6 +88,35 @@ jobs:
     needs:
       - python-project
       - python-build
+    # Matrix job
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.python-project.outputs.matrix_json) }}
+    with:
+      python_version: ${{ matrix.python-version }}
+
+  python-security:
+    name: "Security"
+    uses: os-climate/osc-github-devops/.github/workflows/python-security.yaml@main
+    needs:
+      - python-project
+      - python-build
+    # Matrix job
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.python-project.outputs.matrix_json) }}
+    with:
+      python_version: ${{ matrix.python-version }}
+
+  notebooks:
+    name: "Jupyter Notebooks"
+    if: needs.repository.outputs.jupyter_notebooks  == 'true'
+    uses: os-climate/osc-github-devops/.github/workflows/jupyter-notebooks.yaml@main
+    needs:
+      - repository
+      - python-project
+      - python-build
+    # Matrix job
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.python-project.outputs.matrix_json) }}
@@ -110,13 +140,14 @@ jobs:
 
   pypi-test:
     name: "Test"
-    uses: os-climate/osc-github-devops/.github/workflows/pypi-release.yaml@main
+    uses: os-climate/osc-github-devops/.github/workflows/pypi-package.yaml@main
     needs:
       - repository
       - python-build
       - python-test
       - python-security
     with:
+      test: true
       build_tag: "v5.0.0-dev3"
     secrets:
       ONE_PASSWORD_PRODUCTION: ${{ secrets.ONE_PASSWORD_PRODUCTION }}
@@ -124,7 +155,7 @@ jobs:
   pypi:
     name: "Release"
     if: startsWith(github.ref, 'refs/tags/') || contains(github.event.head_commit.message, '[release]')
-    uses: os-climate/osc-github-devops/.github/workflows/pypi-release.yaml@main
+    uses: os-climate/osc-github-devops/.github/workflows/pypi-package.yaml@main
     needs:
       - repository
       - python-build
@@ -132,33 +163,6 @@ jobs:
       - python-security
       - pypi-test
     with:
-      test: false
       build_tag: "v5.0.0-dev3"
     secrets:
       ONE_PASSWORD_PRODUCTION: ${{ secrets.ONE_PASSWORD_PRODUCTION }}
-
-  python-security:
-    name: "Security"
-    uses: os-climate/osc-github-devops/.github/workflows/python-security.yaml@main
-    needs:
-      - python-project
-      - python-build
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJson(needs.python-project.outputs.matrix_json) }}
-    with:
-      python_version: ${{ matrix.python-version }}
-
-  notebooks:
-    name: "Jupyter Notebooks"
-    if: needs.repository.outputs.jupyter_notebooks  == 'true'
-    uses: os-climate/osc-github-devops/.github/workflows/jupyter-notebooks.yaml@main
-    needs:
-      - repository
-      - python-project
-      - python-build
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJson(needs.python-project.outputs.matrix_json) }}
-    with:
-      python_version: ${{ matrix.python-version }}
