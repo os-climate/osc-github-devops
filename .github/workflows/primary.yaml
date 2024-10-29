@@ -10,7 +10,9 @@ on:
   push:
     paths:
       - "**"
-      - "!.github/**"
+      - "!.*"
+      - "!pdm.lock"
+      - "!tox.ini"
 
 jobs:
   one-password:
