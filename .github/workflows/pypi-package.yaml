@@ -29,7 +29,7 @@ on:
 
 jobs:
   pypi-publish:
-    name: "PyPI Release"
+    name: "PyPI Packages"
     runs-on: "ubuntu-latest"
     environment:
       name: development
@@ -69,8 +69,15 @@ jobs:
           path: ${{ inputs.artefact_location }}
 
       - name: "Check project version matches pushed tags"
+        id: check-project
         if: startsWith(github.ref, 'refs/tags/')
         uses: os-climate/osc-github-devops/.github/actions/python-project-version-vs-tag@main
+
+      - name: "Pushed tag != project metadata"
+        if: startsWith(github.ref, 'refs/tags/') && steps.check-project.outputs.match != true
+        run: |
+          # Pushed tag != project metadata
+          echo "### Pushed tag does not match pyproject.toml ❌" >> "$GITHUB_STEP_SUMMARY"
 
       - name: "Manicure artefacts directory"
         id: files
@@ -94,7 +101,7 @@ jobs:
             echo "No SigStore signing artefacts to purge"
           fi
 
-      - name: "Check PROJECT in Test PyPI"
+      - name: "Check PROJECT in PyPI"
         id: testpypi-project-url-check
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/url-validity-check@main
@@ -105,7 +112,7 @@ jobs:
           string: "/${{ steps.naming.outputs.python_project_name }}"
           suffix: "/"
 
-      - name: "Check RELEASE in Test PyPI"
+      - name: "Check RELEASE in PyPI"
         id: testpypi-release-url-check
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/url-validity-check@main
