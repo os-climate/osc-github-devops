@@ -83,7 +83,7 @@ jobs:
 
   python-test:
     name: "Test"
-    uses: os-climate/osc-github-devops/.github/workflows/python-test-matrix.yaml@main
+    uses: os-climate/osc-github-devops/.github/workflows/python-tests.yaml@main
     needs:
       - python-project
       - python-build
