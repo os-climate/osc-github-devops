@@ -26,7 +26,7 @@ on:
         description: "Attest/sign packages during build"
         required: false
         type: boolean
-        default: true
+        default: false
       SIGSTORE_SIGN:
         description: "Sign build artefacts with Sigstore"
         required: false
@@ -35,7 +35,7 @@ on:
 
 jobs:
   python-build:
-    name: Python Project
+    name: "Python Project"
     runs-on: "ubuntu-latest"
     permissions:
       contents: write
@@ -84,15 +84,17 @@ jobs:
 
       - name: "Build Python project [ with attestation ]"
         id: python-build-attest
-        if: inputs.ATTEST_ARTEFACTS == 'true'
+        if: inputs.attest_artefacts == 'true'
         uses: os-climate/osc-github-devops/.github/actions/python-project-build@main
         with:
-          attest_artefacts: "true"
+          attest_artefacts: true
 
       - name: "Build Python project [ no attestation ]"
         id: python-build
-        if: inputs.ATTEST_ARTEFACTS == 'false'
+        if: inputs.attest_artefacts == 'false'
         uses: os-climate/osc-github-devops/.github/actions/python-project-build@main
+        with:
+          attest_artefacts: false
 
       - name: "Validate artefacts with Twine"
         id: python-twine-check
