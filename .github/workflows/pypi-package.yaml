@@ -26,7 +26,7 @@ on:
       ONE_PASSWORD_PRODUCTION:
         description: "1Password service account credential"
         required: false
-      PYPI_GITHUB_CREDENTIAL:
+      PYPI_CREDENTIAL_FROM_GITHUB:
         description: "PyPI credential from GitHub"
         required: false
 
@@ -188,7 +188,7 @@ jobs:
           packages-dir: ${{ env.ARTEFACT_LOCATION }}
           verify-metadata: false
           # Publishing API key stored as secret/variable in GitHub
-          password: ${{ secrets.PYPI_GITHUB_CREDENTIAL }}
+          password: ${{ secrets.PYPI_CREDENTIAL_FROM_GITHUB }}
 
       - name: "Print summary/job output"
         shell: bash
