@@ -34,8 +34,11 @@ on:
         default: true
 
 jobs:
-  python-build:
+  ### Build WITH artefact attestations
+
+  python-build-attest:
     name: "Python Project"
+    if: inputs.ATTEST_ARTEFACTS == 'true'
     runs-on: "ubuntu-latest"
     permissions:
       contents: write
@@ -43,6 +46,85 @@ jobs:
       id-token: write
       # Required for attestations
       attestations: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Set up Python ${{ inputs.build_python_version }}"
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.build_python_version }}
+
+      - name: "Install PDM tooling"
+        uses: pdm-project/setup-pdm@v4
+        with:
+          python-version: ${{ inputs.build_python_version }}
+
+      - name: "Extract python project name"
+        id: project-name
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/python-project-name@main
+
+      - name: "Extract python project version"
+        id: project-version
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/python-project-version@main
+
+      - name: "Build versioning"
+        id: versioning
+        if: inputs.build_tag
+        shell: bash
+        run: |
+          # Explicit build versioning
+          echo "Explicit build versioning: ${{ inputs.build_tag }}"
+          echo "build_tag=${{ inputs.build_tag }}" >> "$GITHUB_ENV"
+
+      - name: "Patch project versioning metadata"
+        if: env.python_project_version != inputs.build_tag
+        uses: os-climate/osc-github-devops/.github/actions/python-project-version-patch@main
+        with:
+          replacement_version: ${{ env.build_tag }}
+
+      - name: "Build Python project"
+        id: python-build-attest
+        uses: os-climate/osc-github-devops/.github/actions/python-project-build@main
+        with:
+          attest_artefacts: ${{ inputs.ATTEST_ARTEFACTS }}
+
+      - name: "Validate artefacts with Twine"
+        id: python-twine-check
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/python-twine-check@main
+
+      # This step optional and must be explicitly requested (passed the relevant input)
+      #  GitHub attestations are now used in favour of standard SigStore signing
+      - name: "Sign packages with SigStore"
+        uses: sigstore/gh-action-sigstore-python@v3.0.0
+        if: inputs.SIGSTORE_SIGN
+        env:
+          package-path: ${{ inputs.ARTEFACT_LOCATION }}
+        with:
+          inputs: >-
+            ./${{ inputs.ARTEFACT_LOCATION }}/*.tar.gz
+            ./${{ inputs.ARTEFACT_LOCATION }}/*.whl
+
+      - name: "Upload build artefacts"
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.python_project_name }}
+          path: ${{ inputs.ARTEFACT_LOCATION }}
+          if-no-files-found: error
+
+  ### Build WITHOUT artefact attestations
+
+  python-build:
+    name: "Python Project"
+    if: inputs.ATTEST_ARTEFACTS == 'false'
+    runs-on: "ubuntu-latest"
+    permissions:
+      contents: write
+      # Required by SigStore signing action
+      id-token: write
 
     steps:
       - uses: actions/checkout@v4
