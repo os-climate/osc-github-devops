@@ -27,11 +27,18 @@ runs:
       shell: bash
       run: |
         # Install test dependencies
-        python -m pip install --upgrade pip
-        pdm export -o requirements.txt
-        pip install --upgrade -r requirements.txt
-        pip install --upgrade pytest pytest-cov
-        pip install .
+        echo "Upgrading: pip"
+        python -m pip install -q --upgrade pip
+        echo "Installing: pytest, pytest-cov"
+        pip install -q pytest pytest-cov
+        if [ -f pyproject.toml ]; then
+          echo "Installing dependencies from: pyproject.toml"
+          pip install -q .
+        fi
+        if [ -f requirements.txt ]; then
+          echo "Installing dependencies from: requirements.txt"
+          pip install -q -r requirements.txt
+        fi
 
     # Add additional workflow test steps here:
     # 1. detect tox.ini
@@ -88,5 +95,5 @@ runs:
       if: inputs.REPORT_ARTEFACT == 'true'
       with:
         name: test_coverage_report-${{ inputs.PYTHON_VERSION }}.zip
-        path: coverage_reports/
+        path: test_coverage_report-${{ inputs.PYTHON_VERSION }}.zip
         retention-days: 90
