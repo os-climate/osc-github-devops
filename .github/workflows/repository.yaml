@@ -116,7 +116,7 @@ jobs:
           # Build tag
           if [ -z ${{ env.pushed_tag }} ]; then
             # ToDo: Replace with development tag
-            build_tag="v5.0.0-dev5"
+            build_tag="v5.0.0-dev6"
             echo "Build tag: $build_tag"
           else
             build_tag="${{ env.pushed_tag }}"
