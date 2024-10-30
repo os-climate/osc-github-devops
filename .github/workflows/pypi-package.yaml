@@ -62,7 +62,7 @@ jobs:
           echo "PYPI_CREDENTIAL=$PYPI_CREDENTIAL" >> "$GITHUB_ENV"
           if [ -n ${{ secrets.ONE_PASSWORD_PRODUCTION }} ]; then
             echo "1Password service account credential is available"
-            echo "Loaded: $PYPI_CREDENTIAL"
+            echo "Will load: $PYPI_CREDENTIAL"
             echo "use_one_password=true" >> "$GITHUB_ENV"
           else
             echo "use_one_password=false" >> "$GITHUB_ENV"
@@ -152,8 +152,8 @@ jobs:
           packages-dir: ${{ env.ARTEFACT_LOCATION }}
           # We already validated earlier in the pipeline (using twine)
           verify-metadata: false
-          # Optional debugging
-          # verbose: true
+          # Optional debugging, pretty much essential for information on failures
+          verbose: true
 
       # Only used with the publishing method below
       - name: "Retrieve credential [ 1Password ]"
@@ -178,6 +178,7 @@ jobs:
           print-hash: true
           packages-dir: ${{ env.ARTEFACT_LOCATION }}
           verify-metadata: false
+          verbose: true
           # Credential retrieved from 1Password using service account
           password: "${{ env.PYPI_CREDENTIAL}}"
 
@@ -191,6 +192,7 @@ jobs:
           print-hash: true
           packages-dir: ${{ env.ARTEFACT_LOCATION }}
           verify-metadata: false
+          verbose: true
           # Publishing API key stored as secret/variable in GitHub
           password: ${{ secrets.PYPI_CREDENTIAL_FROM_GITHUB }}
 
