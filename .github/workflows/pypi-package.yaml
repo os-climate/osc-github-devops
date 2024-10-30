@@ -97,7 +97,7 @@ jobs:
             echo "No SigStore signing artefacts to purge"
           fi
 
-      - name: "Check PROJECT in PyPI"
+      - name: "Checking PyPI [for PROJECT]"
         id: project-url-check
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/url-validity-check@main
@@ -108,7 +108,7 @@ jobs:
           string: "/${{ steps.naming.outputs.python_project_name }}"
           suffix: "/"
 
-      - name: "Check PROJECT/BUILD in PyPI"
+      - name: "Checking PyPI [for BUILD]"
         id: build-url-check
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/url-validity-check@main
@@ -156,7 +156,7 @@ jobs:
           # Optional debugging, pretty much essential for information on failures
           verbose: true
           # Reminder: mandatory for this action with trusted publishing
-          attestations: true
+          attestations: false # Currently too buggy to enable
 
       # Only used with the publishing method below
       - name: "Retrieve credential [ 1Password ]"

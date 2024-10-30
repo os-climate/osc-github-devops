@@ -79,7 +79,7 @@ jobs:
           exit 1
 
   python-build:
-    name: "Build [Attested]"
+    name: "Build"
     uses: os-climate/osc-github-devops/.github/workflows/python-build.yaml@main
     needs:
       - repository
