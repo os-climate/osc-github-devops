@@ -84,14 +84,14 @@ jobs:
 
       - name: "Build Python project [ with attestation ]"
         id: python-build-attest
-        if: inputs.attest_artefacts == 'true'
+        if: inputs.ATTEST_ARTEFACTS == 'true'
         uses: os-climate/osc-github-devops/.github/actions/python-project-build@main
         with:
           attest_artefacts: true
 
       - name: "Build Python project [ no attestation ]"
         id: python-build
-        if: inputs.attest_artefacts == 'false'
+        if: inputs.ATTEST_ARTEFACTS == 'false'
         uses: os-climate/osc-github-devops/.github/actions/python-project-build@main
         with:
           attest_artefacts: false
