@@ -163,7 +163,7 @@ jobs:
       build_tag: ${{ needs.repository.outputs.build_tag }}
     secrets:
       ONE_PASSWORD_PRODUCTION: ${{ secrets.ONE_PASSWORD_PRODUCTION }}
-      PYPI_DEVELOPMENT: ${{ secrets.PYPI_DEVELOPMENT }}
+      PYPI_CREDENTIAL_FROM_GITHUB: ${{ secrets.PYPI_DEVELOPMENT }}
 
   pypi:
     name: "Release"
@@ -179,4 +179,4 @@ jobs:
       build_tag: ${{ needs.repository.outputs.build_tag }}
     secrets:
       ONE_PASSWORD_PRODUCTION: ${{ secrets.ONE_PASSWORD_PRODUCTION }}
-      PYPI_PRODUCTION: ${{ secrets.PYPI_PRODUCTION }}
+      PYPI_CREDENTIAL_FROM_GITHUB: ${{ secrets.PYPI_PRODUCTION }}
