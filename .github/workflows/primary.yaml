@@ -15,9 +15,6 @@ on:
       - "!pdm.lock"
       - "!tox.ini"
 
-env:
-  attest_artefacts: false
-
 jobs:
   one-password:
     name: "1Password"
@@ -65,41 +62,24 @@ jobs:
       matrix_json: ${{ steps.python_project_metadata.outputs.matrix_json }}
       build_python_version: ${{ steps.python_project_metadata.outputs.build_python_version }}
     steps:
-      - name: "Extract Metadata"
+      - name: "Extract project metadata"
         id: python_project_metadata
         uses: os-climate/osc-github-devops/.github/actions/python-project-setup@main
 
-      - name: "Check tag matches project metadata"
+      - name: "Check pushed tag [CONDITIONAL/tag push]"
         id: check-project
         if: startsWith(github.ref, 'refs/tags/')
         uses: os-climate/osc-github-devops/.github/actions/python-project-version-vs-tag@main
 
-      - name: "Pushed tag != project metadata"
+      - name: "Report pushed tag mismatch [CONDITIONAL/tag push]"
         if: startsWith(github.ref, 'refs/tags/') && steps.check-project.outputs.match != true
         run: |
           # Pushed tag != project metadata
-          echo "## Pushed tag does not match pyproject.toml ❌" >> "$GITHUB_STEP_SUMMARY"
+          echo "## Pushed tag does not match pyproject.toml version ❌" >> "$GITHUB_STEP_SUMMARY"
           exit 1
 
-  # python-build-attest:
-  #   name: "Build [Attest]"
-  #   uses: os-climate/osc-github-devops/.github/workflows/python-build.yaml@main
-  #   needs:
-  #     - repository
-  #     - python-project
-  #   permissions:
-  #     contents: write
-  # Required by SigStore signing action
-  #     id-token: write
-  #     # Required for attestations
-  #     attestations: write
-  #   with:
-  #     build_python_version: ${{ needs.python-project.outputs.build_python_version }}
-  #     build_tag: ${{ needs.repository.outputs.build_tag }}
-  #     attest_artefacts: true
-
   python-build:
-    name: "Build [No Attest]"
+    name: "Build [Attested]"
     uses: os-climate/osc-github-devops/.github/workflows/python-build.yaml@main
     needs:
       - repository
@@ -108,6 +88,8 @@ jobs:
       contents: write
       # Required by SigStore signing action
       id-token: write
+      # Required for attestations
+      attestations: write
     with:
       build_python_version: ${{ needs.python-project.outputs.build_python_version }}
       build_tag: ${{ needs.repository.outputs.build_tag }}

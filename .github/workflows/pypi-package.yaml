@@ -22,6 +22,7 @@ on:
         type: string
         required: false
         default: "dist"
+
     secrets:
       ONE_PASSWORD_PRODUCTION:
         description: "1Password service account credential"
@@ -154,6 +155,8 @@ jobs:
           verify-metadata: false
           # Optional debugging, pretty much essential for information on failures
           verbose: true
+          # Reminder: mandatory for this action with trusted publishing
+          attestations: true
 
       # Only used with the publishing method below
       - name: "Retrieve credential [ 1Password ]"
