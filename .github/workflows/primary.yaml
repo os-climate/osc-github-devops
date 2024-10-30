@@ -15,6 +15,9 @@ on:
       - "!pdm.lock"
       - "!tox.ini"
 
+env:
+  attest_artefacts: false
+
 jobs:
   one-password:
     name: "1Password"
@@ -78,8 +81,25 @@ jobs:
           echo "## Pushed tag does not match pyproject.toml ❌" >> "$GITHUB_STEP_SUMMARY"
           exit 1
 
+  # python-build-attest:
+  #   name: "Build [Attest]"
+  #   uses: os-climate/osc-github-devops/.github/workflows/python-build.yaml@main
+  #   needs:
+  #     - repository
+  #     - python-project
+  #   permissions:
+  #     contents: write
+  # Required by SigStore signing action
+  #     id-token: write
+  #     # Required for attestations
+  #     attestations: write
+  #   with:
+  #     build_python_version: ${{ needs.python-project.outputs.build_python_version }}
+  #     build_tag: ${{ needs.repository.outputs.build_tag }}
+  #     attest_artefacts: true
+
   python-build:
-    name: "Build"
+    name: "Build [No Attest]"
     uses: os-climate/osc-github-devops/.github/workflows/python-build.yaml@main
     needs:
       - repository
@@ -88,12 +108,9 @@ jobs:
       contents: write
       # Required by SigStore signing action
       id-token: write
-      # Required for attestations
-      attestations: write
     with:
       build_python_version: ${{ needs.python-project.outputs.build_python_version }}
       build_tag: ${{ needs.repository.outputs.build_tag }}
-      attest_artefacts: false
 
   python-test:
     name: "Test"
