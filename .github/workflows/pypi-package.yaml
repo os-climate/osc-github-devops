@@ -26,6 +26,9 @@ on:
       ONE_PASSWORD_PRODUCTION:
         description: "1Password service account credential"
         required: false
+      PYPI_GITHUB_CREDENTIAL:
+        description: "PyPI credential from GitHub"
+        required: false
 
 jobs:
   pypi-publish:
@@ -59,7 +62,10 @@ jobs:
           echo "PYPI_CREDENTIAL=$PYPI_CREDENTIAL" >> "$GITHUB_ENV"
           if [ -n ${{ secrets.ONE_PASSWORD_PRODUCTION }} ]; then
             echo "1Password service account credential is available"
+            echo "Loaded: $PYPI_CREDENTIAL"
             echo "use_one_password=true" >> "$GITHUB_ENV"
+          else
+            echo "use_one_password=false" >> "$GITHUB_ENV"
           fi
 
       - name: "⬇ Download build artefacts"
@@ -101,8 +107,8 @@ jobs:
           string: "/${{ steps.naming.outputs.python_project_name }}"
           suffix: "/"
 
-      - name: "Check RELEASE in PyPI"
-        id: testpypi-release-url-check
+      - name: "Check PROJECT/BUILD in PyPI"
+        id: testpypi-build-url-check
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/url-validity-check@main
         with:
@@ -110,27 +116,45 @@ jobs:
           # prefix: "https://test.pypi.org/project"
           # Use project name, e.g. "/ITR"
           string: "/${{ steps.naming.outputs.python_project_name }}"
-          # TODO - the below is no longer doing tag processing
           suffix: "/${{ inputs.build_tag }}/"
 
-      #- name: "Publish to Test PyPI [Trusted Publishing]"
-      #  uses: pypa/gh-action-pypi-publish@release/v1
-      # Primary/default method uses trusted publishing
-      # yamllint disable-line rule:line-length
-      #  if: steps.testpypi-project-url-check.outputs.valid == 'true' && steps.testpypi-release-url-check.outputs.valid == 'false'
-      #  with:
-      #    repository-url: https://test.pypi.org/legacy/
-      # Show checksum values
-      #    print-hash: true
-      #    packages-dir: ${{ env.ARTEFACT_LOCATION }}
-      # We already validate earlier in the pipeline
-      #    verify-metadata: false
-      # Test releases are always debugged
-      #    verbose: true
+      - name: "Conditional publishing check"
+        id: check-environment
+        shell: bash
+        run: |
+          # Conditional publishing checks
+          if [ "$PUBLISH_URL" = "https://pypi.org" ] && \
+            [ "${{ steps.testpypi-build-url-check.outputs.valid }}" == 'true' ]; then
+            echo "This production build/release has already been published"
+            echo "An attempt to release more than once should always fail"
+            echo "# ❌ Cannot publish a production build/release more than once" >> "$GITHUB_STEP_SUMMARY"
+            echo "### $PUBLISH_URL" >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          elif [ "$PUBLISH_URL" = "https://test.pypi.org" ] && \
+            [ "${{ steps.testpypi-build-url-check.outputs.valid }}" == 'true' ]; then
+            echo "This test/development build/release has already been published"
+            exit 0
+          fi
 
-      - name: "Use Service Account [ Production ]"
+      # Primary/default method uses trusted publishing
+      - name: "Publish PyPI [Trusted Publishing]"
+        uses: pypa/gh-action-pypi-publish@release/v1
+        # yamllint disable-line rule:line-length
+        if: steps.testpypi-project-url-check.outputs.valid == 'true' && steps.testpypi-build-url-check.outputs.valid == 'false'
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          # Show checksum values
+          print-hash: true
+          packages-dir: ${{ env.ARTEFACT_LOCATION }}
+          # We already validated earlier in the pipeline (using twine)
+          verify-metadata: false
+          # Optional debugging
+          # verbose: true
+
+      # Only used with the publishing method below
+      - name: "Retrieve credential [ 1Password ]"
         id: one-password-pypi-test
-        if: env.use_one_password == 'true'
+        if: steps.testpypi-project-url-check.outputs.valid == 'false' && env.use_one_password == 'true'
         uses: 1password/load-secrets-action@v2
         with:
           # Export loaded secrets as environment variables
@@ -139,48 +163,40 @@ jobs:
           PYPI_CREDENTIAL: "${{ env.PYPI_CREDENTIAL}}"
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.one_password_production }}
 
-      - name: "Publish to Test PyPI [1Password: API Key]"
+      # Used once when trusted publishing is unavailable
+      # After that, the project should be configured for trusted publishing
+      # Note: this is a manual operation in the PyPI web portal
+      - name: "Publish PyPI [Credential from 1Password]"
         uses: pypa/gh-action-pypi-publish@release/v1
-        # Fallback method uses static organisation credentials
-        # Used initially when trusted publishing is unavailable
-        if: steps.testpypi-project-url-check.outputs.valid == 'false'
+        if: steps.testpypi-project-url-check.outputs.valid == 'false' && env.use_one_password == 'true'
         with:
           repository-url: "${{ env.PUBLISH_URL }}/legacy/"
-          # Show checksum values
           print-hash: true
           packages-dir: ${{ env.ARTEFACT_LOCATION }}
-          # We already validate earlier in the pipeline
           verify-metadata: false
-          # Test releases are always debugged
-          verbose: true
-          # Organisation secret/variable
-          # Defined/stored in 1Password
+          # Credential retrieved from 1Password using service account
           password: "${{ env.PYPI_CREDENTIAL}}"
 
-      #- name: "Publish to Test PyPI [Fallback: API Key]"
-      #  uses: pypa/gh-action-pypi-publish@release/v1
-      # Fallback method uses static organisation credentials
-      # Used initially when trusted publishing is unavailable
-      #  if: steps.testpypi-project-url-check.outputs.valid == 'false'
-      #  with:
-      #    repository-url: https://test.pypi.org/legacy/
-      # Show checksum values
-      #    print-hash: true
-      #    packages-dir: ${{ env.ARTEFACT_LOCATION }}
-      # We already validate earlier in the pipeline
-      #    verify-metadata: false
-      # Test releases are always debugged
-      #    verbose: true
-      # Organisation secret/variable
-      # Defined/stored in 1Password
-      #    password: ${{ secrets.PYPI_DEVELOPMENT }}
+      # Fallback method using credentials stored in GitHub
+      # Only used initially when trusted publishing is unavailable (see above)
+      - name: "Publish PyPI [Fallback: Credential from GitHub]"
+        uses: pypa/gh-action-pypi-publish@release/v1
+        if: steps.testpypi-project-url-check.outputs.valid == 'false' && env.use_one_password == 'false'
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          print-hash: true
+          packages-dir: ${{ env.ARTEFACT_LOCATION }}
+          verify-metadata: false
+          # Publishing API key stored as secret/variable in GitHub
+          password: ${{ secrets.PYPI_GITHUB_CREDENTIAL }}
 
       - name: "Print summary/job output"
         shell: bash
         run: |
           # Print summary/job output
           if [ ${{ inputs.TEST }} = "true" ]; then
-            echo "Successfully tested publishing to PyPI" >> "$GITHUB_STEP_SUMMARY"
+            echo "Successfully tested publishing to PyPI: $PUBLISH_URL" >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "# 🚀 Published Release to PyPI" >> "$GITHUB_STEP_SUMMARY"
+            echo "# 🚀 Published packages to PyPI" >> "$GITHUB_STEP_SUMMARY"
+            echo "### $PUBLISH_URL" >> "$GITHUB_STEP_SUMMARY"
           fi
