@@ -93,6 +93,7 @@ jobs:
     with:
       build_python_version: ${{ needs.python-project.outputs.build_python_version }}
       build_tag: ${{ needs.repository.outputs.build_tag }}
+      attest_artefacts: false
 
   python-test:
     name: "Test"
