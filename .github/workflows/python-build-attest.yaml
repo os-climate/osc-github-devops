@@ -29,7 +29,7 @@ on:
         default: true
 
 jobs:
-  ### Build WITHOUT artefact attestations
+  ### Build WITH artefact attestations
 
   python-build:
     name: "Python Project"
@@ -38,6 +38,8 @@ jobs:
       contents: write
       # Required by SigStore signing action
       id-token: write
+      # Required for attestations
+      attestations: write
 
     steps:
       - uses: actions/checkout@v4
@@ -81,7 +83,7 @@ jobs:
         id: python-build-attest
         uses: os-climate/osc-github-devops/.github/actions/python-project-build@main
         with:
-          attest_artefacts: false
+          attest_artefacts: true
 
       - name: "Validate artefacts with Twine"
         id: python-twine-check
