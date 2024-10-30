@@ -82,19 +82,11 @@ jobs:
         with:
           replacement_version: ${{ env.build_tag }}
 
-      - name: "Build Python project [ with attestation ]"
+      - name: "Build Python project"
         id: python-build-attest
-        if: inputs.ATTEST_ARTEFACTS == 'true'
         uses: os-climate/osc-github-devops/.github/actions/python-project-build@main
         with:
-          attest_artefacts: true
-
-      - name: "Build Python project [ no attestation ]"
-        id: python-build
-        if: inputs.ATTEST_ARTEFACTS == 'false'
-        uses: os-climate/osc-github-devops/.github/actions/python-project-build@main
-        with:
-          attest_artefacts: false
+          attest_artefacts: ${{ inputs.ATTEST_ARTEFACTS }}
 
       - name: "Validate artefacts with Twine"
         id: python-twine-check

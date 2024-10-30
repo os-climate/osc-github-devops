@@ -17,7 +17,6 @@ inputs:
   ATTEST_ARTEFACTS:
     description: "Attest/sign packages during build"
     required: false
-    type: boolean
     default: false
 
 outputs:
