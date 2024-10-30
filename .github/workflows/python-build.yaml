@@ -12,7 +12,7 @@ on:
         description: "Version used to upload/store artefacts for publishing"
         required: false
         type: string
-        default: 3.10
+        default: 3.11
       ARTEFACT_LOCATION:
         description: "Build artefacts will be output to this folder/directory"
         required: false
@@ -25,7 +25,7 @@ on:
       ATTEST_ARTEFACTS:
         description: "Attest/sign packages during build"
         required: false
-        type: string
+        type: boolean
         default: true
       SIGSTORE_SIGN:
         description: "Sign build artefacts with Sigstore"
@@ -84,7 +84,7 @@ jobs:
 
       - name: "Build Python project [ with attestation ]"
         id: python-build-attest
-        if: inputs.ATTEST_ARTEFACTS
+        if: inputs.ATTEST_ARTEFACTS == 'true'
         uses: os-climate/osc-github-devops/.github/actions/python-project-build@main
         with:
           attest_artefacts: "true"
