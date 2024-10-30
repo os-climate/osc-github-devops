@@ -14,10 +14,6 @@ inputs:
     description: "Purge target artefact path prior to builds"
     required: false
     default: false
-  ATTEST_ARTEFACTS:
-    description: "Attest/sign packages during build"
-    required: false
-    default: false
 
 outputs:
   DATETIME_STAMP:
@@ -111,18 +107,22 @@ runs:
         echo "whl_file=$WHL_FILE" >> "$GITHUB_OUTPUT"
         echo "tgz_file=$TGZ_FILE" >> "$GITHUB_OUTPUT"
 
-    - name: "Artefact attestation [WHL]"
+    - name: "Artefact attestation for: ${{ inputs.ARTEFACT_OUTPUT_PATH }}"
       id: attest-whl
-      if: inputs.ATTEST_ARTEFACTS == 'true'
       uses: actions/attest-build-provenance@v1
       with:
-        # e.g. dist/osc_github_devops-0.0.8.dev1-py3-none-any.whl
-        subject-path: "${{ steps.artefact-naming.outputs.whl_file }}"
+        subject-path: ${{ inputs.ARTEFACT_OUTPUT_PATH }}/*
 
-    - name: "Artefact attestation [TGZ]"
-      id: attest-tgz
-      if: inputs.ATTEST_ARTEFACTS == 'true'
-      uses: actions/attest-build-provenance@v1
-      with:
-        # e.g. dist/osc_github_devops-0.0.8.tar.gz
-        subject-path: "${{ steps.artefact-naming.outputs.tgz_file }}"
+    # - name: "Artefact attestation [WHL]"
+    #   id: attest-whl
+    #   uses: actions/attest-build-provenance@v1
+    #   with:
+    #     # e.g. dist/osc_github_devops-0.0.8.dev1-py3-none-any.whl
+    #     subject-path: "${{ steps.artefact-naming.outputs.whl_file }}"
+
+    # - name: "Artefact attestation [TGZ]"
+    #   id: attest-tgz
+    #   uses: actions/attest-build-provenance@v1
+    #   with:
+    #     # e.g. dist/osc_github_devops-0.0.8.tar.gz
+    #     subject-path: "${{ steps.artefact-naming.outputs.tgz_file }}"
