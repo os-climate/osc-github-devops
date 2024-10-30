@@ -161,6 +161,9 @@ jobs:
     with:
       test: true
       build_tag: ${{ needs.repository.outputs.build_tag }}
+    permissions:
+      # Needed for trusted publishing
+      id-token: write
     secrets:
       ONE_PASSWORD_PRODUCTION: ${{ secrets.ONE_PASSWORD_PRODUCTION }}
       PYPI_CREDENTIAL_FROM_GITHUB: ${{ secrets.PYPI_DEVELOPMENT }}
@@ -177,6 +180,9 @@ jobs:
       - pypi-test
     with:
       build_tag: ${{ needs.repository.outputs.build_tag }}
+    permissions:
+      # Needed for trusted publishing
+      id-token: write
     secrets:
       ONE_PASSWORD_PRODUCTION: ${{ secrets.ONE_PASSWORD_PRODUCTION }}
       PYPI_CREDENTIAL_FROM_GITHUB: ${{ secrets.PYPI_PRODUCTION }}
