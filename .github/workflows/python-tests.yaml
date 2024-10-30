@@ -26,11 +26,6 @@ jobs:
         with:
           python-version: ${{ inputs.python_version }}
 
-      - name: "Install PDM tooling"
-        uses: pdm-project/setup-pdm@v4
-        with:
-          python-version: ${{ inputs.python_version }}
-
       - name: "Test Python project"
         id: python-project-tests
         uses: os-climate/osc-github-devops/.github/actions/python-test-project@main

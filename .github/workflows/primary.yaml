@@ -30,13 +30,6 @@ jobs:
       ONE_PASSWORD_DEVELOPMENT: ${{ secrets.ONE_PASSWORD_DEVELOPMENT }}
       ONE_PASSWORD_PRODUCTION: ${{ secrets.ONE_PASSWORD_PRODUCTION }}
 
-  repository:
-    name: "Repository"
-    uses: os-climate/osc-github-devops/.github/workflows/repository.yaml@main
-    permissions:
-      # Required for action that creates labels: github-labels
-      contents: write
-
   check-secrets:
     name: "Required Credentials"
     runs-on: ubuntu-latest
@@ -48,6 +41,13 @@ jobs:
           pypi_development: ${{ secrets.PYPI_DEVELOPMENT }}
           pypi_production: ${{ secrets.PYPI_PRODUCTION }}
           one_password_development: ${{ secrets.ONE_PASSWORD_DEVELOPMENT }}
+
+  repository:
+    name: "Repository"
+    uses: os-climate/osc-github-devops/.github/workflows/repository.yaml@main
+    permissions:
+      # Required for action that creates labels: github-labels
+      contents: write
 
   python-project:
     name: "Python Project"
