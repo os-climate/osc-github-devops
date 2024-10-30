@@ -97,7 +97,7 @@ jobs:
           fi
 
       - name: "Check PROJECT in PyPI"
-        id: testpypi-project-url-check
+        id: project-url-check
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/url-validity-check@main
         with:
@@ -108,7 +108,7 @@ jobs:
           suffix: "/"
 
       - name: "Check PROJECT/BUILD in PyPI"
-        id: testpypi-build-url-check
+        id: build-url-check
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/url-validity-check@main
         with:
@@ -124,25 +124,29 @@ jobs:
         run: |
           # Conditional publishing checks
           if [ "$PUBLISH_URL" = "https://pypi.org" ] && \
-            [ "${{ steps.testpypi-build-url-check.outputs.valid }}" == 'true' ]; then
+            [ "${{ steps.build-url-check.outputs.valid }}" == 'true' ]; then
             echo "This production build/release has already been published"
             echo "An attempt to release more than once should always fail"
             echo "# ❌ Cannot publish a production build/release more than once" >> "$GITHUB_STEP_SUMMARY"
             echo "### $PUBLISH_URL" >> "$GITHUB_STEP_SUMMARY"
             exit 1
           elif [ "$PUBLISH_URL" = "https://test.pypi.org" ] && \
-            [ "${{ steps.testpypi-build-url-check.outputs.valid }}" == 'true' ]; then
+            [ "${{ steps.build-url-check.outputs.valid }}" == 'true' ]; then
             echo "This test/development build/release has already been published"
+            echo "This is not considered an error for test/development build/releases"
             exit 0
           fi
+          echo "Project present in PyPI: ${{ steps.project-url-check.outputs.valid }}"
+          echo "Build present in PyPI: ${{ steps.build-url-check.outputs.valid }}"
+          echo "Checks passed: this build has not yet been published/released ✅"
 
       # Primary/default method uses trusted publishing
       - name: "Publish PyPI [Trusted Publishing]"
         uses: pypa/gh-action-pypi-publish@release/v1
         # yamllint disable-line rule:line-length
-        if: steps.testpypi-project-url-check.outputs.valid == 'true' && steps.testpypi-build-url-check.outputs.valid == 'false'
+        if: steps.project-url-check.outputs.valid == 'true' && steps.build-url-check.outputs.valid == 'false'
         with:
-          repository-url: https://test.pypi.org/legacy/
+          repository-url: "${{ env.PUBLISH_URL }}/legacy/"
           # Show checksum values
           print-hash: true
           packages-dir: ${{ env.ARTEFACT_LOCATION }}
@@ -154,7 +158,7 @@ jobs:
       # Only used with the publishing method below
       - name: "Retrieve credential [ 1Password ]"
         id: one-password-pypi-test
-        if: steps.testpypi-project-url-check.outputs.valid == 'false' && env.use_one_password == 'true'
+        if: steps.project-url-check.outputs.valid == 'false' && env.use_one_password == 'true'
         uses: 1password/load-secrets-action@v2
         with:
           # Export loaded secrets as environment variables
@@ -168,7 +172,7 @@ jobs:
       # Note: this is a manual operation in the PyPI web portal
       - name: "Publish PyPI [Credential from 1Password]"
         uses: pypa/gh-action-pypi-publish@release/v1
-        if: steps.testpypi-project-url-check.outputs.valid == 'false' && env.use_one_password == 'true'
+        if: steps.project-url-check.outputs.valid == 'false' && env.use_one_password == 'true'
         with:
           repository-url: "${{ env.PUBLISH_URL }}/legacy/"
           print-hash: true
@@ -181,7 +185,7 @@ jobs:
       # Only used initially when trusted publishing is unavailable (see above)
       - name: "Publish PyPI [Fallback: Credential from GitHub]"
         uses: pypa/gh-action-pypi-publish@release/v1
-        if: steps.testpypi-project-url-check.outputs.valid == 'false' && env.use_one_password == 'false'
+        if: steps.project-url-check.outputs.valid == 'false' && env.use_one_password == 'false'
         with:
           repository-url: https://test.pypi.org/legacy/
           print-hash: true
