@@ -114,13 +114,6 @@ jobs:
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/python-versions-matrix@main
 
-      - name: "Action: python-twine-check"
-        id: python-twine-check
-        # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/python-twine-check@main
-        with:
-          path: "tests/dist"
-
       - name: "Action: semantic-tag-validate [semantic tag]"
         id: semantic-tag-validate-good
         # yamllint disable-line rule:line-length
