@@ -13,6 +13,8 @@ on:
       - "*"
       - "!update-devops-tooling"
 
+permissions: {}
+
 jobs:
   linting:
     name: "MyPy"
