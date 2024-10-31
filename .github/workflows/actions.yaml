@@ -16,6 +16,8 @@ on:
 #    paths: [".github/**"]
 #    branches: ["main", "master"]
 
+permissions: {}
+
 jobs:
   ### Test Individual Composite Actions ###
 
@@ -43,8 +45,8 @@ jobs:
     name: "Synthetic Tests"
     runs-on: ubuntu-latest
     # if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
-    env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    permissions:
+      contents: read
     steps:
       - name: "Checkout repository"
         uses: actions/checkout@v4
