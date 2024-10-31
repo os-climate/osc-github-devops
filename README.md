@@ -5,7 +5,7 @@
 [![OS-Climate](https://img.shields.io/badge/OS-Climate-blue)](https://os-climate.org/) [![Slack](https://img.shields.io/badge/slack-osclimate-blue.svg?logo=slack)](https://os-climate.slack.com) [![Source Code](https://img.shields.io/badge/GitHub-100000?logo=github&logoColor=white&color=blue)](https://github.com/os-climate/osc-github-devops) [![PyPI](https://img.shields.io/pypi/v/osc-github-devops?logo=python&logoColor=white&color=blue)](https://pypi.org/project/osc-github-devops)[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 <!-- markdownlint-disable-next-line MD013 -->
- [![pre-commit.ci status badge]][pre-commit.ci results page] [![TestPyPI](https://img.shields.io/pypi/v/osc-github-devops?logo=python&label=TestPyPi&logoColor=white&color=32C955&pypiBaseUrl=https://test.pypi.org)](https://test.pypi.org/project/osc-github-devops) [![🧪 GitHub Actions CI/CD workflow tests badge]][GHA workflow runs list] [![Coverage](https://coverage-badge.samuelcolvin.workers.dev/os-climate/osc-github-devops.svg)](https://coverage-badge.samuelcolvin.workers.dev/redirect/os-climate/osc-github-devops) [![🔐 CodeQL](https://github.com/os-climate/osc-github-devops/actions/workflows/codeql.yml/badge.svg)](https://github.com/os-climate/osc-github-devops/actions/workflows/codeql.yml) [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/os-climae/osc-github-devops/badge)](https://scorecard.dev/viewer/?uri=github.com/os-climate/osc-github-devops)
+ [![pre-commit.ci status badge]][pre-commit.ci results page] [![TestPyPI](https://img.shields.io/pypi/v/osc-github-devops?logo=python&label=TestPyPi&logoColor=white&color=32C955&pypiBaseUrl=https://test.pypi.org)](https://test.pypi.org/project/osc-github-devops) [![🧪 GitHub Actions CI/CD workflow tests badge]][GHA workflow runs list] [![Coverage](https://coverage-badge.samuelcolvin.workers.dev/os-climate/osc-github-devops.svg)](https://coverage-badge.samuelcolvin.workers.dev/redirect/os-climate/osc-github-devops) [![🔐 CodeQL](https://github.com/os-climate/osc-github-devops/actions/workflows/codeql.yml/badge.svg)](https://github.com/os-climate/osc-github-devops/actions/workflows/codeql.yml) [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/os-climate/osc-github-devops/badge)](https://scorecard.dev/viewer/?uri=github.com/os-climate/osc-github-devops)
 <!-- prettier-ignore-end -->
 
 ## Composite actions and reusable workflows for Python projects
@@ -54,7 +54,7 @@ In the meantime, here is some general documentation covering the relevant topics
 [comment]: # Section below is sourced by the badges displayed under the project heading
 -->
 
-[🧪 GitHub Actions CI/CD workflow tests badge]: https://github.com/os-climate/osc-github-devops/actions/workflows/repository.yaml/badge.svg?branch=main&event=push
-[GHA workflow runs list]: https://github.com/os-climate/osc-github-devops/actions/workflows/repository.yaml?query=branch%3Amain
+[🧪 GitHub Actions CI/CD workflow tests badge]: https://github.com/os-climate/osc-github-devops/actions/workflows/primary.yaml/badge.svg?branch=main&event=push
+[GHA workflow runs list]: https://github.com/os-climate/osc-github-devops/actions/workflows/primary.yaml?query=branch%3Amain
 [pre-commit.ci results page]: https://results.pre-commit.ci/latest/github/os-climate/osc-github-devops/main
 [pre-commit.ci status badge]: https://results.pre-commit.ci/badge/github/os-climate/osc-github-devops/main.svg
