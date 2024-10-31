@@ -47,8 +47,6 @@ jobs:
     # if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
     permissions:
       contents: read
-      # Required to read labels?
-      # issues: read
     steps:
       - name: "Checkout repository"
         uses: actions/checkout@v4

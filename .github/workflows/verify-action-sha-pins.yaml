@@ -11,6 +11,8 @@ on:
     types: [opened, reopened, edited, synchronize]
     paths: [".github/**"]
 
+permissions: {}
+
 jobs:
   ### Test Version Pinned Actions ###
   check-actions:
