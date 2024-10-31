@@ -28,6 +28,8 @@ on:
         type: boolean
         default: true
 
+permissions: {}
+
 jobs:
   ### Always builds WITH artefact attestations
 

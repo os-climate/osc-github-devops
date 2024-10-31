@@ -14,6 +14,8 @@ on:
       - "master"
       - "!update-devops-tooling"
 
+permissions: {}
+
 jobs:
   build_and_deploy:
     # Only run when pull request is merged
@@ -21,13 +23,14 @@ jobs:
     name: "Rebuild Documentation"
     runs-on: ubuntu-latest
     continue-on-error: false
-
     permissions:
       # IMPORTANT: mandatory for documentation updates; used in final step
-      id-token: write
-      pull-requests: write
       contents: write
-      repository-projects: write
+      # ToDo: 2024-10-31
+      # These were enabled previously; need to check if they are still necessary?
+      # id-token: write
+      # pull-requests: write
+      # repository-projects: write
 
     steps:
       - name: "Checkout Repository"
