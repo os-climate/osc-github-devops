@@ -13,10 +13,14 @@ on:
         required: true
         type: string
 
+permissions: {}
+
 jobs:
   notebook-tests:
     name: "Notebook Tests"
     runs-on: "ubuntu-latest"
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
 

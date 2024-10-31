@@ -14,10 +14,14 @@ on:
         required: true
         type: string
 
+permissions: {}
+
 jobs:
   python-test-matrix:
     name: "Unit Tests"
     runs-on: "ubuntu-latest"
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
 
