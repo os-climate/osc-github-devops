@@ -13,9 +13,11 @@ on:
 
 jobs:
   ### Test Version Pinned Actions ###
-  test-versions:
+  check-actions:
     name: "Check Action SHA Pinning"
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       # Check entire repository on workflow_dispatch
       - name: "Checkout entire repository"

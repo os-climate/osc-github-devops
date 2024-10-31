@@ -19,7 +19,8 @@ jobs:
     runs-on: "ubuntu-latest"
     # Don't run when pull request is merged
     if: github.event.pull_request.merged == false
-
+    permissions:
+      contents: read
     steps:
       - name: Setup Python
         uses: actions/setup-python@v5
