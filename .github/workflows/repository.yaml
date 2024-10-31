@@ -57,15 +57,12 @@ jobs:
       pushed_tag: ${{ steps.pushed-tag.outputs.pushed_tag }}
       build_tag: ${{ steps.build-tag.outputs.build_tag }}
 
-      # Label verification
-      # present: ${{ steps.labels.outputs.present }}
-      # created: ${{ steps.labels.outputs.created }}
-
     permissions:
-      # Required for action to create labels: github-mandatory-labels
-      contents: write
-    env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      contents: read
+
+    #env:
+    #  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     steps:
       - uses: actions/checkout@v4
 
@@ -122,8 +119,3 @@ jobs:
             build_tag="${{ env.pushed_tag }}"
           fi
           echo "build_tag=$build_tag" >> "$GITHUB_OUTPUT"
-
-      #- name: "Verify/create labels"
-      #  id: labels
-      #  # yamllint disable-line rule:line-length
-      #  uses: os-climate/osc-github-devops/.github/actions/github-labels@main
