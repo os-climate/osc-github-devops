@@ -47,6 +47,8 @@ jobs:
     # if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
     permissions:
       contents: read
+      # Required to read labels?
+      # issues: read
     steps:
       - name: "Checkout repository"
         uses: actions/checkout@v4
@@ -268,6 +270,8 @@ jobs:
         id: github-labels
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/github-labels@main
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: "Validate: github-labels"
         shell: bash
