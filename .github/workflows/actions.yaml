@@ -30,13 +30,14 @@ jobs:
       EXPORT: false
     secrets:
       ONE_PASSWORD_DEVELOPMENT: ${{ secrets.ONE_PASSWORD_DEVELOPMENT }}
+    # Does not need to interact with GitHub not the repository at all
+    permissions: {}
 
   repository:
     name: "Repository Content"
     uses: os-climate/osc-github-devops/.github/workflows/repository.yaml@main
     permissions:
-      # Required for action that creates labels: github-mandatory-labels
-      contents: write
+      contents: read
 
   tests:
     name: "Synthetic Tests"
