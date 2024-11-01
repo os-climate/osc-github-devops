@@ -19,12 +19,14 @@ on:
         required: false
         default: "dist"
 
+permissions: {}
+
 jobs:
   python-audit:
     name: "Python Audit"
     runs-on: "ubuntu-latest"
     permissions:
-      contents: write
+      contents: read
 
     steps:
       - name: "Checkout repository"
