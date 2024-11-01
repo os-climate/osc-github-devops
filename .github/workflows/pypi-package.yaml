@@ -31,6 +31,8 @@ on:
         description: "PyPI credential from GitHub"
         required: false
 
+permissions: {}
+
 jobs:
   pypi-publish:
     name: "PyPI Packages"
