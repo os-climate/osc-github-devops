@@ -15,6 +15,8 @@ on:
       - "!pdm.lock"
       - "!tox.ini"
 
+permissions: {}
+
 jobs:
   one-password:
     name: "1Password"
@@ -29,10 +31,12 @@ jobs:
       # Test development credentials
       ONE_PASSWORD_DEVELOPMENT: ${{ secrets.ONE_PASSWORD_DEVELOPMENT }}
       ONE_PASSWORD_PRODUCTION: ${{ secrets.ONE_PASSWORD_PRODUCTION }}
+    permissions: {}
 
   check-secrets:
     name: "Required Credentials"
     runs-on: ubuntu-latest
+    permissions: {}
     steps:
       - name: "Check for required secrets/API keys/tokens"
         uses: os-climate/osc-github-devops/.github/actions/github-secrets@main
@@ -123,6 +127,8 @@ jobs:
       matrix: ${{ fromJson(needs.python-project.outputs.matrix_json) }}
     with:
       python_version: ${{ matrix.python-version }}
+    permissions:
+      contents: read
 
   notebooks:
     name: "Jupyter Notebooks"
@@ -138,6 +144,8 @@ jobs:
       matrix: ${{ fromJson(needs.python-project.outputs.matrix_json) }}
     with:
       python_version: ${{ matrix.python-version }}
+    permissions:
+      contents: read
 
   github-release:
     name: "Release"
@@ -166,6 +174,7 @@ jobs:
       test: true
       build_tag: ${{ needs.repository.outputs.build_tag }}
     permissions:
+      contents: read
       # Needed for trusted publishing
       id-token: write
     secrets:
@@ -185,6 +194,7 @@ jobs:
     with:
       build_tag: ${{ needs.repository.outputs.build_tag }}
     permissions:
+      contents: read
       # Needed for trusted publishing
       id-token: write
     secrets:
