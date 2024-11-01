@@ -135,6 +135,7 @@ jobs:
             [ "${{ steps.build-url-check.outputs.valid }}" == 'true' ]; then
             echo "This test/development build/release has already been published"
             echo "This is not considered an error for test/development build/releases"
+            echo "PUBLISH=false" >> "$GITHUB_ENV"
             exit 0
           fi
           echo "Project present in PyPI: ${{ steps.project-url-check.outputs.valid }}"
@@ -203,8 +204,10 @@ jobs:
         shell: bash
         run: |
           # Print summary/job output
-          if [ ${{ inputs.TEST }} = "true" ]; then
-            echo "Successfully tested publishing to PyPI: $PUBLISH_URL" >> "$GITHUB_STEP_SUMMARY"
+          if [ ${{ inputs.TEST }} = "true" ] && [ "$PUBLISH" = "false" ]; then
+            echo "Publishing test skipped due to existing content: $PUBLISH_URL ⛔️" >> "$GITHUB_STEP_SUMMARY"
+          elif [ ${{ inputs.TEST }} = "true" ]; then
+            echo "Publishing test successful: $PUBLISH_URL ✅" >> "$GITHUB_STEP_SUMMARY"
           else
             echo "# 🚀 Published packages to PyPI" >> "$GITHUB_STEP_SUMMARY"
             echo "### $PUBLISH_URL" >> "$GITHUB_STEP_SUMMARY"
