@@ -36,6 +36,8 @@ on:
       build_tag:
         value: ${{ jobs.repository.outputs.build_tag }}
 
+permissions: {}
+
 jobs:
   repository:
     name: "Check Content"

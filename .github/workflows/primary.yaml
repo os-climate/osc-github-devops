@@ -47,7 +47,7 @@ jobs:
     uses: os-climate/osc-github-devops/.github/workflows/repository.yaml@main
     permissions:
       # Required for action that creates labels: github-labels
-      contents: write
+      contents: read
 
   python-project:
     name: "Python Project"
@@ -61,6 +61,8 @@ jobs:
       versioning_type: ${{ steps.python_project_metadata.outputs.versioning_type }}
       matrix_json: ${{ steps.python_project_metadata.outputs.matrix_json }}
       build_python_version: ${{ steps.python_project_metadata.outputs.build_python_version }}
+    permissions:
+      contents: read
     steps:
       - name: "Extract project metadata"
         id: python_project_metadata
@@ -106,6 +108,8 @@ jobs:
       matrix: ${{ fromJson(needs.python-project.outputs.matrix_json) }}
     with:
       python_version: ${{ matrix.python-version }}
+    permissions:
+      contents: read
 
   python-security:
     name: "Security"
