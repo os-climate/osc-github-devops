@@ -1,0 +1,25 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation
+
+name: "💬 Last Commit Message Body"
+
+outputs:
+  MESSAGE:
+    description: "The last commit message body"
+    value: ${{ steps.commit.outputs.message }}
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v4
+
+    - name: "Get commit message"
+      id: commit
+      shell: bash
+      run: |
+        # Get commit message
+        COMMIT_MESSAGE=$(git show -s --format='%B')
+        echo "COMMIT_MESSAGE<<EOF"$'\n'"$COMMIT_MESSAGE"$'\n'EOF >> "$GITHUB_OUTPUT"
+        echo "Last commit message body:"
+        echo "$COMMIT_MESSAGE"
