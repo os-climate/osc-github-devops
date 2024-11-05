@@ -1,0 +1,66 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation
+
+name: "🏷️ Check/Inject Issue-ID"
+
+outputs:
+  PRESENT:
+    description: "Whether the Issue-ID string is present"
+    value: ${{ steps.fetch.outputs.count }}
+
+runs:
+  using: "composite"
+  steps:
+    # - uses: actions/checkout@v4
+
+    - name: "Retrieve last commit message body"
+      id: retrieve
+      uses: os-climate/osc-github-devops/.github/actions/git-commit-message-body@main
+
+    - name: "Check commit message for required string"
+      id: check
+      shell: bash
+      run: |
+        # Check commit message for required string"
+        TMPFILE=$(mktemp -p /tmp --suffix "-commit-message-body.txt")
+        echo "${{ steps.retrieve.outputs.message }}" >> "$TMPFILE"
+
+        # Gerrit reg-ex expression is:
+        # Issue-ID: ([A-Z][A-Z0-9]{1,9}-\\d+)
+
+        ISSUE=$(grep -i -w -m1 '^Issue-ID: .*$' "$TMPFILE")
+        if [ "$?" -eq 0 ]; then
+          echo "✅ Existing Issue-ID was found in the pull request"
+          echo "PRESENT=true" >> "$GITHUB_ENV"
+          echo "PRESENT=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "❌ Existing Issue-ID was NOT found in the pull request"
+          echo "PRESENT=false" >> "$GITHUB_ENV"
+          echo "PRESENT=false" >> "$GITHUB_OUTPUT"
+        fi
+
+    # - name: "Patch Python project version: pyproject.toml"
+    #   id: patch-version-pyprject-toml
+    #   if: steps.pyproject-toml.outputs.type == 'file'
+    #   uses: os-climate/osc-github-devops/.github/actions/file-sed-regex@main
+    #   with:
+    #     flags: "-i -E"
+    #     regex: 's:^version =.*$:version = "${{ inputs.REPLACEMENT_VERSION }}":'
+    #     filename: "pyproject.toml"
+
+    - name: "Looking up appropriate JIRA ticket for this change"
+      id: lookup
+      if: env.present == 'true'
+      shell: bash
+      run: |
+        # Look up appropriate JIRA ticket for this change
+        echo "Looking up appropriate JIRA ticket for this change"
+
+    - name: "Injecting Issue-ID into body of first commit message"
+      id: inject
+      if: env.present == 'false'
+      shell: bash
+      run: |
+        # Injecting Issue-ID into body of first commit
+        echo "Injecting Issue-ID into body of first commit"
