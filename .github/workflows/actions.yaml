@@ -55,6 +55,11 @@ jobs:
           fetch-tags: true
           # The semantic-tag-current action currently contains a workaround for this behaviour
 
+      - name: "Action: git-commit-message-body"
+        id: git-commit-message-body
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/git-commit-message-body@main
+
       - name: "Action: python-project-name"
         id: python-project-name
         # yamllint disable-line rule:line-length
