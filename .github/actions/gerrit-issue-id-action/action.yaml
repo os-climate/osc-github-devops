@@ -58,7 +58,7 @@ runs:
           echo "json command not in PATH"
         fi
         echo "jq:"
-        echo "$ISSUE_ID_LOOKUP_JSON" | jq -r '.$ACTOR'
+        echo "$ISSUE_ID_LOOKUP_JSON" | jq -r ".$ACTOR"
         echo "json:"
         echo "$ISSUE_ID_LOOKUP_JSON" | json "$ACTOR"
         ISSUE_ID_LOOKUP_JSON="${{ inputs.ISSUE_ID_LOOKUP_JSON }}"
