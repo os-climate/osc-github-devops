@@ -4,6 +4,12 @@
 
 name: "🏷️ Check/Inject Issue-ID"
 
+inputs:
+  ISSUE_ID_LOOKUP_JSON:
+    description: "JSON lookup table mapping users to JIRA tickets"
+    type: string
+    required: true
+
 outputs:
   PRESENT:
     description: "Whether the Issue-ID string is present"
@@ -22,40 +28,48 @@ runs:
       id: check
       shell: bash
       run: |
-        # Check commit message for required string"
+        # Check commit message for required string
         TMPFILE=$(mktemp -p /tmp --suffix "-commit-message-body.txt")
-        echo "${{ steps.retrieve.outputs.message }}" >> "$TMPFILE"
+        echo "${{ steps.retrieve.outputs.commit_message }}" >> "$TMPFILE"
 
         # Gerrit reg-ex expression is:
         # Issue-ID: ([A-Z][A-Z0-9]{1,9}-\\d+)
 
-        ISSUE=$(grep -i -w -m1 '^Issue-ID: .*$' "$TMPFILE")
-        if [ "$?" -eq 0 ]; then
-          echo "✅ Existing Issue-ID was found in the pull request"
+        if [[ "${{ steps.retrieve.outputs.commit_message }}" =~ "Issue-ID: " ]]; then
+          echo "✅ Issue-ID was found in the pull request"
           echo "PRESENT=true" >> "$GITHUB_ENV"
           echo "PRESENT=true" >> "$GITHUB_OUTPUT"
         else
-          echo "❌ Existing Issue-ID was NOT found in the pull request"
+          echo "❌ Issue-ID was NOT found in the pull request"
           echo "PRESENT=false" >> "$GITHUB_ENV"
           echo "PRESENT=false" >> "$GITHUB_OUTPUT"
         fi
 
-    # - name: "Patch Python project version: pyproject.toml"
-    #   id: patch-version-pyprject-toml
-    #   if: steps.pyproject-toml.outputs.type == 'file'
-    #   uses: os-climate/osc-github-devops/.github/actions/file-sed-regex@main
-    #   with:
-    #     flags: "-i -E"
-    #     regex: 's:^version =.*$:version = "${{ inputs.REPLACEMENT_VERSION }}":'
-    #     filename: "pyproject.toml"
-
     - name: "Looking up appropriate JIRA ticket for this change"
       id: lookup
-      if: env.present == 'true'
       shell: bash
       run: |
         # Look up appropriate JIRA ticket for this change
         echo "Looking up appropriate JIRA ticket for this change"
+        ACTOR="${{ github.actor }}"
+        ACTOR_ID="${{ github.actor_id }}"
+        echo "Actor: $ACTOR [$ACTOR_ID]"
+        if [ -z "${{ env.ISSUE_ID_LOOKUP_JSON }}" ]; then
+          echo "The lookup table variable was not accessible/set: ISSUE_ID_LOOKUP_JSON"; exit 1
+        else
+          ISSUE_ID_LOOKUP_JSON="${{ env.ISSUE_ID_LOOKUP_JSON }}"
+        fi
+        JQ=$(which jq || true)
+        JSON=$(which json || true)
+        if [ ! -x $JQ ]; then
+          echo "jq command not in PATH"
+        elif [ ! -x $JQ ]; then
+          echo "json command not in PATH"
+        fi
+        echo "jq:"
+        echo "$ISSUE_ID_LOOKUP_JSON" | jq -r '.$ACTOR'
+        echo "json:"
+        echo "$ISSUE_ID_LOOKUP_JSON" | json "$ACTOR"
 
     - name: "Injecting Issue-ID into body of first commit message"
       id: inject
