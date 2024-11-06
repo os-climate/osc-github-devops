@@ -1,0 +1,32 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation
+
+# Checks the commit message body for an Issue-ID, adds one when NOT present
+name: "🏷️ [R] Check/Inject Issue-ID"
+
+# yamllint disable-line rule:truthy
+on:
+  workflow_call:
+    inputs:
+      ISSUE_ID_LOOKUP_JSON:
+        description: "Version used to upload/store artefacts for publishing"
+        required: true
+        type: string
+
+permissions: {}
+
+jobs:
+
+  issue-id:
+    runs-on: "ubuntu-latest"
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      # yamllint disable-line rule:line-length
+      - uses: os-climate/osc-github-devops/.github/actions/gerrit-issue-id-action@main
+        with:
+          issue_id_lookup_json: ${{ inputs.ISSUE_ID_LOOKUP_JSON }}
