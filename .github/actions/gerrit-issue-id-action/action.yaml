@@ -45,22 +45,12 @@ runs:
       shell: bash
       run: |
         # Look up appropriate JIRA ticket for this change
-        set -vx
         echo "Looking up appropriate JIRA ticket for this change"
         ACTOR="${{ github.actor }}"
         ACTOR_ID="${{ github.actor_id }}"
         echo "Actor: $ACTOR [$ACTOR_ID]"
-        JQ=$(which jq || true)
-        JSON=$(which json || true)
-        if [ ! -x $JQ ]; then
-          echo "jq command not in PATH"
-        elif [ ! -x $JQ ]; then
-          echo "json command not in PATH"
-        fi
-        echo "jq:"
-        echo "$ISSUE_ID_LOOKUP_JSON" | jq -r ".$ACTOR"
-        echo "json:"
-        echo "$ISSUE_ID_LOOKUP_JSON" | json "$ACTOR"
+
+        # Validate lookup table contents
         ISSUE_ID_LOOKUP_JSON="${{ inputs.ISSUE_ID_LOOKUP_JSON }}"
         if [ -z "${{ inputs.ISSUE_ID_LOOKUP_JSON }}" ]; then
           echo "The lookup table variable was not accessible/set: ISSUE_ID_LOOKUP_JSON"; exit 1
@@ -68,6 +58,10 @@ runs:
           echo "Lookup table:"
           echo "$ISSUE_ID_LOOKUP_JSON"
         fi
+
+        JQ=$(which jq || true)
+        echo "jq lookup returned:"
+        echo "$ISSUE_ID_LOOKUP_JSON" | jq -r ".$ACTOR"
 
     - name: "Injecting Issue-ID into body of first commit message"
       id: inject
