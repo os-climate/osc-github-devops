@@ -31,8 +31,7 @@ runs:
         # Gerrit reg-ex expression is:
         # Issue-ID: ([A-Z][A-Z0-9]{1,9}-\\d+)
 
-        ISSUE=$(grep -i -w -m1 '^Issue-ID: .*$' "$TMPFILE")
-        if [ "$?" -eq 0 ]; then
+        if [[ ${{ steps.retrieve.outputs.commit_message }} =~ "Issue-ID: " ]]; then
           echo "✅ Existing Issue-ID was found in the pull request"
           echo "PRESENT=true" >> "$GITHUB_ENV"
           echo "PRESENT=true" >> "$GITHUB_OUTPUT"
@@ -41,6 +40,17 @@ runs:
           echo "PRESENT=false" >> "$GITHUB_ENV"
           echo "PRESENT=false" >> "$GITHUB_OUTPUT"
         fi
+
+        #ISSUE=$(grep -q -i -w -m1 '^Issue-ID: .*$' "$TMPFILE")
+        #if [ "$?" -eq 0 ]; then
+        #  echo "✅ Existing Issue-ID was found in the pull request"
+        #  echo "PRESENT=true" >> "$GITHUB_ENV"
+        #  echo "PRESENT=true" >> "$GITHUB_OUTPUT"
+        #else
+        #  echo "❌ Existing Issue-ID was NOT found in the pull request"
+        #  echo "PRESENT=false" >> "$GITHUB_ENV"
+        #  echo "PRESENT=false" >> "$GITHUB_OUTPUT"
+        #fi
 
     # - name: "Patch Python project version: pyproject.toml"
     #   id: patch-version-pyprject-toml
