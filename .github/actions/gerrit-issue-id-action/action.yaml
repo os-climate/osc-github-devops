@@ -23,8 +23,6 @@ runs:
       shell: bash
       run: |
         # Check commit message for required string
-        set -vx
-        set +e
         TMPFILE=$(mktemp -p /tmp --suffix "-commit-message-body.txt")
         echo "${{ steps.retrieve.outputs.commit_message }}" >> "$TMPFILE"
 
@@ -32,25 +30,14 @@ runs:
         # Issue-ID: ([A-Z][A-Z0-9]{1,9}-\\d+)
 
         if [[ "${{ steps.retrieve.outputs.commit_message }}" =~ "Issue-ID: " ]]; then
-          echo "✅ Existing Issue-ID was found in the pull request"
+          echo "✅ Issue-ID was found in the pull request"
           echo "PRESENT=true" >> "$GITHUB_ENV"
           echo "PRESENT=true" >> "$GITHUB_OUTPUT"
         else
-          echo "❌ Existing Issue-ID was NOT found in the pull request"
+          echo "❌ Issue-ID was NOT found in the pull request"
           echo "PRESENT=false" >> "$GITHUB_ENV"
           echo "PRESENT=false" >> "$GITHUB_OUTPUT"
         fi
-
-        #ISSUE=$(grep -q -i -w -m1 '^Issue-ID: .*$' "$TMPFILE")
-        #if [ "$?" -eq 0 ]; then
-        #  echo "✅ Existing Issue-ID was found in the pull request"
-        #  echo "PRESENT=true" >> "$GITHUB_ENV"
-        #  echo "PRESENT=true" >> "$GITHUB_OUTPUT"
-        #else
-        #  echo "❌ Existing Issue-ID was NOT found in the pull request"
-        #  echo "PRESENT=false" >> "$GITHUB_ENV"
-        #  echo "PRESENT=false" >> "$GITHUB_OUTPUT"
-        #fi
 
     # - name: "Patch Python project version: pyproject.toml"
     #   id: patch-version-pyprject-toml
@@ -63,11 +50,13 @@ runs:
 
     - name: "Looking up appropriate JIRA ticket for this change"
       id: lookup
-      if: env.present == 'true'
       shell: bash
       run: |
         # Look up appropriate JIRA ticket for this change
         echo "Looking up appropriate JIRA ticket for this change"
+        ACTOR="${{ github.actor }}"
+        ACTOR_ID="${{ github.actor_id }}"
+        echo "Actor: $ACTOR [$ACTOR_ID]"
 
     - name: "Injecting Issue-ID into body of first commit message"
       id: inject
