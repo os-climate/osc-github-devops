@@ -5,9 +5,9 @@
 name: "💬 Last Commit Message Body"
 
 outputs:
-  MESSAGE:
+  COMMIT_MESSAGE:
     description: "The last commit message body"
-    value: ${{ steps.commit.outputs.message }}
+    value: ${{ steps.commit.outputs.commit_message }}
 
 runs:
   using: "composite"
