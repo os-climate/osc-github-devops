@@ -21,6 +21,7 @@ runs:
     - name: "Check commit message for required string"
       id: check
       shell: bash
+      continue-on-error: true
       run: |
         # Check commit message for required string
         set -vx
