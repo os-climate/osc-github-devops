@@ -31,7 +31,8 @@ runs:
         # Gerrit reg-ex expression is:
         # Issue-ID: ([A-Z][A-Z0-9]{1,9}-\\d+)
 
-        if [[ ${{ steps.retrieve.outputs.commit_message }} =~ "Issue-ID: " ]]; then
+
+        if [[ "${{ steps.retrieve.outputs.commit_message }}" =~ "Issue-ID: " ]]; then
           echo "✅ Existing Issue-ID was found in the pull request"
           echo "PRESENT=true" >> "$GITHUB_ENV"
           echo "PRESENT=true" >> "$GITHUB_OUTPUT"
