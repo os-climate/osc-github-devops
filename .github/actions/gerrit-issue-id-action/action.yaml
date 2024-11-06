@@ -22,9 +22,10 @@ runs:
       id: check
       shell: bash
       run: |
-        # Check commit message for required string"
+        # Check commit message for required string
+        set -vx
         TMPFILE=$(mktemp -p /tmp --suffix "-commit-message-body.txt")
-        echo "${{ steps.retrieve.outputs.message }}" >> "$TMPFILE"
+        echo "${{ steps.retrieve.outputs.commit_message }}" >> "$TMPFILE"
 
         # Gerrit reg-ex expression is:
         # Issue-ID: ([A-Z][A-Z0-9]{1,9}-\\d+)
