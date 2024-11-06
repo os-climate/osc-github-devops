@@ -18,11 +18,6 @@ outputs:
 runs:
   using: "composite"
   steps:
-    # - uses: actions/checkout@v4
-
-    - name: "Retrieve last commit message body"
-      id: retrieve
-      uses: os-climate/osc-github-devops/.github/actions/git-commit-message-body@main
 
     - name: "Check commit message for required string"
       id: check
