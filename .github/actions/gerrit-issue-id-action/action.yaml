@@ -60,8 +60,20 @@ runs:
         fi
 
         JQ=$(which jq || true)
-        echo "jq lookup returned:"
-        echo "$ISSUE_ID_LOOKUP_JSON" | jq -r ".$ACTOR"
+        if [ -x "$JQ" ]; then
+          KEY="$ACTOR"
+          VALUE=$(echo "$ISSUE_ID_LOOKUP_JSON" | jq -r --arg KEY "$KEY" '.[] | select(.key==$KEY) | .value')
+          if [ -z "$VALUE" ]; then
+            echo "The key/value lookup failed"; exit 1
+          fi
+          echo "Key/value lookup returned:"
+          echo "$VALUE"
+        else
+          echo "Error: jq command was NOT found in the PATH"; exit 1
+        fi
+        echo "issue_id=$VALUE" >> GITHUB_ENV
+        echo "issue_id=$VALUE" >> GITHUB_OUTPUT
+        echo "### Inserting Issue-ID: $VALUE 🏷️" >> "$GITHUB_STEP_SUMMARY"
 
     - name: "Injecting Issue-ID into body of first commit message"
       id: inject
