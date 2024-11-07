@@ -50,7 +50,8 @@ runs:
         echo "Actor: $ACTOR [$ACTOR_ID]"
 
         # Validate lookup table contents
-        ISSUE_ID_LOOKUP_JSON="${{ inputs.ISSUE_ID_LOOKUP_JSON }}"
+        # ISSUE_ID_LOOKUP_JSON="${{ inputs.ISSUE_ID_LOOKUP_JSON }}"
+        ISSUE_ID_LOOKUP_JSON="${{ fromJson(inputs.ISSUE_ID_LOOKUP_JSON) }}"
         if [ -z "${{ inputs.ISSUE_ID_LOOKUP_JSON }}" ]; then
           echo "The lookup table variable was not accessible/set: ISSUE_ID_LOOKUP_JSON"; exit 1
         else
