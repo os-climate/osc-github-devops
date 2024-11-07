@@ -17,10 +17,9 @@ on:
 permissions: {}
 
 jobs:
-
   issue-id:
     runs-on: "ubuntu-latest"
-    if: ${{ vars.ISSUE_ID_LOOKUP_JSON }} != ''
+    if: vars.ISSUE_ID_LOOKUP_JSON != ''
     permissions:
       contents: read
       pull-requests: write
