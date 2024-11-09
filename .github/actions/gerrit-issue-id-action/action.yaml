@@ -63,7 +63,7 @@ runs:
         JQ=$(which jq || true)
         if [ -x "$JQ" ]; then
           KEY="$ACTOR"
-          '${{ inputs.ISSUE_ID_LOOKUP_JSON }}' > table.json
+          echo '${{ inputs.ISSUE_ID_LOOKUP_JSON }}' > table.json
           echo "File contents:"
           cat table.json
           # yamllint disable-line rule:line-length
