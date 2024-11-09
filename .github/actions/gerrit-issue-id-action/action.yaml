@@ -97,8 +97,9 @@ runs:
       shell: bash
       run: |
         # Injecting Issue-ID into body of first commit
-        gh pr checkout 23
+        # git fetch; git pull
+        # gh pr checkout 23
         git config user.name "${{ inputs.COMMIT_USER_NAME }}"
         git config user.email "${{ inputs.COMMIT_USER_EMAIL }}"
         git commit --amend -m"${{ inputs.COMMIT_MESSAGE_BODY }}" -m"Issue-ID: ${{ env.issue_id }}" --no-verify --no-edit
-        git push
+        git push --force
