@@ -76,4 +76,8 @@ runs:
       shell: bash
       run: |
         # Injecting Issue-ID into body of first commit
-        echo "Injecting Issue-ID into body of first commit"
+        set -vx
+        git commit --amend -m"${{ steps.retrieve.outputs.commit_message }} -m"Issue-ID: $ISSUE_ID" --no-verify
+        git push
+
+
