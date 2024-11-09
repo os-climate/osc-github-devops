@@ -28,6 +28,9 @@ jobs:
 
       # yamllint disable-line rule:line-length
       - uses: os-climate/osc-github-devops/.github/actions/gerrit-issue-id-action@main
+        env:
+          # Required for the GitHub CLI
+          GH_TOKEN: ${{ github.token }}
         with:
           commit_message_body: ${{ steps.retrieve.outputs.COMMIT_MESSAGE }}
           issue_id_lookup_json: ${{ vars.ISSUE_ID_LOOKUP_JSON }}
