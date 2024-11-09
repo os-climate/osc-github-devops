@@ -34,6 +34,12 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - name: "Checkout Pull Request"
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.head_ref }}
+        fetch-depth: 0
+
     - name: "Check commit message for required string"
       id: check
       shell: bash
@@ -87,13 +93,12 @@ runs:
 
     - name: "Injecting Issue-ID into body of first commit message"
       id: inject
-      # if: env.PRESENT == 'false'
+      if: env.PRESENT == 'false'
       shell: bash
       run: |
         # Injecting Issue-ID into body of first commit
-        echo "Status: ${{ env.PRESENT }}"
         set -vx
         git config user.name "${{ inputs.COMMIT_USER_NAME }}"
         git config user.email "${{ inputs.COMMIT_USER_EMAIL }}"
-        git commit --amend -m"${{ inputs.COMMIT_MESSAGE_BODY }}" -m"Issue-ID: ${{ env.issue_id }}" --no-verify
+        git commit --amend -m"${{ inputs.COMMIT_MESSAGE_BODY }}" -m"Issue-ID: ${{ env.issue_id }}" --no-verify --no-edit
         git push

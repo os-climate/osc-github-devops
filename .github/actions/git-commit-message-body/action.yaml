@@ -12,7 +12,11 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - uses: actions/checkout@v4
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.head_ref }}
+        fetch-depth: 0
 
     - name: "Get commit message"
       id: commit
