@@ -44,7 +44,6 @@ runs:
       shell: bash
       run: |
         # Look up appropriate JIRA ticket for this change
-        echo "Looking up appropriate JIRA ticket for this change"
         ACTOR="${{ github.actor }}"
         ACTOR_ID="${{ github.actor_id }}"
         echo "Actor: $ACTOR [$ACTOR_ID]"
@@ -58,12 +57,12 @@ runs:
         if [ -x "$JQ" ]; then
           KEY="$ACTOR"
           # yamllint disable-line rule:line-length
-          VALUE=$(echo '${{ inputs.ISSUE_ID_LOOKUP_JSON }}' | jq -r --arg KEY "$KEY" '.[] | select(.key==$KEY) | .value')
+          VALUE=$(echo '${{ inputs.ISSUE_ID_LOOKUP_JSON }}' | jq -r --arg KEY "$KEY" '.[] |\
+            select(.key==$KEY) | .value')
           if [ -z "$VALUE" ]; then
-            echo "The key/value lookup failed"; exit 1
+            echo "❌ The key/value lookup failed"; exit 1
           fi
-          echo "Key/value lookup returned:"
-          echo "$VALUE"
+          echo "✅ Issue-ID: $VALUE"
         else
           echo "Error: jq command was NOT found in the PATH"; exit 1
         fi
