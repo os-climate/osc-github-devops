@@ -43,6 +43,8 @@ runs:
       id: lookup
       shell: bash
       run: |
+        set -vx
+
         # Look up appropriate JIRA ticket for this change
         echo "Looking up appropriate JIRA ticket for this change"
         ACTOR="${{ github.actor }}"
