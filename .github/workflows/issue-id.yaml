@@ -13,7 +13,6 @@ permissions: {}
 
 jobs:
   issue-id:
-    name: "Verify/Inject Issue-ID"
     runs-on: "ubuntu-latest"
     if: vars.ISSUE_ID_LOOKUP_JSON != ''
     permissions:
