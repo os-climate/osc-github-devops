@@ -52,16 +52,12 @@ runs:
         echo "Actor: $ACTOR [$ACTOR_ID]"
 
         # Validate lookup table contents
-        ISSUE_ID_LOOKUP_JSON="${{ inputs.ISSUE_ID_LOOKUP_JSON }}"
-        ISSUE_ID_LOOKUP_JSON_2='${{ inputs.ISSUE_ID_LOOKUP_JSON }}'
-        # ISSUE_ID_LOOKUP_JSON="${{ fromJson(inputs.ISSUE_ID_LOOKUP_JSON) }}"
+        ISSUE_ID_LOOKUP_JSON='${{ inputs.ISSUE_ID_LOOKUP_JSON }}'
         if [ -z "${{ inputs.ISSUE_ID_LOOKUP_JSON }}" ]; then
           echo "The required lookup JSON/variable is not set: ISSUE_ID_LOOKUP_JSON"; exit 1
         else
           echo "Lookup table:"
           echo "$ISSUE_ID_LOOKUP_JSON"
-          echo "Lookup table 2:"
-          echo "$ISSUE_ID_LOOKUP_JSON_2"
         fi
 
         JQ=$(which jq || true)
@@ -70,11 +66,8 @@ runs:
           "${{ inputs.ISSUE_ID_LOOKUP_JSON }}" > table.json
           echo "File contents:"
           cat table.json
-          echo "${{ inputs.ISSUE_ID_LOOKUP_JSON }}" > echo.json
-          echo "Echo contents:"
-          cat echo.json
           # yamllint disable-line rule:line-length
-          VALUE=$(echo '${{ inputs.ISSUE_ID_LOOKUP_JSON }}' | jq -r --arg KEY "$KEY" '.[] | select(.key==$KEY) | .value')
+          VALUE=$(echo "$ISSUE_ID_LOOKUP_JSON" | jq -r --arg KEY "$KEY" '.[] | select(.key==$KEY) | .value')
           if [ -z "$VALUE" ]; then
             echo "The key/value lookup failed"; exit 1
           fi
