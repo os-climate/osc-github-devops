@@ -5,6 +5,10 @@
 name: "🏷️ Check/Inject Issue-ID"
 
 inputs:
+  COMMIT_MESSAGE_BODY:
+    description: "Commit message body to amend"
+    type: string
+    required: true
   ISSUE_ID_LOOKUP_JSON:
     description: "JSON lookup table mapping users to JIRA tickets"
     type: string
@@ -23,13 +27,13 @@ runs:
       shell: bash
       run: |
         # Check commit message for required string
-        TMPFILE=$(mktemp -p /tmp --suffix "-commit-message-body.txt")
-        echo "${{ steps.retrieve.outputs.commit_message }}" >> "$TMPFILE"
+        # TMPFILE=$(mktemp -p /tmp --suffix "-commit-message-body.txt")
+        # echo "${{ inputs.COMMIT_MESSAGE_BODY }}" >> "$TMPFILE"
 
         # Gerrit reg-ex expression is:
         # Issue-ID: ([A-Z][A-Z0-9]{1,9}-\\d+)
 
-        if [[ "${{ steps.retrieve.outputs.commit_message }}" =~ "Issue-ID: " ]]; then
+        if [[ "${{ inputs.COMMIT_MESSAGE_BODY }}" =~ "Issue-ID: " ]]; then
           echo "✅ Issue-ID was found in the pull request"
           echo "PRESENT=true" >> "$GITHUB_ENV"
           echo "PRESENT=true" >> "$GITHUB_OUTPUT"
@@ -72,11 +76,11 @@ runs:
 
     - name: "Injecting Issue-ID into body of first commit message"
       id: inject
-      # if: env.present == 'false'
+      # if: env.PRESENT == 'false'
       shell: bash
       run: |
         # Injecting Issue-ID into body of first commit
-        echo "Status: ${{ env.present }}"
+        echo "Status: ${{ env.PRESENT }}"
         set -vx
-        git commit --amend -m"${{ steps.retrieve.outputs.commit_message }} -m"Issue-ID: $ISSUE_ID" --no-verify
+        git commit --amend -m"${{ inputs.COMMIT_MESSAGE_BODY }}" -m"Issue-ID: ${{ env.issue_id }}" --no-verify
         git push

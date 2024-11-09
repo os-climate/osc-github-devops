@@ -8,11 +8,6 @@ name: "🏷️ [R] Check/Inject Issue-ID"
 # yamllint disable-line rule:truthy
 on:
   workflow_call:
-    #inputs:
-    #  ISSUE_ID_LOOKUP_JSON:
-    #    description: "JSON lookup table mapping users to JIRA tickets"
-    #    type: string
-    #    required: true
 
 permissions: {}
 
@@ -28,9 +23,11 @@ jobs:
 
       - name: "Retrieve last commit message body"
         id: retrieve
+        # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/git-commit-message-body@main
 
       # yamllint disable-line rule:line-length
       - uses: os-climate/osc-github-devops/.github/actions/gerrit-issue-id-action@main
         with:
+          commit_message_body: ${{ steps.retrieve.outputs.COMMIT_MESSAGE }}
           issue_id_lookup_json: ${{ vars.ISSUE_ID_LOOKUP_JSON }}
