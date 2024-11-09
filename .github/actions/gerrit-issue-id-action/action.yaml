@@ -79,5 +79,3 @@ runs:
         set -vx
         git commit --amend -m"${{ steps.retrieve.outputs.commit_message }} -m"Issue-ID: $ISSUE_ID" --no-verify
         git push
-
-
