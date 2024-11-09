@@ -67,9 +67,9 @@ runs:
         else
           echo "Error: jq command was NOT found in the PATH"; exit 1
         fi
-        echo "issue_id=$VALUE" >> GITHUB_ENV
-        echo "issue_id=$VALUE" >> GITHUB_OUTPUT
-        echo "### Inserting Issue-ID: $VALUE 🏷️" >> "$GITHUB_STEP_SUMMARY"
+        echo "issue_id=$VALUE" >> "$GITHUB_ENV"
+        echo "issue_id=$VALUE" >> "$GITHUB_OUTPUT"
+        echo "### 🏷️ Issue-ID: $VALUE" >> "$GITHUB_STEP_SUMMARY"
 
     - name: "Injecting Issue-ID into body of first commit message"
       id: inject
