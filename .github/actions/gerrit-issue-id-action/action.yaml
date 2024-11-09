@@ -72,10 +72,11 @@ runs:
 
     - name: "Injecting Issue-ID into body of first commit message"
       id: inject
-      if: env.present == 'false'
+      # if: env.present == 'false'
       shell: bash
       run: |
         # Injecting Issue-ID into body of first commit
+        echo "Status: ${{ env.present }}"
         set -vx
         git commit --amend -m"${{ steps.retrieve.outputs.commit_message }} -m"Issue-ID: $ISSUE_ID" --no-verify
         git push
