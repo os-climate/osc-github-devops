@@ -27,13 +27,12 @@ runs:
       shell: bash
       run: |
         # Check commit message for required string
-        # TMPFILE=$(mktemp -p /tmp --suffix "-commit-message-body.txt")
-        # echo "${{ inputs.COMMIT_MESSAGE_BODY }}" >> "$TMPFILE"
 
         # Gerrit reg-ex expression is:
         # Issue-ID: ([A-Z][A-Z0-9]{1,9}-\\d+)
 
-        if [[ "${{ inputs.COMMIT_MESSAGE_BODY }}" =~ "Issue-ID: " ]]; then
+        COMMIT_MESSAGE="${{ inputs.COMMIT_MESSAGE_BODY }}"
+        if [[ "$COMMIT_MESSAGE" =~ "Issue-ID: " ]]; then
           echo "✅ Issue-ID was found in the pull request"
           echo "PRESENT=true" >> "$GITHUB_ENV"
           echo "PRESENT=true" >> "$GITHUB_OUTPUT"
