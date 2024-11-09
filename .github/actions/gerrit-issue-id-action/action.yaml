@@ -63,11 +63,11 @@ runs:
         JQ=$(which jq || true)
         if [ -x "$JQ" ]; then
           KEY="$ACTOR"
-          "${{ inputs.ISSUE_ID_LOOKUP_JSON }}" > table.json
+          '${{ inputs.ISSUE_ID_LOOKUP_JSON }}' > table.json
           echo "File contents:"
           cat table.json
           # yamllint disable-line rule:line-length
-          VALUE=$(echo "$ISSUE_ID_LOOKUP_JSON" | jq -r --arg KEY "$KEY" '.[] | select(.key==$KEY) | .value')
+          VALUE=$(echo '${{ inputs.ISSUE_ID_LOOKUP_JSON }}' | jq -r --arg KEY "$KEY" '.[] | select(.key==$KEY) | .value')
           if [ -z "$VALUE" ]; then
             echo "The key/value lookup failed"; exit 1
           fi
