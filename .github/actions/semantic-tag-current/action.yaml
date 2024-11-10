@@ -19,16 +19,16 @@ outputs:
   TAG_COUNT:
     description: "The number of tags in this repository"
     value: ${{ steps.fetch.outputs.count }}
-  CURRENT_TAG:
+  TAG:
     # A leading non-numeric "v" character will be stripped
     description: "Return the latest semantic tag from repository"
     value: ${{ steps.results.outputs.tag }}
-  CURRENT_VTAG:
+  VTAG:
     description: "The tag [with v prefix] e.g. v1.2.3"
     value: ${{ steps.results.outputs.vtag }}
-  CURRENT_TAG_SEMANTIC:
+  SEMANTIC:
     description: "Set true if current tag is semantic"
-    value: ${{ steps.results.outputs.semantic }}
+    value: ${{ steps.validate.outputs.semantic }}
 
 runs:
   using: "composite"
@@ -64,6 +64,8 @@ runs:
       if: env.tag_count == '0' && inputs.create_missing == 'true'
       uses: os-climate/osc-github-devops/.github/actions/repository-tag-create@main
       with:
+        tag: "v0.0.0"
+        prerelease: true
         token: ${{ inputs.GITHUB_TOKEN }}
 
     - name: "Get latest tag"
@@ -72,46 +74,34 @@ runs:
       shell: bash
       run: |
         # Get latest tag
-        TAG_INTERIM=$(git tag -l --sort=committerdate | grep -o '?*.*.*' | sort -rV | head -1 || true)
+        TAG=$(git tag -l --sort=committerdate | grep -o '?*.*.*' | sort -rV | head -1 || true)
 
-        if [ ${{ inputs.TYPE }} = "all" ]; then
-          TAG_INTERIM=$(git tag -l --sort=committerdate | grep -o '?*.*.*' | \
+        if [ ${{ env.tag_count}} == '0' ]; then
+          TAG="0.0.0"
+        elif [ ${{ inputs.TYPE }} = "all" ]; then
+          TAG=$(git tag -l --sort=committerdate | grep -o '?*.*.*' | \
           sort -rV | head -1 || true)
         elif [ ${{ inputs.TYPE }} = "production" ]; then
-          TAG_INTERIM=$(git tag -l --sort=committerdate | grep -o '?*.*.*' | \
+          TAG=$(git tag -l --sort=committerdate | grep -o '?*.*.*' | \
           grep -Ev '(dev|alpha|beta|test)' | sort -rV | head -1 || true)
         elif [ ${{ inputs.TYPE }} = "development" ]; then
-          TAG_INTERIM=$(git tag -l --sort=committerdate | grep -o '?*.*.*' | \
+          TAG=$(git tag -l --sort=committerdate | grep -o '?*.*.*' | \
           grep -E '(dev|alpha|beta|test)' | sort -rV | head -1 || true)
         fi
 
         # If present, strip the leading "v" character
-        if [[ "$TAG_INTERIM" == v* ]]; then
-          TAG_INTERIM="${TAG_INTERIM:1}"
+        if [[ "$TAG" == v* ]]; then
+          TAG="${TAG:1}"
         fi
 
         # Report and record result
-        echo "tag: ${TAG_INTERIM} [v${TAG_INTERIM}]"
-        echo "tag=${TAG_INTERIM}" >> $GITHUB_ENV
-        echo "tag=${TAG_INTERIM}" >> $GITHUB_OUTPUT
+        echo "tag: ${TAG} [v${TAG}]"
+        echo "tag=${TAG}" >> "$GITHUB_ENV"
+        echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+        echo "vtag=v${TAG}" >> "$GITHUB_OUTPUT"
 
     - name: "Check semantic/validity"
       id: validate
       uses: os-climate/osc-github-devops/.github/actions/semantic-tag-validate@main
       with:
         tag: ${{ env.tag }}
-
-    - name: "Return current repository semantic tag"
-      id: results
-      shell: bash
-      run: |
-        # Return current repository semantic tag
-
-        TAG="${{ env.tag }}"
-        echo "Tag: $TAG [v$TAG]"
-        echo "current_tag=${TAG}" >> "$GITHUB_ENV"
-        echo "current_tag=${TAG}" >> "$GITHUB_OUTPUT"
-        echo "current_vtag=v${TAG}" >> "$GITHUB_ENV"
-        echo "current_vtag=v${TAG}" >> "$GITHUB_OUTPUT"
-        echo "current_tag_semantic=${{ steps.validate.outputs.semantic }}" >> "$GITHUB_ENV"
-        echo "current_tag_semantic=${{ steps.validate.outputs.semantic }}" >> "$GITHUB_OUTPUT"
