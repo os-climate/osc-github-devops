@@ -33,17 +33,6 @@ runs:
         echo "Looking up value for ${{ inputs.key }} in ${{ inputs.variable }}"
 
         # Validate the variable is not empty/unset
-
-        # https://github.com/orgs/community/discussions/23473
-        # ${{ env[format(...)] }}
-        # Really, we need something like:
-        # ${{ vars.$GITHUB_VARIABLE }}
-        # How about: ${{ vars.[format($GITHUB_VARIABLE)] }}
-        # ${{ env[format(...)] }}
-        # '${{ format('tf-env-{0}', inputs.env_id) }}'
-
-
-        # Validate the variable is not empty/unset
         if [ -z "${{ vars.$GITHUB_VARIABLE }}" ]; then
           echo "Error: The required lookup variable/JSON is NOT set"
           echo "Variable name: ${{ vars.$GITHUB_VARIABLE }}"; exit 1
@@ -52,6 +41,8 @@ runs:
         JQ=$(which jq || true)
         if [ -x "$JQ" ]; then
           KEY="${{ inputs.KEY }}"
+          # See: https://github.com/orgs/community/discussions/23473
+          # Variable reference taken from input
           VALUE=$(echo '${{ format('var.{0}', inputs.VARIABLE }}' | \
             jq -r --arg KEY "$KEY" '.[] | select(.key==$KEY) | .value')
           if [ -z "$VALUE" ]; then
