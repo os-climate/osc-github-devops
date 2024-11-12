@@ -52,8 +52,6 @@ jobs:
     permissions:
       # Required for action that creates labels: github-labels
       contents: read
-    with:
-      create_initial_tag: true
 
   python-project:
     name: "Python Project"

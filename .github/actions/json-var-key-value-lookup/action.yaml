@@ -42,6 +42,8 @@ runs:
         # ${{ env[format(...)] }}
         # '${{ format('tf-env-{0}', inputs.env_id) }}'
 
+
+        # Validate the variable is not empty/unset
         if [ -z "${{ vars.$GITHUB_VARIABLE }}" ]; then
           echo "Error: The required lookup variable/JSON is NOT set"
           echo "Variable name: ${{ vars.$GITHUB_VARIABLE }}"; exit 1
