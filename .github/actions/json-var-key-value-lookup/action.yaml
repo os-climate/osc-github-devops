@@ -29,30 +29,20 @@ runs:
         # Fetch value from JSON lookup table
 
         # Variable set at repository or organisation level
-        GITHUB_VARIABLE="${{ inputs.VARIABLE }}"
-        echo "Looking up value for ${{ inputs.key }} in ${{ inputs.variable }}"
+        echo "Looking up value for: ${{ inputs.key }} in ${{ inputs.variable }}"
 
         # Validate the variable is not empty/unset
-
-        # https://github.com/orgs/community/discussions/23473
-        # ${{ env[format(...)] }}
-        # Really, we need something like:
-        # ${{ vars.$GITHUB_VARIABLE }}
-        # How about: ${{ vars.[format($GITHUB_VARIABLE)] }}
-        # ${{ env[format(...)] }}
-        # '${{ format('tf-env-{0}', inputs.env_id) }}'
-
-
-        # Validate the variable is not empty/unset
-        if [ -z "${{ vars.$GITHUB_VARIABLE }}" ]; then
+        if [ -z '${{ format('vars.{0}', inputs.VARIABLE }}' ]; then
           echo "Error: The required lookup variable/JSON is NOT set"
-          echo "Variable name: ${{ vars.$GITHUB_VARIABLE }}"; exit 1
+          echo "Variable name: ${{ format('vars.{0}', inputs.VARIABLE }}"; exit 1
         fi
 
         JQ=$(which jq || true)
         if [ -x "$JQ" ]; then
           KEY="${{ inputs.KEY }}"
-          VALUE=$(echo '${{ format('var.{0}', inputs.VARIABLE }}' | \
+          # See: https://github.com/orgs/community/discussions/23473
+          # Variable reference taken from input
+          VALUE=$(echo '${{ format('vars.{0}', inputs.VARIABLE }}' | \
             jq -r --arg KEY "$KEY" '.[] | select(.key==$KEY) | .value')
           if [ -z "$VALUE" ]; then
             echo "❌ Key/value lookup failed"; exit 1
@@ -63,4 +53,4 @@ runs:
         fi
         echo "value=$VALUE" >> "$GITHUB_ENV"
         echo "value=$VALUE" >> "$GITHUB_OUTPUT"
-        echo "### ⬆️ Key/value lookup in $GITHUB_VARIABLE returned: $VALUE" >> "$GITHUB_STEP_SUMMARY"
+        echo "### ⬆️ Key/value lookup returned: $VALUE" >> "$GITHUB_STEP_SUMMARY"
