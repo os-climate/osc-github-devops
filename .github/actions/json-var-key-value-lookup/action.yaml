@@ -42,10 +42,13 @@ runs:
           echo "Variable name: $GITHUB_VARIABLE"; exit 1
         fi
 
+        # Display variable JSON to help debug problems
+        echo "Variable contains:"
+        echo "${{ format('vars.{0}', inputs.VARIABLE) }}"
+
         JQ=$(which jq || true)
         if [ -x "$JQ" ]; then
           KEY="${{ inputs.KEY }}"
-
           VALUE=$(echo "${{ format('vars.{0}', inputs.VARIABLE) }}" | \
             jq -r --arg KEY "$KEY" '.[] | select(.key==$KEY) | .value')
           if [ -z "$VALUE" ]; then
