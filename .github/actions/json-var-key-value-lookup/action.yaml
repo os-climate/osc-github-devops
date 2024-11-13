@@ -39,8 +39,10 @@ runs:
         JQ=$(which jq || true)
         if [ -x "$JQ" ]; then
           KEY="${{ inputs.KEY }}"
-          VALUE=$(echo "$JSON" | \
+
+          VALUE=$(echo '${{ inputs.JSON }}' | \
             jq -r --arg KEY "$KEY" '.[] | select(.key==$KEY) | .value')
+
           if [ -z "$VALUE" ]; then
             echo "❌ Key/value lookup failed"; exit 1
           fi
