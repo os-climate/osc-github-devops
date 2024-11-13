@@ -89,4 +89,4 @@ runs:
         git config user.email "${{ inputs.COMMIT_USER_EMAIL }}"
         git commit --amend -m"${{ inputs.COMMIT_MESSAGE_BODY }}" -m"Issue-ID: ${{ env.value }}" --no-verify --no-edit
         git push --force
-        echo "present=true" >> "$GITHUB_OUTPUTS"
+        echo "present=true" >> "$GITHUB_OUTPUT"
