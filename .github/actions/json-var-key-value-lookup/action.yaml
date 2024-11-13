@@ -35,10 +35,9 @@ runs:
 
         # See: https://github.com/orgs/community/discussions/23473
         # Variable reference taken from input; needs careful substitution
-        GITHUB_VARIABLE="${{ format('vars.{0}', inputs.VARIABLE) }}"
 
         # Validate the variable is not empty/unset
-        if [ -z "$GITHUB_VARIABLE" ]; then
+        if [ -z "${{ format('vars.{0}', inputs.VARIABLE) }}" ]; then
           echo "Error: The required lookup variable/JSON is NOT set"
           echo "Variable name: $GITHUB_VARIABLE"; exit 1
         fi
@@ -47,7 +46,7 @@ runs:
         if [ -x "$JQ" ]; then
           KEY="${{ inputs.KEY }}"
 
-          VALUE=$(echo "$GITHUB_VARIABLE" | \
+          VALUE=$(echo "${{ format('vars.{0}', inputs.VARIABLE) }}" | \
             jq -r --arg KEY "$KEY" '.[] | select(.key==$KEY) | .value')
           if [ -z "$VALUE" ]; then
             echo "❌ Key/value lookup failed"; exit 1
