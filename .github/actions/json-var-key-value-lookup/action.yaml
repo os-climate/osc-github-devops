@@ -34,7 +34,7 @@ runs:
           echo "Error: The required lookup variable/JSON was NOT passed as input"; exit 1
         fi
 
-        echo "Looking up value for: ${{ inputs.key }}
+        echo "Looking up value for: ${{ inputs.key }}"
         echo "Input variable name: ${inputs.json}"
         echo "Input variable value: $JSON"
 
