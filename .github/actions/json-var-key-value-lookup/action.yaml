@@ -28,6 +28,8 @@ runs:
       run: |
         # Fetch value from JSON lookup table
 
+        set -vx
+
         # Variable set at repository or organisation level
         echo "Looking up value for: ${{ inputs.key }} in ${{ inputs.variable }}"
 
