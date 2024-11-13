@@ -28,6 +28,7 @@ runs:
       run: |
         # Fetch value for key from JSON lookup table
 
+        JSON="${{ inputs.json }}"
         # Validate the variable is not empty/unset
         if [ -z "$JSON" ]; then
           echo "Error: The required lookup variable/JSON was NOT passed as input"; exit 1

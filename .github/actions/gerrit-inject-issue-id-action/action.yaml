@@ -15,6 +15,12 @@ inputs:
     type: string
     required: true
   # Optional
+  INJECT:
+    # When injection is enabled and no issue found, output variable will be set true
+    description: "Whether to inject an issue-id if NOT found"
+    type: boolean
+    required: false
+    default: true
   COMMIT_USER_NAME:
     description: "User used to perform the commit"
     type: string
@@ -45,10 +51,6 @@ runs:
       shell: bash
       run: |
         # Check commit message for required string
-
-        # Gerrit reg-ex expression is:
-        # Issue-ID: ([A-Z][A-Z0-9]{1,9}-\\d+)
-
         COMMIT_MESSAGE="${{ inputs.COMMIT_MESSAGE_BODY }}"
         if [[ "$COMMIT_MESSAGE" =~ "Issue-ID: " ]]; then
           echo "✅ Issue-ID was found in the pull request"
@@ -61,7 +63,7 @@ runs:
         fi
 
     - name: "Identifying key for Issue-ID lookup"
-      id: lookup
+      if: env.PRESENT == 'false' && inputs.INJECT == 'true'
       shell: bash
       run: |
         # Identifying key for Issue-ID lookup
@@ -71,14 +73,15 @@ runs:
         echo "key=$ACTOR" >> "$GITHUB_ENV"
 
     - name: "Get Issue-ID from JSON lookup table"
+      if: env.PRESENT == 'false' && inputs.INJECT == 'true'
       uses: os-climate/osc-github-devops/.github/actions/json-var-key-value-lookup@main
       with:
-        json: ${{ inputs.ISSUE_ID_LOOKUP_JSON }}
+        json: ${{ inputs.issue_id_lookup_json }}
         key: ${{ env.key }}
 
     - name: "Injecting Issue-ID into body of first commit message"
       id: inject
-      if: env.PRESENT == 'false'
+      if: env.PRESENT == 'false' && inputs.INJECT == 'true'
       shell: bash
       run: |
         # Injecting Issue-ID into body of first commit
@@ -86,3 +89,4 @@ runs:
         git config user.email "${{ inputs.COMMIT_USER_EMAIL }}"
         git commit --amend -m"${{ inputs.COMMIT_MESSAGE_BODY }}" -m"Issue-ID: ${{ env.value }}" --no-verify --no-edit
         git push --force
+        echo "present=true" >> "$GITHUB_OUTPUTS"
