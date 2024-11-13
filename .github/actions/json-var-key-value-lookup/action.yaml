@@ -35,8 +35,6 @@ runs:
         fi
 
         echo "Looking up value for: ${{ inputs.key }}"
-        echo "Input variable name: ${inputs.json}"
-        echo "Input variable value: $JSON"
 
         JQ=$(which jq || true)
         if [ -x "$JQ" ]; then
