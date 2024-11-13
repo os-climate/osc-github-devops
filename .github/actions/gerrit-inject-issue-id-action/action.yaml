@@ -60,20 +60,20 @@ runs:
           echo "PRESENT=false" >> "$GITHUB_OUTPUT"
         fi
 
-    - name: "Looking up appropriate JIRA ticket for this change"
+    - name: "Identifying key for Issue-ID lookup"
       id: lookup
       shell: bash
       run: |
-        # Look up appropriate JIRA ticket for this change
+        # Identifying key for Issue-ID lookup
         ACTOR="${{ github.actor }}"
         ACTOR_ID="${{ github.actor_id }}"
-        echo "Actor: $ACTOR [$ACTOR_ID]"
+        echo "Using GitHub actor as key: $ACTOR [$ACTOR_ID]"
         echo "key=$ACTOR" >> "$GITHUB_ENV"
 
-    - name: "Get Issue-ID from JSON variable"
+    - name: "Get Issue-ID from JSON lookup table"
       uses: os-climate/osc-github-devops/.github/actions/json-var-key-value-lookup@main
       with:
-        variable: ISSUE_ID_LOOKUP_JSON
+        json: ${{ inputs.ISSUE_ID_LOOKUP_JSON }}
         key: ${{ env.key }}
 
     - name: "Injecting Issue-ID into body of first commit message"
@@ -82,8 +82,6 @@ runs:
       shell: bash
       run: |
         # Injecting Issue-ID into body of first commit
-        # git fetch; git pull
-        # gh pr checkout 23
         git config user.name "${{ inputs.COMMIT_USER_NAME }}"
         git config user.email "${{ inputs.COMMIT_USER_EMAIL }}"
         git commit --amend -m"${{ inputs.COMMIT_MESSAGE_BODY }}" -m"Issue-ID: ${{ env.value }}" --no-verify --no-edit

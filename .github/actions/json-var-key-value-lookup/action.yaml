@@ -5,51 +5,42 @@
 name: "JSON Variable Key/Value Lookup"
 
 inputs:
-  VARIABLE:
-    description: "The name of the variable containing a JSON key/value lookup table"
+  JSON:
+    description: "The JSON key/value lookup table"
     type: string
     required: true
   KEY:
-    description: "The JSON key too lookup"
+    description: "The JSON key requiring lookup"
     type: string
     required: true
 
 outputs:
   VALUE:
-    description: "The value associated with the key"
+    description: "The value associated with the supplied key"
     value: ${{ steps.lookup.outputs.value }}
 
 runs:
   using: "composite"
   steps:
-    - name: "Fetch value from JSON lookup table"
+    - name: "Fetch value for key from JSON lookup table"
       id: lookup
       shell: bash
       run: |
-        # Fetch value from JSON lookup table
-
-        set -vx
-
-        # Variable set at repository or organisation level
-        echo "Looking up value for: ${{ inputs.key }} in ${{ inputs.variable }}"
-
-        # See: https://github.com/orgs/community/discussions/23473
-        # Variable reference taken from input; needs careful substitution
+        # Fetch value for key from JSON lookup table
 
         # Validate the variable is not empty/unset
-        if [ -z "${{ format('vars.{0}', inputs.VARIABLE) }}" ]; then
-          echo "Error: The required lookup variable/JSON is NOT set"
-          echo "Variable name: $GITHUB_VARIABLE"; exit 1
+        if [ -z "$JSON" ]; then
+          echo "Error: The required lookup variable/JSON was NOT passed as input"; exit 1
         fi
 
-        # Display variable JSON to help debug problems
-        echo "Variable contains:"
-        echo "${{ format('vars.{0}', inputs.VARIABLE) }}"
+        echo "Looking up value for: ${{ inputs.key }}
+        echo "Input variable name: ${inputs.json}"
+        echo "Input variable value: $JSON"
 
         JQ=$(which jq || true)
         if [ -x "$JQ" ]; then
           KEY="${{ inputs.KEY }}"
-          VALUE=$(echo "${{ format('vars.{0}', inputs.VARIABLE) }}" | \
+          VALUE=$(echo "$JSON" | \
             jq -r --arg KEY "$KEY" '.[] | select(.key==$KEY) | .value')
           if [ -z "$VALUE" ]; then
             echo "❌ Key/value lookup failed"; exit 1
