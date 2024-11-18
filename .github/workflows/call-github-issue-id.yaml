@@ -1,0 +1,23 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation
+
+name: call-issue-id-reusable-workflow
+
+# yamllint disable-line rule:truthy
+on:
+  pull_request_target:
+    types: [opened, reopened, edited, synchronize]
+    branches:
+      - master
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  issue-id:
+    permissions:
+      contents: write
+    uses: os-climate/osc-github-devops/.github/workflows/reuse-issue-id.yaml@main
