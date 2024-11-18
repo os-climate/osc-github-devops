@@ -1,0 +1,421 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+
+name: "🔨 Actions and Workflows"
+
+# yamllint disable-line rule:truthy
+on:
+  workflow_dispatch:
+  push:
+    branches: ["main", "master"]
+    paths: [".github/**"]
+
+#  pull_request:
+#    types: [opened, reopened, edited, synchronize]
+#    paths: [".github/**"]
+#    branches: ["main", "master"]
+
+permissions: {}
+
+jobs:
+  ### Test Individual Composite Actions ###
+
+  one-password:
+    name: "1Password"
+    uses: os-climate/osc-github-devops/.github/workflows/one-password.yaml@main
+    # Do NOT run until change is merged; secrets will NOT be available and workflow WILL fail
+    if: github.event_name != 'pull_request'
+    with:
+      ACCESS_TYPE: "development"
+      VAULT_ITEM: "op://67hdehutbpddhfbgm6ffjvdsbu/Test Secure Note/notesPlain"
+      EXPORT: false
+    secrets:
+      ONE_PASSWORD_DEVELOPMENT: ${{ secrets.ONE_PASSWORD_DEVELOPMENT }}
+    # Does not need to interact with GitHub not the repository at all
+    permissions: {}
+
+  repository:
+    name: "Repository Content"
+    uses: os-climate/osc-github-devops/.github/workflows/repository.yaml@main
+    permissions:
+      contents: read
+
+  tests:
+    name: "Synthetic Tests"
+    runs-on: ubuntu-latest
+    # if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+    permissions:
+      contents: read
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
+        with:
+          # Does not currently work: https://github.com/actions/checkout/issues/1471
+          fetch-tags: true
+          # The semantic-tag-current action currently contains a workaround for this behaviour
+
+      - name: "Action: git-commit-message"
+        id: git-commit-message
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/git-commit-message@main
+
+      - name: "Action: python-project-name"
+        id: python-project-name
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/python-project-name@main
+
+      - name: "Validate: python-project-name"
+        shell: bash
+        run: |
+          # Check output from: python-project-name
+          PYTHON_PROJECT_NAME="${{ steps.python-project-name.outputs.python_project_name }}"
+          if [ "$PYTHON_PROJECT_NAME" != "osc-github-devops" ]; then
+            echo "ERROR: Python project name was not as expected"
+            echo "python_project_name: $PYTHON_PROJECT_NAME"; exit 1
+          else
+            echo "Returned project name is correct: $PYTHON_PROJECT_NAME"
+          fi
+
+      - name: "Action: python-project-version"
+        id: python-project-version
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/python-project-version@main
+
+      - name: "Validate: python-project-version"
+        shell: bash
+        run: |
+          # Check output from: python-project-version
+          PYTHON_PROJECT_VERSION="${{ steps.python-project-version.outputs.python_project_version }}"
+          if [ "$PYTHON_PROJECT_VERSION" != "v0.0.4" ]; then
+            echo "ERROR: Python project version was not as expected"
+            echo "python_project_version: $PYTHON_PROJECT_NAME"; exit 1
+          else
+            echo "Returned project version is correct: $PYTHON_PROJECT_NAME"
+          fi
+
+      - name: "Action: python-project-name-match-repo-name"
+        id: python-project-name-match-repo-name
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/python-project-name-match-repo-name@main
+
+      - name: "Validate: python-project-name-match-repo-name"
+        shell: bash
+        run: |
+          # Check output from: python-project-name-match-repo-name
+          MATCHES_REPO_NAME="${{ steps.python-project-name-match-repo-name.outputs.MATCHES_REPO_NAME }}"
+          if [ "$MATCHES_REPO_NAME" != "true" ]; then
+            echo "ERROR: Python project name did not match repository name, as expected"
+            echo "MATCHES_REPO_NAME: $MATCHES_REPO_NAME"; exit 1
+          else
+            echo "Project name matched repository name, as expected"
+            echo "MATCHES_REPO_NAME: $MATCHES_REPO_NAME"
+          fi
+
+      - name: "Extract TOX stanza"
+        id: tox-stanza
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/tox-parse-stanza@main
+
+      - name: "Action: python-versions-matrix"
+        id: python-versions-matrix
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/python-versions-matrix@main
+
+      - name: "Action: semantic-tag-validate [semantic tag]"
+        id: semantic-tag-validate-good
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/semantic-tag-validate@main
+        with:
+          tag: "v1.2.3"
+
+      - name: "Action: semantic-tag-validate [junk tag]"
+        id: semantic-tag-validate-junk
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/semantic-tag-validate@main
+        with:
+          tag: "v1.not-valid.3.garbage"
+
+      - name: "Validate: semantic-tag-validate"
+        shell: bash
+        run: |
+          # Check output from: semantic-tag-validate [semantic/junk]
+          ERRORS="false"
+          if [ "${{ steps.semantic-tag-validate-good.outputs.semantic }}" != "true" ]; then
+            echo "Errors with: semantic-tag-validate v1.2.3"
+            ERRORS="true"
+          fi
+          if [ "${{ steps.semantic-tag-validate-junk.outputs.semantic }}" != "false" ]; then
+            echo "Errors with: semantic-tag-production v1.not-valid.3.garbage"
+            ERRORS="true"
+          fi
+          if [ "$ERRORS" = "true" ]; then
+            echo "ERROR: check semantic tag validation action/code"; exit 1
+          else
+            echo "All tag validation tests passed, no errors found"
+          fi
+
+      - name: "Action: semantic-tag-current"
+        id: semantic-tag-current
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/semantic-tag-current@main
+
+      - name: "Action: semantic-tag-production [patch]"
+        id: semantic-tag-production-patch
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/semantic-tag-production@main
+        with:
+          tag: "v2.9.6"
+          type: "patch"
+
+      - name: "Action: semantic-tag-production [minor]"
+        id: semantic-tag-production-minor
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/semantic-tag-production@main
+        with:
+          tag: "v0.1.2"
+          type: "minor"
+
+      - name: "Action: semantic-tag-production [major]"
+        id: semantic-tag-production-major
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/semantic-tag-production@main
+        with:
+          tag: "v1.2.3"
+          type: "major"
+
+      - name: "Validate Incremented PROD Tags"
+        shell: bash
+        run: |
+          # Check output from: semantic-tag-production
+          ERRORS="false"
+          if [ "${{ steps.semantic-tag-production-patch.outputs.tag }}" != "2.9.7" ]; then
+            echo "Errors with: semantic-tag-production [patch]"
+            ERRORS="true"
+          fi
+          if [ "${{ steps.semantic-tag-production-minor.outputs.tag }}" != "0.2.0" ]; then
+            echo "Errors with: semantic-tag-production [minor]"
+            ERRORS="true"
+          fi
+          if [ "${{ steps.semantic-tag-production-major.outputs.tag }}" != "2.0.0" ]; then
+            echo "Errors with: semantic-tag-production [major]"
+            ERRORS="true"
+          fi
+          if [ "$ERRORS" = "true" ]; then
+            echo "ERROR: check tag manipulation action/code"; exit 1
+          else
+            echo "All tag check tests passed, no errors found"
+          fi
+
+      - name: "Action: semantic-tag-development [patch]"
+        id: semantic-tag-development-patch
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/semantic-tag-development@main
+        with:
+          tag: "v0.0.4"
+          type: "patch"
+
+      - name: "Action: semantic-tag-development [minor]"
+        id: semantic-tag-development-minor
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/semantic-tag-development@main
+        with:
+          tag: "v1.8.3"
+          type: "minor"
+
+      - name: "Action: semantic-tag-development [major]"
+        id: semantic-tag-development-major
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/semantic-tag-development@main
+        with:
+          tag: "v4.1.1"
+          type: "major"
+
+      - name: "Validate Incremented DEV Tags"
+        shell: bash
+        run: |
+          # Check output from: semantic-tag-development
+          ERRORS='false'
+          EXPECTED='0.0.5-dev1'
+          if [ "${{ steps.semantic-tag-development-patch.outputs.tag }}" != "$EXPECTED" ]; then
+            echo "Errors with: semantic-tag-development [patch]"
+            echo "Received: ${{ steps.semantic-tag-development-patch.outputs.tag }} Expected: $EXPECTED"
+            ERRORS='true'
+          fi
+          EXPECTED='1.9.0-dev1'
+          if [ "${{ steps.semantic-tag-development-minor.outputs.tag }}" != "$EXPECTED" ]; then
+            echo "Errors with: semantic-tag-development [minor]"
+            echo "Received: ${{ steps.semantic-tag-development-patch.outputs.tag }} Expected: $EXPECTED"
+            ERRORS='true'
+          fi
+          EXPECTED='5.0.0-dev1'
+          if [ "${{ steps.semantic-tag-development-major.outputs.tag }}" != "$EXPECTED" ]; then
+            echo "Errors with: semantic-tag-development [major]"
+            echo "Received: ${{ steps.semantic-tag-development-patch.outputs.tag }} Expected: $EXPECTED"
+            ERRORS='true'
+          fi
+          if [ "$ERRORS" = 'true' ]; then
+            echo "ERROR: check tag manipulation action/code"; exit 1
+          else
+            echo 'All tag check tests passed, no errors found'
+          fi
+
+      - name: "Action: url-validity-check"
+        id: url-validity-check
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/url-validity-check@main
+        with:
+          prefix: "https://test.pypi.org/project"
+          string: "/ITR"
+          suffix: "/"
+
+      - name: "Action: github-labels"
+        id: github-labels
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/github-labels@main
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: "Validate: github-labels"
+        shell: bash
+        run: |
+          # Check output from: github-labels
+          if [ "${{ steps.github-labels.outputs.present }}" = 'true' ]; then
+            echo "Labels are reported present:"
+            if (gh label list | grep release); then
+              exit 0
+            fi
+          elif [ "${{ steps.github-labels.outputs.created }}" = 'true' ]; then
+            echo "Labels are reported present:"
+            if (gh label list | grep release); then
+              exit 0
+            fi
+          else
+            echo 'The expected action outputs/labels were NOT found'
+            gh label list
+            exit 1
+          fi
+
+      - name: "Action: github-secrets"
+        uses: os-climate/osc-github-devops/.github/actions/github-secrets@main
+        # Do NOT run until change is merged; secrets will NOT be available and workflow WILL fail
+        if: github.event_name != 'pull_request'
+        # continue-on-error: true
+        with:
+          # Mandatory secrets/variables to check
+          pypi_development: ${{ secrets.PYPI_DEVELOPMENT }}
+          pypi_production: ${{ secrets.PYPI_PRODUCTION }}
+          one_password_development: ${{ secrets.ONE_PASSWORD_DEVELOPMENT }}
+
+      - name: "Action: string-comparison [match]"
+        id: string-comparison-matching
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/string-comparison@main
+        with:
+          string_a: "Mary had a little lamb"
+          string_b: "Mary had a little lamb"
+
+      - name: "Action: string-comparison [different]"
+        id: string-comparison-different
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/string-comparison@main
+        with:
+          string_a: "Mary had a little lamb"
+          string_b: "I do not like eating lamb"
+
+      - name: "Action: string-comparison [sub-string match]"
+        id: string-comparison-substring
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/string-comparison@main
+        with:
+          string_a: "Mary had a little lamb"
+          string_b: "a little lamb"
+          substring_match: "true"
+
+      - name: "Action: string-comparison [sub-string match, case-insensitive]"
+        id: string-comparison-substring-nocase
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/string-comparison@main
+        with:
+          string_a: "Mary had a little lamb"
+          string_b: "A little lamb"
+          substring_match: "true"
+          case_insensitive: "true"
+
+      - name: "Report Errors: string-comparison"
+        # yamllint disable-line rule:line-length
+        if: steps.string-comparison-matching.outputs.match == 'false'
+          || steps.string-comparison-different.outputs.match == 'true'
+          || steps.string-comparison-substring.outputs.match == 'false'
+          || steps.string-comparison-substring-nocase.outputs.match == 'false'
+        shell: bash
+        run: |
+          # Check string-comparison action logic
+          echo 'String comparison/action logic appears to be broken'
+          exit 1
+
+      # Action: path-check
+      - name: "Action: path test [valid file]"
+        id: path-check-file
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/path-check@main
+        with:
+          check_path: "tests/resources/test-folder/test-file"
+
+      - name: "Action: path test [valid folder]"
+        id: path-check-folder
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/path-check@main
+        with:
+          check_path: "tests/resources/test-folder"
+
+      - name: "Action: path test [valid symlink to file]"
+        id: path-check-symlink-file
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/path-check@main
+        with:
+          check_path: "tests/resources/test-valid-file-symlink"
+
+      - name: "Action: path test [valid symlink to folder]"
+        id: path-check-symlink-folder
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/path-check@main
+        with:
+          check_path: "tests/resources/test-valid-folder-symlink"
+
+      # Tests: path-check
+      - name: "Error with path tests (files/directories/symlinks)"
+        id: path-check-errors
+        shell: bash
+        if: steps.path-check-file.outputs.type != 'file' ||
+          steps.path-check-file.outputs.symlink != 'false' ||
+          steps.path-check-folder.outputs.type != 'directory' ||
+          steps.path-check-folder.outputs.symlink != 'false' ||
+          steps.path-check-symlink-file.outputs.type != 'file' ||
+          steps.path-check-symlink-file.outputs.symlink != 'true' ||
+          steps.path-check-symlink-folder.outputs.type != 'directory' ||
+          steps.path-check-symlink-folder.outputs.symlink != 'true'
+        run: |
+          # Report errors with path tests
+          echo "One or more path checks failed validation"; exit 1
+
+      - name: "Action: python-project-version-patch"
+        id: python-project-version-patch
+        uses: os-climate/osc-github-devops/.github/actions/python-project-version-patch@main
+        with:
+          replacement_version: "v1.0.0"
+
+      - name: "Validate: python-project-version-patch"
+        shell: bash
+        run: |
+          # Check version string was patched correctly
+          if [ -f pyproject.toml ]; then
+            if (grep "v1.0.0" pyproject.toml); then
+              echo "Version substitution successful ✅"
+            else
+              echo "Version substitution failed ❌"
+            fi
+          fi
+
+      - name: "Action: python-project-setup"
+        uses: os-climate/osc-github-devops/.github/actions/python-project-setup@main

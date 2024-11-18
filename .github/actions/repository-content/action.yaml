@@ -1,0 +1,127 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+
+name: "🔍 Repository Checks"
+description: "Scans repository content and identifies supported content"
+
+outputs:
+  PYTHON_PROJECT:
+    description: "Repository contains a Python project with file: pyproject.toml"
+    value: ${{ steps.content.outputs.python_project }}
+  NODE_JS_PROJECT:
+    description: "Repository contains a Node.js project with file: package.json"
+    value: ${{ steps.content.outputs.node_js_project }}
+  MAVEN_CONFIG:
+    description: "Repository contains Maven project with file: pom.xml"
+    value: ${{ steps.content.outputs.maven_config }}
+  GRADLE_CONFIG:
+    description: "Repository contains Gradle project with file(s): settings.gradle*"
+    value: ${{ steps.content.outputs.gradle_config }}
+  JUPYTER_NOTEBOOKS:
+    description: "Repository contains Jupyter Notebooks with file(s): *.ipynb"
+    value: ${{ steps.content.outputs.jupyter_notebooks }}
+  TOX_CONFIG:
+    description: "Repository contains a TOX configuration file: tox.ini"
+    value: ${{ steps.content.outputs.tox_config }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Inpect repository content"
+      id: content
+      shell: bash
+      run: |
+        #/usr/bin/env bash
+        # Inpect repository content
+
+        #SHELLCODESTART
+
+        # Always create a local text file containing the summary output
+        TMPFILE=$(mktemp -p /tmp --suffix "github-summary-output.txt")
+
+        # Allows for testing from a local shell
+        if [ -z "$GITHUB_OUTPUT" ]; then
+          echo "Running from a shell, NOT workflow"
+          export GITHUB_OUTPUT="/dev/null"
+          export GITHUB_ENV="/dev/null"
+        fi
+
+        # Check for Python project metadata files
+        if [ -f pyproject.toml ] || [ -f setup.py ]; then
+          PYTHON_PROJECT="true"
+        else
+          PYTHON_PROJECT="false"
+        fi
+
+        # Check for Node.JS package description
+        if [ -f package.json ]; then
+          NODE_JS_PROJECT="true"
+        else
+          NODE_JS_PROJECT="false"
+        fi
+
+        # Check for Maven config: pom.xml
+        if [ -f pom.xml ]; then
+          MAVEN_CONFIG="true"
+        else
+          MAVEN_CONFIG="false"
+        fi
+
+        # Check for Gradle settings files: settings.gradle*
+        GRADLE_COUNT=$(find . -name 'settings.gradle*' | wc -l )
+        if [ "$GRADLE_COUNT" -ne 0 ]; then
+          GRADLE_CONFIG="true"
+        else
+          GRADLE_CONFIG="false"
+        fi
+
+        # Check for TOX configuration: tox.ini
+        if [ -f tox.ini ]; then
+          TOX_CONFIG="true"
+        else
+          TOX_CONFIG="false"
+        fi
+
+        # Check for Jupyter Notebooks: *.ipynb
+        NOTEBOOK_COUNT=$(find . -name '*.ipynb' | wc -l )
+        if [ "$NOTEBOOK_COUNT" -ne 0 ]; then
+          JUPYTER_NOTEBOOKS="true"
+        else
+          JUPYTER_NOTEBOOKS="false"
+        fi
+
+        ### Set Outputs ###
+
+        echo "python_project=$PYTHON_PROJECT" >> "$GITHUB_OUTPUT"
+        echo "node_js_project=$NODE_JS_PROJECT" >> "$GITHUB_OUTPUT"
+        echo "maven_config=$MAVEN_CONFIG" >> "$GITHUB_OUTPUT"
+        echo "gradle_config=$GRADLE_CONFIG" >> "$GITHUB_OUTPUT"
+        echo "tox_config=$TOX_CONFIG" >> "$GITHUB_OUTPUT"
+        echo "jupyter_notebooks=$JUPYTER_NOTEBOOKS" >> "$GITHUB_OUTPUT"
+
+        ### GitHub Summary ###
+
+        echo '# 🔍 Repository Content Inspection' >> "$TMPFILE"
+        echo "Supported content types are listed in the table below" >> "$TMPFILE"
+        echo "| Status | Support Content Type |" >> "$TMPFILE"
+        echo "| -------- | ------- |" >> "$TMPFILE"
+        echo "| $PYTHON_PROJECT | Python Project |" >> "$TMPFILE"
+        echo "| $NODE_JS_PROJECT | Node.js Project |" >> "$TMPFILE"
+        echo "| $MAVEN_CONFIG | Maven Configuration |" >> "$TMPFILE"
+        echo "| $GRADLE_CONFIG | Gradle Configuration |" >> "$TMPFILE"
+        echo "| $TOX_CONFIG | Tox Configuration |" >> "$TMPFILE"
+        echo "| $JUPYTER_NOTEBOOKS | Jupyter Notebooks |" >> "$TMPFILE"
+
+        # The hack below helps make the displayed output summary pretty
+        sed -i "s/true/✅/g" "$TMPFILE"
+        sed -i "s/false/❌/g" "$TMPFILE"
+
+        # Displays summary text to the terminal when run from a shell
+        cat "$TMPFILE"  >> "$GITHUB_STEP_SUMMARY"
+        if [ "$GITHUB_OUTPUT" = "/dev/null" ]; then
+          cat "$TMPFILE"
+        fi
+        rm "$TMPFILE"
+
+        #SHELLCODEEND

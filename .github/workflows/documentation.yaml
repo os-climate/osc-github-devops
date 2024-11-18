@@ -1,0 +1,67 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+
+name: "📰 Publish Documentation"
+
+# yamllint disable-line rule:truthy
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [closed]
+    branches:
+      - "main"
+      - "master"
+      - "!update-devops-tooling"
+
+permissions: {}
+
+jobs:
+  build_and_deploy:
+    # Only run when pull request is merged
+    if: github.event.pull_request.merged == true
+    name: "Rebuild Documentation"
+    runs-on: ubuntu-latest
+    continue-on-error: false
+    permissions:
+      # IMPORTANT: mandatory for documentation updates; used in final step
+      contents: write
+      # ToDo: 2024-10-31
+      # These were enabled previously; need to check if they are still necessary?
+      # id-token: write
+      # pull-requests: write
+      # repository-projects: write
+
+    steps:
+      - name: "Checkout Repository"
+        uses: actions/checkout@v4
+
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: "Setup PDM for build commands"
+        uses: pdm-project/setup-pdm@v4
+
+      - name: "Install Dependencies"
+        run: |
+          python -m pip install --upgrade pip
+          pdm lock
+          pdm export -o requirements.txt
+          if [ -f docs/requirements.txt ]; then
+          pip install -r docs/requirements.txt; fi
+
+      - name: "Build documentation: (tox/sphinx)"
+        run: |
+          pip install --upgrade tox
+          tox -e docs
+
+      - name: "Publish Documentation"
+        if: success()
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          publish_branch: gh-pages
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/_build/html/
+          keep_files: true

@@ -1,0 +1,66 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+
+name: "📦 [R] Python Audit"
+# Packages a development/production release on GitHub"
+
+on:
+  workflow_call:
+    inputs:
+      PYTHON_VERSION:
+        # Usually specified/extracted from the file: pyproject.toml
+        description: "Python matrix versions to use for test builds (in JSON)"
+        required: true
+        type: string
+      ARTEFACT_LOCATION:
+        description: "Path/location for build artefacts"
+        type: string
+        required: false
+        default: "dist"
+
+permissions: {}
+
+jobs:
+  python-audit:
+    name: "Python Audit"
+    runs-on: "ubuntu-latest"
+    permissions:
+      contents: read
+
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
+
+      - name: "Extract project/repository naming"
+        id: naming
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/python-project-name@main
+
+      - name: "⬇ Download build artefacts"
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.python_project_name }}
+          path: ${{ inputs.artefact_location }}
+
+      - name: "Set up Python ${{ inputs.python_version }}"
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python_version }}
+
+      - name: "Install build products/dependencies"
+        run: |
+          # Install build products/dependencies
+          echo "Upgrading: pip, setuptools"
+          python -m pip install -q --upgrade pip setuptools
+          echo "Installing built package(s) and dependencies"
+          for wheel in ${{ inputs.artefact_location }}/*.whl; do
+                  pip install -q "$wheel"
+          done
+          if [ -f requirements.txt ]; then
+            echo "Installing dependencies from: requirements.txt"
+            pip install -q -r requirements.txt
+          fi
+
+      - name: "Auditing with: pip audit"
+        uses: pypa/gh-action-pip-audit@v1.1.0

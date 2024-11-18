@@ -1,0 +1,67 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+
+name: "🏷️ Check Tag/String is Semantic"
+
+inputs:
+  TAG:
+    description: "Tag/string to check/verify e.g. v1.2.3"
+    required: true
+
+outputs:
+  SEMANTIC:
+    description: "True if tag matches semantic versioning check"
+    value: ${{ steps.validate.outputs.semantic }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Validate tag/string is semantic"
+      id: validate
+      shell: bash
+      run: |
+        # Validate tag/string is semantic
+
+        #SHELLCODESTART
+
+        # Allows for testing from a local shell
+        if [ -z "$GITHUB_OUTPUT" ]; then
+          echo "Running from a shell, NOT workflow"
+          export GITHUB_OUTPUT="/dev/null"
+          export GITHUB_ENV="/dev/null"
+        else
+          TAG=${{ inputs.TAG }}
+        fi
+
+        if [ -z "$TAG" ]; then
+          echo "Running from shell script outside GitHub"
+          if [ $# -ne 1 ]; then
+            echo "Usage:  $0 [tag to validate]"; exit 1
+          else
+            TAG="$1"
+          fi
+        fi
+
+        echo "Tag to check: $TAG"
+
+        # If present, strip the leading "v" character
+        if [[ "$TAG" == v* ]]; then
+          TAG="${TAG:1}"
+        fi
+
+        # Regular expression to match semantic tag
+        PATTERN="^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-((0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*))?(\+([0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*))?$"
+
+        # Validate supplied (and parsed) tag
+        if ! [[ "$TAG" =~ $PATTERN ]]; then
+          echo "ERROR: invalid semantic tag ❌"
+          semantic="false"
+        else
+          echo "Tag is semantic/valid ✅"
+          semantic="true"
+        fi
+
+        echo "semantic=$semantic" >> $GITHUB_OUTPUT
+
+        #SHELLCODEEND

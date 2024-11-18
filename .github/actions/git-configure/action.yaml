@@ -1,0 +1,31 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation
+
+name: "🛠️ Configure GIT"
+
+inputs:
+  COMMIT_USER_NAME:
+    description: "User used to perform the commit"
+    type: string
+    required: false
+    default: "github-actions[bot]"
+  COMMIT_USER_EMAIL:
+    description: "User used to perform the commit"
+    type: string
+    required: false
+    default: "41898282+github-actions[bot]@users.noreply.github.com"
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Configure GIT"
+      id: configure
+      shell: bash
+      run: |
+        # Configure GIT
+        git config user.name "${{ inputs.COMMIT_USER_NAME }}"
+        git config user.email "${{ inputs.COMMIT_USER_EMAIL }}"
+        USER_STRING="${{ inputs.COMMIT_USER_NAME }} [ ${{ inputs.COMMIT_USER_EMAIL }} ]"
+        echo "GIT Configuration: $USER_STRING"
+        echo "### 🛠️ GIT configuration: $USER_STRING" >> "$GITHUB_STEP_SUMMARY"

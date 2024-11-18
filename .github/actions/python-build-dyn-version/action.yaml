@@ -1,0 +1,29 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+
+name: "🧱 Get Dynamic Build Name"
+description: "Returns the dynamic build versioning"
+
+outputs:
+  DYNAMIC_VERSION:
+    description: "Dynamic versioning from build system"
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v4
+
+    - name: "Get dynamic build version from file"
+      shell: bash
+      run: |
+        # Get dynamic build version from file
+        FILENAME=version.txt
+        if [ -f "$FILENAME" ]; then
+          echo DYNAMIC_VERSION=$(cat "$FILENAME")
+          echo "Build version enumerated from $FILENAME: $DYNAMIC_VERSION"
+        else
+          echo "Build version could not be enumerated from: $FILENAME"
+        fi
+
+        echo "dynamic_version=$DYNAMIC_VERSION" >> GITHUB_OUTPUT

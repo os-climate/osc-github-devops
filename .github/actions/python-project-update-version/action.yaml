@@ -1,0 +1,52 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+
+name: "🐍 Update Python Project Version"
+
+inputs:
+  VERSION:
+    description: "Target/replacement version string"
+    required: true
+    type: string
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Validate action inputs"
+      id: validate-inputs
+      shell: bash
+      run: |
+        # Validate action inputs
+
+        #SHELLCODESTART
+
+        # Allows for testing from a local shell
+        if [ -z "$GITHUB_OUTPUT" ]; then
+          echo "Running from a shell, NOT workflow"
+          export GITHUB_OUTPUT="/dev/null"
+          export GITHUB_ENV="/dev/null"
+          if [ $# -ne 1 ]; then
+            echo "Error: invalid arguments specified"
+            echo "Usage:  $0 [version]"; exit 1
+          else
+            VERSION="$1"
+          fi
+        else
+          VERSION=${{ inputs.VERSION }}
+        fi
+
+        if [ -z "$VERSION" ]; then
+          echo "The version string was empty; check inputs passed to action"
+          exit 1
+        fi
+
+        #SHELLCODEEND
+
+    - name: "Substitute version string"
+      id: update-version
+      uses: os-climate/osc-github-devops/.github/actions/file-grep-regex@main
+      with:
+        filename: "pyproject.toml"
+        regex:
+        flags:

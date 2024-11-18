@@ -1,0 +1,99 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+
+name: "🧪 Python Test"
+description: "Tests a Python Project"
+
+inputs:
+  # The matrix Python build version should be passed into this action
+  PYTHON_VERSION:
+    description: "Python version used to build artefacts"
+    required: true
+  NEVER_FAIL:
+    description: "Continue even when a test fails"
+    required: false
+    default: false
+  REPORT_ARTEFACT:
+    description: "Store test/coverage report as artefact"
+    required: false
+    default: false
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Install test dependencies"
+      id: install-dependencies
+      shell: bash
+      run: |
+        # Install test dependencies
+        echo "Upgrading: pip"
+        python -m pip install -q --upgrade pip
+        echo "Installing: pytest, pytest-cov"
+        pip install -q pytest pytest-cov
+        if [ -f pyproject.toml ]; then
+          echo "Installing dependencies from: pyproject.toml"
+          pip install -q .
+        fi
+        if [ -f requirements.txt ]; then
+          echo "Installing dependencies from: requirements.txt"
+          pip install -q -r requirements.txt
+        fi
+
+    # Add additional workflow test steps here:
+    # 1. detect tox.ini
+    # 2. parse file for test stanza
+    # 3. use tox if testing available there
+    # 4. exit 0 if successful (following steps will be skipped)
+    # 5. otherwise proceed to fallback method below (pytest)
+
+    - name: "Run tests and coverage report"
+      id: run-tests
+      if: inputs.NEVER_FAIL == 'false'
+      shell: bash
+      run: |
+        # Run tests, coverage report
+        if [ -d test ]; then
+          pytest --cov --cov-report=html:coverage_report tests
+        elif [ -d tests ]; then
+          pytest --cov --cov-report=html:coverage_report tests
+        else
+          echo "No test/tests directories were found"
+          echo "Aborting testing without error"; exit 0
+        fi
+
+    - name: "Run tests and coverage report [NEVER_FAIL]"
+      id: run-tests-nofail
+      if: inputs.REPORT_ARTEFACT == 'true'
+      shell: bash
+      run: |
+        # Run tests, coverage report
+        if [ -d test ]; then
+          pytest --cov --cov-report=html:coverage_report tests || true
+        elif [ -d tests ]; then
+          pytest --cov --cov-report=html:coverage_report tests || true
+        else
+          echo "No test/tests directories were found"
+          echo "Aborting testing without error"; exit 0
+        fi
+
+    - name: "Create ZIP archive of coverage report"
+      id: archive-report
+      if: inputs.REPORT_ARTEFACT == 'true'
+      shell: bash
+      run: |
+        # Create ZIP archive of coverage report
+        if [ -d coverage_report ]; then
+          echo "Creating ZIP file of HTML coverage report"
+          zip -r test_coverage_report-${{ inputs.PYTHON_VERSION }}.zip coverage_report
+        else
+          echo "No coverage report directory exists"
+        fi
+
+    - name: "Upload test/coverage report"
+      uses: actions/upload-artifact@v4
+      if: inputs.REPORT_ARTEFACT == 'true'
+      with:
+        name: test_coverage_report-${{ inputs.PYTHON_VERSION }}.zip
+        path: test_coverage_report-${{ inputs.PYTHON_VERSION }}.zip
+        retention-days: 90
