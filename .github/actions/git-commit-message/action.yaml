@@ -24,9 +24,9 @@ runs:
   steps:
     - name: Checkout
       uses: actions/checkout@v4
-      with:
-        ref: ${{ inputs.REF }}
-        fetch-depth: ${{ inputs.FETCH_DEPTH }}
+      #with:
+      #  ref: ${{ inputs.REF }}
+      #  fetch-depth: ${{ inputs.FETCH_DEPTH }}
 
     - name: "GIT commit message"
       id: return

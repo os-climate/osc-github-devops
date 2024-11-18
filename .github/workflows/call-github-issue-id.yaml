@@ -17,7 +17,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  issue-id:
+  github-pr:
+    name: "Pull Request"
     permissions:
       contents: write
     uses: os-climate/osc-github-devops/.github/workflows/reuse-issue-id.yaml@main
