@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
-name: "🏷️ Check/Inject Issue-ID"
+name: "🎟️ Inject Issue-ID"
 
 inputs:
   # Required
@@ -74,6 +74,6 @@ runs:
       shell: bash
       run: |
         # Injecting Issue-ID into body of first commit
-        git commit --amend -m"${{ inputs.COMMIT_MESSAGE_BODY }}" -m"Issue-ID: ${{ env.value }}" --no-verify --no-edit
+        git commit --amend -m"${{ env.COMMIT_MESSAGE_BODY }}" -m"Issue-ID: ${{ env.value }}" --no-verify --no-edit
         git push --force
         echo "present=true" >> "$GITHUB_OUTPUT"

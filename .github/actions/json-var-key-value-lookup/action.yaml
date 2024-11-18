@@ -52,4 +52,5 @@ runs:
         fi
         echo "value=$VALUE" >> "$GITHUB_ENV"
         echo "value=$VALUE" >> "$GITHUB_OUTPUT"
-        echo "### ⬆️ Key/value lookup returned: $VALUE" >> "$GITHUB_STEP_SUMMARY"
+        echo "### ⬆️ JSON Key/Value Lookup" >> "$GITHUB_STEP_SUMMARY"
+        echo "Result: $VALUE" >> "$GITHUB_STEP_SUMMARY"
