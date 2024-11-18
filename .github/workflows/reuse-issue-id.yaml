@@ -3,7 +3,7 @@
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 # Checks the commit message body for an Issue-ID, adds one when NOT present
-name: "🏷️ [R] Inject Issue-ID"
+name: "🎟️ [R] Inject Issue-ID"
 
 # yamllint disable-line rule:truthy
 on:
@@ -19,6 +19,6 @@ jobs:
       contents: write
     steps:
       # yamllint disable-line rule:line-length
-      - uses: os-climate/osc-github-devops/.github/actions/gerrit-inject-issue-id-action@main
+      - uses: os-climate/osc-github-devops/.github/actions/inject-issue-id-action@main
         with:
           issue_id_lookup_json: ${{ vars.ISSUE_ID_LOOKUP_JSON }}

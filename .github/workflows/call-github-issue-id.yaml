@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
-name: call-issue-id-reusable-workflow
+name: "🎟️ Inject Issue-ID"
 
 # yamllint disable-line rule:truthy
 on:
