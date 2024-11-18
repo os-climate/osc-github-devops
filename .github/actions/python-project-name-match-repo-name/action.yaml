@@ -1,0 +1,62 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+
+name: "Compare Python Project and Repository Names"
+description: "Returns the name of the Python Project"
+
+outputs:
+  MATCHES_REPO_NAME:
+    description: "Set true if the project name and repository name are identical"
+    value: ${{ steps.compare-naming.outputs.matches_repo_name }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Capture Python project name"
+      id: python-project-name
+      uses: os-climate/osc-github-devops/.github/actions/python-project-name@main
+
+    - name: "Capture GitHub repository/project name"
+      id: compare-naming
+      shell: bash
+      run: |
+        # Capture repository/project name
+
+        #SHELLCODESTART
+
+        # Allows for testing from a local shell
+        if [ -z "$GITHUB_OUTPUT" ]; then
+          echo "Running from a shell, NOT workflow"
+          export GITHUB_OUTPUT="/dev/null"
+          export GITHUB_ENV="/dev/null"
+
+          # Cannot enumerate GitHub repository name when outside GitHub
+          # When running from shell, get from GIT instead
+          echo "Note: GitHub repo name will come from GIT repo name"
+          GITHUB_REPOSITORY_NAME=$(basename $(git rev-parse --show-toplevel))
+        else
+          GITHUB_REPOSITORY_NAME=$(basename ${{ github.repository }})
+        fi
+
+        echo "GITHUB_REPOSITORY_NAME: $GITHUB_REPOSITORY_NAME"
+
+        PYTHON_PROJECT_NAME="${{ steps.python-project-name.outputs.python_project_name }}"
+        echo "PYTHON_PROJECT_NAME: $PYTHON_PROJECT_NAME"
+
+        if [[ "$GITHUB_REPOSITORY_NAME" == "$PYTHON_PROJECT_NAME" ]]; then
+          MATCHES_REPO_NAME="true"
+        else
+          MATCHES_REPO_NAME="false"
+        fi
+        echo "MATCHES_REPO_NAME=$MATCHES_REPO_NAME"
+
+        # Make available in the environment
+        echo "github_repository_name=$GITHUB_REPOSITORY_NAME" >> "$GITHUB_ENV"
+        echo "matches_repo_name=$MATCHES_REPO_NAME" >> "$GITHUB_ENV"
+
+        # Write as action output
+        echo "github_repository_name=$GITHUB_REPOSITORY_NAME" >> "$GITHUB_OUTPUT"
+        echo "matches_repo_name=$MATCHES_REPO_NAME" >> "$GITHUB_OUTPUT"
+
+        #SHELLCODEEND

@@ -1,0 +1,79 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation
+
+name: "🏷️ Check/Inject Issue-ID"
+
+inputs:
+  # Required
+  ISSUE_ID_LOOKUP_JSON:
+    description: "JSON lookup table mapping users to JIRA tickets"
+    type: string
+    required: true
+  # Optional
+  INJECT:
+    # When injection is enabled and no issue found...
+    # String will be added, output variable set true
+    description: "Whether to inject an issue-id if NOT found"
+    type: boolean
+    required: false
+    default: true
+
+outputs:
+  PRESENT:
+    description: "Whether the Issue-ID string is present"
+    value: ${{ steps.fetch.outputs.count }}
+
+runs:
+  using: "composite"
+  steps:
+    # No need to checkout repository, performed by first action below
+    - name: "GIT commit message body"
+      uses: os-climate/osc-github-devops/.github/actions/git-commit-message@main
+
+    - name: "Check commit message for required string"
+      id: check
+      shell: bash
+      run: |
+        # Check commit message for required string
+        COMMIT_MESSAGE="${{ env.COMMIT_MESSAGE_BODY }}"
+        if [[ "$COMMIT_MESSAGE" =~ "Issue-ID: " ]]; then
+          echo "✅ Issue-ID was found in the pull request"
+          echo "PRESENT=true" >> "$GITHUB_ENV"
+          echo "PRESENT=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "❌ Issue-ID was NOT found in the pull request"
+          echo "PRESENT=false" >> "$GITHUB_ENV"
+          echo "PRESENT=false" >> "$GITHUB_OUTPUT"
+        fi
+
+    - name: "Identifying key for Issue-ID lookup"
+      if: env.PRESENT == 'false' && inputs.INJECT == 'true'
+      shell: bash
+      run: |
+        # Identifying key for Issue-ID lookup
+        ACTOR="${{ github.actor }}"
+        ACTOR_ID="${{ github.actor_id }}"
+        echo "Using GitHub actor as key: $ACTOR [$ACTOR_ID]"
+        echo "key=$ACTOR" >> "$GITHUB_ENV"
+
+    - name: "Get Issue-ID from JSON lookup table"
+      if: env.PRESENT == 'false' && inputs.INJECT == 'true'
+      uses: os-climate/osc-github-devops/.github/actions/json-var-key-value-lookup@main
+      with:
+        json: ${{ inputs.issue_id_lookup_json }}
+        key: ${{ env.key }}
+
+    - name: "Configure GIT user for commit"
+      if: env.PRESENT == 'false' && inputs.INJECT == 'true'
+      uses: os-climate/osc-github-devops/.github/actions/git-configure@main
+
+    - name: "Injecting Issue-ID into body of first commit message"
+      id: inject
+      if: env.PRESENT == 'false' && inputs.INJECT == 'true'
+      shell: bash
+      run: |
+        # Injecting Issue-ID into body of first commit
+        git commit --amend -m"${{ inputs.COMMIT_MESSAGE_BODY }}" -m"Issue-ID: ${{ env.value }}" --no-verify --no-edit
+        git push --force
+        echo "present=true" >> "$GITHUB_OUTPUT"

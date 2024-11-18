@@ -1,0 +1,182 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+
+[project]
+name = "osc-github-devops"
+# Static versioning
+version = "v0.0.4"
+# Uncomment to enable dynamic versioning
+# dynamic = [ "version" ]
+description = "Python project metadata to permit workflow testing."
+authors = [
+  { name = "Matthew Watkins", email = "93649628+ModeSevenIndustrialSolutions@users.noreply.github.com" },
+]
+requires-python = "<3.13,>=3.10"
+readme = "README.md"
+license = { text = "Apache-2.0" }
+keywords = ["Climate", "ITR", "Finance"]
+classifiers = [
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: MacOS",
+  "Operating System :: Microsoft :: Windows",
+  "Operating System :: Unix",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+#  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.10",
+  "Topic :: Office/Business :: Financial",
+  "Topic :: Scientific/Engineering",
+  "Topic :: Software Development",
+]
+
+dependencies = [
+    "typer",
+    "jupyterlab"
+]
+
+[project.urls]
+Homepage = "https://github.com/os-climate/osc-github-devops"
+Repository = "https://github.com/os-climate/osc-github-devops"
+Downloads = "https://github.com/os-climate/osc-github-devops/releases"
+"Bug Tracker" = "https://github.com/os-climate/osc-github-devops/issues"
+Documentation = "https://github.com/os-climate/osc-github-devops/tree/main/docs"
+"Source Code" = "https://github.com/os-climate/osc-github-devops"
+
+[project.scripts]
+osc-github-devops = "devops_reusable_workflows.cli:run"
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[project.optional-dependencies]
+  dev = [
+  "ruff",
+  "toml",
+  "pdm",
+  "tox",
+  "tox-pdm",
+]
+test = [
+    "pdm[pytest]",
+    "pytest",
+    "pytest-cov",
+]
+
+[tool.pdm.version]
+# This stanza is documented here:
+# https://backend.pdm-project.org/metadata/#read-from-scm-tag-supporting-git-and-hg
+# Get versioning directly from GIT
+source = "scm"
+fallback_version = "0.0.0"
+write_to = "version.txt"
+
+[tool.pdm.scripts]
+test = "pytest"
+tox = "tox"
+docs = { shell = "cd docs && mkdocs serve", help = "Start the dev server for doc preview" }
+lint = "pre-commit run --all-files"
+complete = { call = "tasks.complete:main", help = "Create autocomplete files for bash and fish" }
+
+[tool.pdm.dev-dependencies]
+tox = ["tox", "tox-pdm"]
+docs = ["sphinx", "sphinx-copybutton"]
+lint = ["pre-commit"]
+
+[tool.pytest.ini_options]
+testpaths = [
+    "tests/",
+]
+addopts = "--cov"
+
+[tool.coverage.run]
+source = ["src"]
+omit = ["test/*"]
+# relative_files = true
+
+[tool.coverage.report]
+fail_under = 30
+skip_empty = true
+#format = "html"
+ignore_errors = true
+
+[tool.coverage.html]
+directory = "coverage_html_report"
+
+[tool.mypy]
+ignore_missing_imports = true
+
+[tool.ruff]
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".ipynb_checkpoints",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pyenv",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    ".vscode",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "site-packages",
+    "venv",
+]
+
+[tool.ruff.lint]
+extend-fixable = [
+    # Instead of trailing-whitespace
+    "W291", "W293"
+    ]
+
+extend-select = [
+    # Instead of pydocstyle
+    "D",
+    #Instead of flake8
+    "E", "F","B",
+    # Instead of pep8-naming
+    "N",
+    # Instead of flake8-debugger or debug-statements
+    "T10",
+]
+
+ignore = [
+    "E203",
+    "E501",
+    # Avoid incompatible rules
+    "D203",
+    "D213",
+]
+
+[tool.ruff.lint.extend-per-file-ignores]
+# Ignore `D` rules everywhere except for the `src/` directory.
+"!src/**.py" = ["D"]
+
+[tool.ruff.lint.pycodestyle]
+max-line-length = 160
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+docstring-code-format = false
+docstring-code-line-length = "dynamic"

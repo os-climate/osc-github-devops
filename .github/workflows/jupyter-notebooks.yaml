@@ -1,0 +1,57 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+
+name: "🧪 [R] Notebook Tests"
+# Runs tests on a Python project's Jupyter Notebooks
+
+on:
+  workflow_call:
+    inputs:
+      PYTHON_VERSION:
+        description: "Python version to use for testing"
+        required: true
+        type: string
+
+permissions: {}
+
+jobs:
+  notebook-tests:
+    name: "Notebook Tests"
+    runs-on: "ubuntu-latest"
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Setup Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python_version }}
+
+      - name: "Install notebook/test dependencies"
+        run: |
+          # Install notebook/test dependencies
+          echo "Upgrading: pip"
+          python -m pip install -q --upgrade pip
+          if [ -f pyproject.toml ]; then
+            echo "Installing dependencies from: pyproject.toml"
+            pip install -q .
+          fi
+          if [ -f requirements.txt ]; then
+            echo "Installing dependencies from: requirements.txt"
+            pip install -q -r requirements.txt
+          fi
+          echo "Installing: pytest, pytest-cov, nbmake"
+          pip install -q pytest pytest-cov nbmake
+
+      - name: "Testing Jupyter Notebooks"
+        run: |
+          # Testing Jupyter notebooks
+          # Consider enabling the line below when debugging/testing
+          # find . -name '*.ipynb'
+          echo "Running command: pytest --nbmake -- **/*.ipynb"
+          pytest --nbmake src/*/*.ipynb --cov=src/devops_reusable_workflows
+          # Might need an __init__.py file in tests folder for notebooks there to be tested?
+          # https://stackoverflow.com/questions/47287721/coverage-py-warning-no-data-was-collected-no-data-collected
+          # pytest --nbmake tests/test_*.ipynb --cov=tests

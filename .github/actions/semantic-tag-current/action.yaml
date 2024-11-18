@@ -1,0 +1,107 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+
+name: "🏷️ Return Current/Latest Repository Tag"
+
+inputs:
+  TYPE:
+    description: "Return current tag from repository [all|production|development]"
+    required: false
+    type: string
+    default: "all"
+  CREATE_MISSING:
+    description: "If NO tags found, create default tag v0.0.0"
+    type: boolean
+    default: false
+
+outputs:
+  TAG_COUNT:
+    description: "The number of tags in this repository"
+    value: ${{ steps.fetch.outputs.count }}
+  TAG:
+    # A leading non-numeric "v" character will be stripped
+    description: "Return the latest semantic tag from repository"
+    value: ${{ steps.results.outputs.tag }}
+  VTAG:
+    description: "The tag [with v prefix] e.g. v1.2.3"
+    value: ${{ steps.results.outputs.vtag }}
+  SEMANTIC:
+    description: "Set true if current tag is semantic"
+    value: ${{ steps.validate.outputs.semantic }}
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v4
+
+    - name: "Fetch tags"
+      id: fetch
+      shell: bash
+      if: startsWith(github.ref, 'refs/tags/') != true
+      # Don't fetch tags if a tag was pushed, it will result in an error, e.g.
+      # Fetching tags...
+      # From https://github.com/os-climate/osc-github-devops
+      #  * [new branch]      main       -> origin/main
+      #  * [new tag]         v0.0.0     -> v0.0.0
+      #  ! [rejected]        v0.0.2     -> v0.0.2  (would clobber existing tag)
+      run: |
+        # Workaround for: https://github.com/actions/checkout/issues/1471
+        echo "Fetching tags..."
+        git fetch --tags
+        TAG_COUNT=$(git tag -l | wc -l)
+        echo "tag_count=$TAG_COUNT" >> "$GITHUB_ENV"
+        echo "tag_count=$TAG_COUNT" >> "$GITHUB_OUTPUT"
+
+    - name: "No tags found/set in this repository"
+      if: env.tag_count == '0'
+      shell: bash
+      run: |
+        echo "Warning: No tags were found in this repository"
+        echo "tag=0.0.0" >> $GITHUB_ENV
+
+    - name: "Create initial tag [OPTIONAL]"
+      if: env.tag_count == '0' && inputs.create_missing == 'true'
+      uses: os-climate/osc-github-devops/.github/actions/repository-tag-create@main
+      with:
+        tag: "v0.0.0"
+        prerelease: true
+        token: ${{ inputs.GITHUB_TOKEN }}
+
+    - name: "Get latest tag"
+      if: env.tag_count != '0'
+      id: retrieve
+      shell: bash
+      run: |
+        # Get latest tag
+        TAG=$(git tag -l --sort=committerdate | grep -o '?*.*.*' | sort -rV | head -1 || true)
+
+        if [ ${{ env.tag_count}} == '0' ]; then
+          TAG="0.0.0"
+        elif [ ${{ inputs.TYPE }} = "all" ]; then
+          TAG=$(git tag -l --sort=committerdate | grep -o '?*.*.*' | \
+          sort -rV | head -1 || true)
+        elif [ ${{ inputs.TYPE }} = "production" ]; then
+          TAG=$(git tag -l --sort=committerdate | grep -o '?*.*.*' | \
+          grep -Ev '(dev|alpha|beta|test)' | sort -rV | head -1 || true)
+        elif [ ${{ inputs.TYPE }} = "development" ]; then
+          TAG=$(git tag -l --sort=committerdate | grep -o '?*.*.*' | \
+          grep -E '(dev|alpha|beta|test)' | sort -rV | head -1 || true)
+        fi
+
+        # If present, strip the leading "v" character
+        if [[ "$TAG" == v* ]]; then
+          TAG="${TAG:1}"
+        fi
+
+        # Report and record result
+        echo "tag: ${TAG} [v${TAG}]"
+        echo "tag=${TAG}" >> "$GITHUB_ENV"
+        echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+        echo "vtag=v${TAG}" >> "$GITHUB_OUTPUT"
+
+    - name: "Check semantic/validity"
+      id: validate
+      uses: os-climate/osc-github-devops/.github/actions/semantic-tag-validate@main
+      with:
+        tag: ${{ env.tag }}

@@ -1,0 +1,29 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+
+name: "🧱 Check Dependencies"
+description: "Checks for presence of pdm.lock file"
+# Does not scan for legacy dependency declarations
+# e.g. requirements.txt
+
+outputs:
+  DECLARED:
+    description: "Set true when a PDM lockfile is found"
+    value: ${{ steps.check.outputs.declared }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Check for PDM Lock File"
+      id: check
+      shell: bash
+      run: |
+        # Check for presence: pdm.lock
+        if [ -f pdm.lock ]; then
+          echo "PDM lockfile present"
+          echo "declared=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "PDM lockfile NOT present"
+          echo "declared=false" >> "$GITHUB_OUTPUT"
+        fi

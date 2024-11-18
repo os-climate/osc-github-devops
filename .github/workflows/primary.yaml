@@ -1,0 +1,202 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+
+name: "🤖 DevOps Automation"
+
+# yamllint disable-line rule:truthy
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "**"
+      - "!.github/**"
+      - "!.*"
+      - "!pdm.lock"
+      - "!tox.ini"
+
+permissions: {}
+
+jobs:
+  one-password:
+    name: "1Password"
+    uses: os-climate/osc-github-devops/.github/workflows/one-password.yaml@main
+    # Do NOT run until change is merged; secrets will NOT be available and workflow WILL fail
+    if: github.event_name != 'pull_request'
+    with:
+      ACCESS_TYPE: "production"
+      VAULT_ITEM: "op://hdiyadcjno2knqgvcy4wj5ulya/Test Secure Note/notesPlain"
+      EXPORT: false
+    secrets:
+      # Test development credentials
+      ONE_PASSWORD_DEVELOPMENT: ${{ secrets.ONE_PASSWORD_DEVELOPMENT }}
+      ONE_PASSWORD_PRODUCTION: ${{ secrets.ONE_PASSWORD_PRODUCTION }}
+    permissions: {}
+
+  check-secrets:
+    name: "Required Credentials"
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: "Check for required secrets/API keys/tokens"
+        uses: os-climate/osc-github-devops/.github/actions/github-secrets@main
+        with:
+          # Mandatory secrets/variables to check
+          pypi_development: ${{ secrets.PYPI_DEVELOPMENT }}
+          pypi_production: ${{ secrets.PYPI_PRODUCTION }}
+          one_password_development: ${{ secrets.ONE_PASSWORD_DEVELOPMENT }}
+
+  repository:
+    name: "Repository"
+    uses: os-climate/osc-github-devops/.github/workflows/repository.yaml@main
+    permissions:
+      # Required for action that creates labels: github-labels
+      contents: read
+
+  python-project:
+    name: "Python Project"
+    needs: repository
+    if: needs.repository.outputs.python_project  == 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      # Gather Python project metadata
+      python_project_name: ${{ steps.python_project_metadata.outputs.python_project_name }}
+      python_build_name: ${{ steps.python_project_metadata.outputs.python_build_name }}
+      versioning_type: ${{ steps.python_project_metadata.outputs.versioning_type }}
+      matrix_json: ${{ steps.python_project_metadata.outputs.matrix_json }}
+      build_python_version: ${{ steps.python_project_metadata.outputs.build_python_version }}
+    permissions:
+      contents: read
+    steps:
+      - name: "Extract project metadata"
+        id: python_project_metadata
+        uses: os-climate/osc-github-devops/.github/actions/python-project-setup@main
+
+      - name: "Check pushed tag [CONDITIONAL/tag push]"
+        id: check-project
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: os-climate/osc-github-devops/.github/actions/python-project-version-vs-tag@main
+
+      - name: "Report pushed tag mismatch [CONDITIONAL/tag push]"
+        if: startsWith(github.ref, 'refs/tags/') && steps.check-project.outputs.match != true
+        run: |
+          # Pushed tag != project metadata
+          echo "## Pushed tag does not match pyproject.toml version ❌" >> "$GITHUB_STEP_SUMMARY"
+          exit 1
+
+  python-build:
+    name: "Build"
+    uses: os-climate/osc-github-devops/.github/workflows/python-build.yaml@main
+    needs:
+      - repository
+      - python-project
+    permissions:
+      contents: write
+      # Required by SigStore signing action
+      id-token: write
+      # Required for attestations
+      attestations: write
+    with:
+      build_python_version: ${{ needs.python-project.outputs.build_python_version }}
+      build_tag: ${{ needs.repository.outputs.build_tag }}
+
+  python-test:
+    name: "Test"
+    uses: os-climate/osc-github-devops/.github/workflows/python-tests.yaml@main
+    needs:
+      - python-project
+      - python-build
+    # Matrix job
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.python-project.outputs.matrix_json) }}
+    with:
+      python_version: ${{ matrix.python-version }}
+    permissions:
+      contents: read
+
+  python-security:
+    name: "Security"
+    uses: os-climate/osc-github-devops/.github/workflows/python-security.yaml@main
+    needs:
+      - python-project
+      - python-build
+    # Matrix job
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.python-project.outputs.matrix_json) }}
+    with:
+      python_version: ${{ matrix.python-version }}
+    permissions:
+      contents: read
+
+  notebooks:
+    name: "Jupyter Notebooks"
+    if: needs.repository.outputs.jupyter_notebooks  == 'true'
+    uses: os-climate/osc-github-devops/.github/workflows/jupyter-notebooks.yaml@main
+    needs:
+      - repository
+      - python-project
+      - python-build
+    # Matrix job
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.python-project.outputs.matrix_json) }}
+    with:
+      python_version: ${{ matrix.python-version }}
+    permissions:
+      contents: read
+
+  github-release:
+    name: "Release"
+    if: startsWith(github.ref, 'refs/tags/') || contains(github.event.head_commit.message, '[release]')
+    uses: os-climate/osc-github-devops/.github/workflows/github-release.yaml@main
+    needs:
+      - repository
+      - python-build
+      - python-test
+      - python-security
+    permissions:
+      # Needed both here and in the called workflow
+      contents: write
+    with:
+      build_tag: ${{ needs.repository.outputs.build_tag }}
+
+  pypi-test:
+    name: "Test"
+    uses: os-climate/osc-github-devops/.github/workflows/pypi-package.yaml@main
+    needs:
+      - repository
+      - python-build
+      - python-test
+      - python-security
+    with:
+      test: true
+      build_tag: ${{ needs.repository.outputs.build_tag }}
+    permissions:
+      contents: read
+      # Needed for trusted publishing
+      id-token: write
+    secrets:
+      ONE_PASSWORD_PRODUCTION: ${{ secrets.ONE_PASSWORD_PRODUCTION }}
+      PYPI_CREDENTIAL_FROM_GITHUB: ${{ secrets.PYPI_DEVELOPMENT }}
+
+  pypi:
+    name: "Release"
+    if: startsWith(github.ref, 'refs/tags/') || contains(github.event.head_commit.message, '[release]')
+    uses: os-climate/osc-github-devops/.github/workflows/pypi-package.yaml@main
+    needs:
+      - repository
+      - python-build
+      - python-test
+      - python-security
+      - pypi-test
+    with:
+      build_tag: ${{ needs.repository.outputs.build_tag }}
+    permissions:
+      contents: read
+      # Needed for trusted publishing
+      id-token: write
+    secrets:
+      ONE_PASSWORD_PRODUCTION: ${{ secrets.ONE_PASSWORD_PRODUCTION }}
+      PYPI_CREDENTIAL_FROM_GITHUB: ${{ secrets.PYPI_PRODUCTION }}

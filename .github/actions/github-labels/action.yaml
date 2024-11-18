@@ -1,0 +1,63 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+
+name: "🛠️ Check/Verify GitHub Labels"
+description: "Checks/creates mandatory labels"
+
+outputs:
+  # Note: these outputs/states are mutually exclusive
+  # The labels EITHER already exist OR were created
+  PRESENT:
+    description: "Returns true if the labels exist"
+    value: ${{ steps.github.outputs.present }}
+  CREATED:
+    description: "Returns true if the labels were created"
+    value: ${{ steps.github.outputs.created }}
+
+runs:
+  using: "composite"
+  steps:
+    - id: github
+      shell: bash
+      run: |
+        # Check for presence of mandatory labels
+
+        #SHELLCODESTART
+
+        # Allows for testing from a local shell
+        if [ -z "$GITHUB_OUTPUT" ]; then
+          echo "Running from a shell, NOT workflow"
+          export GITHUB_OUTPUT="/dev/null"
+          export GITHUB_ENV="/dev/null"
+        fi
+
+        # Initial assumption is that labels do NOT exist
+        PRESENT="false"; CREATED="false"
+
+        # Define the labels that we might need to create
+        TMPFILE=$(mktemp -p /tmp --suffix "-lables.txt")
+        cat << EOF > "$TMPFILE"
+        gh label create "release/major"  --description "Major release"
+        gh label create "release/minor"  --description "Minor release"
+        gh label create "release/patch"  --description "Patch release"
+        EOF
+        chmod a+x "$TMPFILE"
+
+        # Define a regular expression to check for the presence of our labels
+        PATTERN=".*Major release.*Minor release.*Patch release.*"
+
+        echo "Attempting to retrieve labels with: gh label list"
+        LABELS=$(gh label list)
+        if [[ "$LABELS" =~ $PATTERN ]]; then
+          echo "Required labels were found"
+          echo "present=true" >> $GITHUB_OUTPUT
+          exit 0
+        fi
+
+        # Run the script to create the required labels
+        "$TMPFILE"
+        echo "created=true" >> $GITHUB_OUTPUT
+        echo "Required labels were NOT found and were created"
+
+        #SHELLCODEEND

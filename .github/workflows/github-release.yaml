@@ -1,0 +1,80 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+
+name: "📦 [R] GitHub Release"
+# Packages a development/production release on GitHub
+
+on:
+  workflow_call:
+    inputs:
+      PRERELEASE:
+        description: "Mark release as pre-release/development version"
+        type: string
+        required: false
+        default: false
+      BUILD_TAG:
+        description: "Semantic tag for this release/build"
+        type: string
+        required: true
+      ARTEFACT_LOCATION:
+        description: "Path/location for build artefacts"
+        type: string
+        required: false
+        default: "dist"
+
+permissions: {}
+
+jobs:
+  github-release:
+    name: "GitHub Release"
+    runs-on: "ubuntu-latest"
+    permissions:
+      contents: write
+
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
+
+      - name: "Extract project/repository naming"
+        id: naming
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/python-project-name@main
+
+      - name: "⬇ Download build artefacts"
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.python_project_name }}
+          path: ${{ inputs.artefact_location }}
+
+      - name: "Check project version matches pushed tags"
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: os-climate/osc-github-devops/.github/actions/python-project-version-vs-tag@main
+
+      - name: "Create GitHub release"
+        uses: softprops/action-gh-release@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          prerelease: ${{ inputs.prerelease }}
+          tag_name: ${{ inputs.build_tag }}
+          name: "${{ env.python_project_name }} ${{ inputs.build_tag }}"
+
+          # ToDo: Incorporate release notes, etc.
+          # body_path: ${{ github.workspace }}/CHANGELOG.rst
+          files: |
+            ${{ inputs.artefact_location }}/*.tar.gz
+            ${{ inputs.artefact_location }}/*.whl
+            ${{ inputs.artefact_location }}/*.sigstore*
+
+      - name: "Print summary/job output"
+        shell: bash
+        run: |
+          # Print summary/job output
+
+          echo "# 🚀 GitHub Release" >> "$GITHUB_STEP_SUMMARY"
+          echo "Build version/tag: ${{ inputs.build_tag }}" >> "$GITHUB_STEP_SUMMARY"
+          if [ "${{ inputs.prerelease }}" = "true" ]; then
+            echo "Pre-release/Development Build: ✅"
+          else
+            echo "Production/Release Build: ✅"
+          fi

@@ -1,0 +1,25 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+
+name: "📦 Twine Check Artefacts"
+
+inputs:
+  PATH:
+    description: "Directory/folder containing Python build artefacts"
+    required: true
+    default: "dist"
+
+runs:
+  using: "composite"
+  steps:
+    - id: twine-check
+      name: "Check Artefacts with Twine"
+      shell: bash
+      run: |
+        # Run twine check against build artefacts
+        echo -n "Installing Python tool: twine"
+        pip install -q --upgrade twine
+        echo "Path to check: ${{ inputs.path }}"
+        echo "Running: twine check ${{ inputs.path }}/*"
+        twine check ${{ inputs.path }}/*

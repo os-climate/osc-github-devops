@@ -1,0 +1,55 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation
+
+name: "JSON Variable Key/Value Lookup"
+
+inputs:
+  JSON:
+    description: "The JSON key/value lookup table"
+    type: string
+    required: true
+  KEY:
+    description: "The JSON key requiring lookup"
+    type: string
+    required: true
+
+outputs:
+  VALUE:
+    description: "The value associated with the supplied key"
+    value: ${{ steps.lookup.outputs.value }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Fetch value for key from JSON lookup table"
+      id: lookup
+      shell: bash
+      run: |
+        # Fetch value for key from JSON lookup table
+
+        JSON="${{ inputs.json }}"
+        # Validate the variable is not empty/unset
+        if [ -z "$JSON" ]; then
+          echo "Error: The required lookup variable/JSON was NOT passed as input"; exit 1
+        fi
+
+        echo "Looking up value for: ${{ inputs.key }}"
+
+        JQ=$(which jq || true)
+        if [ -x "$JQ" ]; then
+          KEY="${{ inputs.KEY }}"
+
+          VALUE=$(echo '${{ inputs.JSON }}' | \
+            jq -r --arg KEY "$KEY" '.[] | select(.key==$KEY) | .value')
+
+          if [ -z "$VALUE" ]; then
+            echo "❌ Key/value lookup failed"; exit 1
+          fi
+          echo "✅ Value returned: $VALUE"
+        else
+          echo "Error: jq command was NOT found in the PATH"; exit 1
+        fi
+        echo "value=$VALUE" >> "$GITHUB_ENV"
+        echo "value=$VALUE" >> "$GITHUB_OUTPUT"
+        echo "### ⬆️ Key/value lookup returned: $VALUE" >> "$GITHUB_STEP_SUMMARY"

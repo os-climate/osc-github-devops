@@ -1,0 +1,128 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+
+name: "🧱 Python Build"
+description: "Builds a Python Project"
+
+inputs:
+  ARTEFACT_OUTPUT_PATH:
+    description: "Output path/location for build artefacts"
+    required: false
+    default: "dist"
+  PURGE_OUTPUT_PATH:
+    description: "Purge target artefact path prior to builds"
+    required: false
+    default: false
+
+outputs:
+  DATETIME_STAMP:
+    description: "Date/time stamp at build time"
+    value: ${{ steps.parameters.outputs.datetime }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Set build parameters/variables"
+      id: parameters
+      shell: bash
+      run: |
+        # Set build parameters/variables
+        echo "Action triggered by: ${GITHUB_TRIGGERING_ACTOR}"
+        datetime=$(date +'%Y-%m-%d-%H%M')
+        echo "Build date and time stamp: $datetime"
+        echo "datetime=$datetime" >> "$GITHUB_ENV"
+        echo "datetime=${datetime}" >> "$GITHUB_OUTPUT"
+
+    - name: "Check target/path for build products"
+      id: check-target
+      shell: bash
+      run: |
+        # Check target path for build products
+        if [ ! -d ${{ inputs.artefact_output_path }} ]; then
+          if (mkdir -p ${{ inputs.artefact_output_path }}); then
+            echo "Created target path for build products: ${{ inputs.artefact_output_path }}"
+          else
+            echo "Failed to create directory for build products: ${{ inputs.artefact_output_path }}"
+            exit 1
+          fi
+        else
+          echo "Specified directory for artefacts is valid"
+          FILES=$(ls ${{ inputs.artefact_output_path }} | wc -l)
+          if [ "$FILES" -gt 0 ]; then
+            echo "target_populated=true" >> "$GITHUB_OUTPUT"
+            echo "Content already exists in target directory:"
+            ls -l ${{ inputs.artefact_output_path }}
+          fi
+        fi
+
+    - name: "Clean build target directory"
+      id: clean-target
+      shell: bash
+      if: steps.check-target.outputs.target_populated == 'true' && inputs.purge_output_path == 'true'
+      run: |
+        # Clean target path for build products
+        echo "Running command: rm -f ${{ inputs.artefact_output_path }}/*"
+        rm -f "${{ inputs.artefact_output_path }}/*"
+
+    - name: "Perform Python project build"
+      id: perform-build
+      shell: bash
+      run: |
+        # Perform package build
+        python -m pip install -q --upgrade pip
+        if [ -f pyproject.toml ]; then
+          echo "Found file: pyproject.toml"
+          echo "Building with command: pdm build --dest ${{ inputs.artefact_output_path }}"
+          pdm build --dest ${{ inputs.artefact_output_path }}
+        elif [ -f tox.ini ]; then
+          echo "Found TOX configuration file: tox.ini"
+          echo "Attempting to install TOX..."
+          pip install -q --upgrade tox tox-gh-actions
+          echo "Attempting build with: tox -e build"
+          echo "WARNING: assumes build artefact path is valid"
+          tox -e build
+        else
+          echo "Neither file found: tox.ini/pyproject.toml"
+          echo "Attempting build with: python -m build"
+          pip -q --upgrade install build
+          python -m build --outdir ${{ inputs.artefact_output_path }}
+        fi
+        echo "Build succeeded"
+
+    - name: "Package dependency graph"
+      id: show-graph
+      shell: bash
+      run: |
+        # Package dependency graph
+        pdm list --graph
+
+    - name: "Capture build artefact names"
+      id: artefact-naming
+      shell: bash
+      run: |
+        # Capture build artefact names
+        WHL_FILE=$(ls ${{ inputs.ARTEFACT_OUTPUT_PATH }}/*.whl)
+        TGZ_FILE=$(ls ${{ inputs.ARTEFACT_OUTPUT_PATH }}/*.tar.gz)
+        echo "whl_file=$WHL_FILE" >> "$GITHUB_OUTPUT"
+        echo "tgz_file=$TGZ_FILE" >> "$GITHUB_OUTPUT"
+
+    - name: "Artefact attestation for: ${{ inputs.ARTEFACT_OUTPUT_PATH }}"
+      id: attest-whl
+      uses: actions/attest-build-provenance@v1
+      with:
+        subject-path: ${{ inputs.ARTEFACT_OUTPUT_PATH }}/*
+
+    # - name: "Artefact attestation [WHL]"
+    #   id: attest-whl
+    #   uses: actions/attest-build-provenance@v1
+    #   with:
+    #     # e.g. dist/osc_github_devops-0.0.8.dev1-py3-none-any.whl
+    #     subject-path: "${{ steps.artefact-naming.outputs.whl_file }}"
+
+    # - name: "Artefact attestation [TGZ]"
+    #   id: attest-tgz
+    #   uses: actions/attest-build-provenance@v1
+    #   with:
+    #     # e.g. dist/osc_github_devops-0.0.8.tar.gz
+    #     subject-path: "${{ steps.artefact-naming.outputs.tgz_file }}"
