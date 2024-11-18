@@ -1,0 +1,95 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation
+
+name: "🏷️ Repository Tagging"
+# Enumerate current tag, generate development/production tags, create initial tag
+
+inputs:
+  CREATE_INITIAL:
+    description: "Create an initial tag if none found in repository"
+    required: false
+    type: string
+    default: "true"
+  GITHUB_TOKEN:
+    description: "Required to push new tags to the repository"
+    required: true
+
+outputs:
+  CURRENT_TAG:
+    description: "Current/latest tag from repository"
+    value: ${{ steps.repository-tags.outputs.vtag }}
+  TAG_VALIDITY:
+    description: "Flags if the current repository tag is NOT semantic"
+    value: ${{ steps.repository-tags.outputs.current_tag_semantic }}
+  DEVELOPMENT_TAG:
+    description: "Semantic tag for next development release/build"
+    value: ${{ steps.tagging.outputs.development_tag }}
+  PRODUCTION_TAG:
+    description: "Semantic tag for next production release/build"
+    value: ${{ steps.tagging.outputs.production_tag }}
+  PRERELEASE:
+    description: "Set true if this release is a test/development release"
+    value: ${{ steps.this-build.outputs.prerelease }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Retrieve/verify tags"
+      id: repository-tags
+      # yamllint disable-line rule:line-length
+      uses: os-climate/osc-github-devops/.github/actions/semantic-tag-current@main
+
+    - name: "Generate DEVELOPMENT build/tag"
+      id: development-tag
+      # yamllint disable-line rule:line-length
+      uses: os-climate/osc-github-devops/.github/actions/semantic-tag-development@main
+      with:
+        tag: ${{ steps.repository-tags.outputs.vtag }}
+
+    - name: "Generate PRODUCTION build/tag"
+      id: production-tag
+      # yamllint disable-line rule:line-length
+      uses: os-climate/osc-github-devops/.github/actions/semantic-tag-production@main
+      with:
+        tag: ${{ steps.repository-tags.outputs.vtag }}
+
+    # ToDo:
+    #  1. Add type based on labels in pull request
+    #  2. Add type based on strings in commit message
+    - name: "Define this build/tag"
+      id: this-build
+      shell: bash
+      run: |
+        # Flag build/release type
+        if [ "$GITHUB_REF_NAME" == "main" ] &&
+         [ "$GITHUB_REF_TYPE" == "branch" ] &&
+         [ "$GITHUB_EVENT_NAME" == "push" ]; then
+        PRERELEASE="true"
+        BUILD_TAG=${{ steps.development-tag.outputs.vtag }}
+        elif [ "$GITHUB_REF_NAME" == "main" ] &&
+         [ "$GITHUB_REF_TYPE" == "branch" ] &&
+         [ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]; then
+        PRERELEASE="true"
+        BUILD_TAG=${{ steps.development-tag.outputs.vtag }}
+        else
+        PRERELEASE="false"
+        BUILD_TAG=${{ steps.production-tag.outputs.vtag }}
+        fi
+        echo "PRERELEASE=$PRERELEASE"
+        echo "PRERELEASE=$PRERELEASE" >> "$GITHUB_ENV"
+        echo "PRERELEASE=$PRERELEASE" >> "$GITHUB_OUTPUT"
+        echo "build_tag=$BUILD_TAG"
+        echo "build_tag=$BUILD_TAG" >> "$GITHUB_ENV"
+        echo "build_tag=$BUILD_TAG" >> "$GITHUB_OUTPUT"
+
+    # Only runs if no tags are found, pushes an initial v0.0.0
+    - name: "Create initial v0.0.0 tag"
+      id: initial-tag
+      if: steps.repository-tags.outputs.invalid == 'true' &&
+        inputs.create_initial == 'true'
+      uses: softprops/action-gh-release@v2
+      with:
+        token: ${{ inputs.GITHUB_TOKEN }}
+        prerelease: true
+        tag_name: v0.0.0

@@ -1,0 +1,61 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+
+name: "🌍 Check URL for Validity"
+description: "Check URL for Validity"
+
+inputs:
+  PREFIX:
+    description: "URL prefix to check"
+    # e.g. "https://pypi.org/project/"
+    required: true
+  STRING:
+    description: "Check URL for presence of this project/name"
+    # e.g. "ITR"
+    required: false
+  SUFFIX:
+    description: "URL prefix to check"
+    # e.g. "/"
+    required: false
+
+outputs:
+  VALID:
+    description: "Set true when web URL/location exists"
+    value: ${{ steps.check.outputs.valid }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Check Tooling is Available"
+      id: prerequiresites
+      shell: bash
+      run: |
+        # Verify tooling is available
+        WGET_CMD=$(which wget)
+        if [ ! -x $WGET_CMD ]; then
+          apt-get update
+          apt-get -y install wget
+          WGET_CMD=$(which wget)
+          if [ ! -x $WGET_CMD ]; then
+            echo "Unable to find/install WGET commend"
+            echo "Check instance type and OS environment"; exit 1
+          fi
+        else
+          echo "Using WGET command: $WGET_CMD"
+        fi
+
+    - name: "Check URL for Validity"
+      id: check
+      shell: bash
+      run: |
+        # Check URL for Validity
+        if (wget ${{ inputs.PREFIX }}${{ inputs.STRING }}${{ inputs.SUFFIX }} --spider -q); then
+          echo "URL/location WAS found and valid ✅"
+          echo "${{ inputs.PREFIX }}${{ inputs.STRING }}${{ inputs.SUFFIX }}"
+          echo "valid=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "URL/location was NOT found/valid ❌"
+          echo "${{ inputs.PREFIX }}${{ inputs.STRING }}${{ inputs.SUFFIX }}"
+          echo "valid=false" >> "$GITHUB_OUTPUT"
+        fi

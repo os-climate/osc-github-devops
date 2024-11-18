@@ -1,0 +1,28 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+
+name: "↗️ Project versioning type"
+
+outputs:
+  VERSIONING_TYPE:
+    description: "Versioning type from pyproject.toml [static|dynamic]"
+    value: ${{ steps.parse-project-metadata.outputs.versioning_type }}
+
+runs:
+  using: "composite"
+  steps:
+    - id: parse-project-metadata
+      name: "Extract Python project versioning"
+      shell: bash
+      run: |
+        set -o pipefail
+
+        # Set static or dynamic version flag, based on pyproject.toml directive
+        if (grep -q 'dynamic = \["version"\]' pyproject.toml); then
+          echo "Dynamic versioning set in pyproject.toml"
+          echo "versioning_type=dynamic" >> "$GITHUB_OUTPUT"
+        else
+          echo "Static versioning set in pyproject.toml"
+          echo "versioning_type=static" >> "$GITHUB_OUTPUT"
+        fi

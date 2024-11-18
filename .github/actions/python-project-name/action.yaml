@@ -1,0 +1,86 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+
+name: "🐍 Get Python Project Name"
+description: "Returns the name of the Python Project"
+
+outputs:
+  PYTHON_PROJECT_NAME:
+    description: "The name of the Python project from pyproject.toml or setup.py"
+    value: ${{ steps.variables.outputs.python_project_name }}
+  PYTHON_BUILD_NAME:
+    # Any dashes in the name will be replaced with underscores
+    description: "The name of the Python project when built"
+    value: ${{ steps.variables.outputs.python_build_name }}
+
+runs:
+  using: "composite"
+  steps:
+    - uses: os-climate/osc-github-devops/.github/actions/path-check@main
+      id: setup-py
+      with:
+        check_path: "setup-py"
+
+    - uses: os-climate/osc-github-devops/.github/actions/path-check@main
+      id: pyproject-toml
+      with:
+        check_path: "pyproject.toml"
+
+    - name: "Use project name from setup.py"
+      id: setup-py-name
+      if: steps.setup-py.outputs.type == 'file'
+      uses: os-climate/osc-github-devops/.github/actions/file-grep-regex@main
+      with:
+        flags: "-oP -m1"
+        regex: '(?<=name=")([^"]*)'
+        filename: "setup.py"
+
+    - name: "Use project name from pyproject.toml"
+      id: pyproject-toml-name
+      if: steps.pyproject-toml.outputs.type == 'file'
+      uses: os-climate/osc-github-devops/.github/actions/file-grep-regex@main
+      with:
+        flags: "-oP -m1"
+        regex: '(?<=^name = ")([^"]*)'
+        filename: "pyproject.toml"
+
+    - name: "Throw error if Python project metadata was NOT found"
+      if: steps.pyproject-toml.outputs.type == 'invalid' &&
+        steps.setup-py.outputs.type == 'invalid'
+      shell: bash
+      run: |
+        # Throw error if Python project metadata was NOT found
+        echo "Neither pyproject.toml NOR setup.py were found"; exit 1
+
+    - name: "Return extracted values"
+      id: variables
+      shell: bash
+      run: |
+        # Return extracted values
+
+        # pyproject.toml is preferred source if both files exist
+        if [ ${{ steps.pyproject-toml.outputs.type == 'file' }} ]; then
+          echo "Using project name from source: pyproject.toml"
+          PYTHON_PROJECT_NAME="${{ steps.pyproject-toml-name.outputs.extracted_string}}"
+
+        elif [ ${{ steps.setup-py.outputs.type == 'file' }} ]; then
+          echo "Using project name from source: setup.py"
+          PYTHON_PROJECT_NAME="${{ steps.setup-py-name.outputs.extracted_string}}"
+        fi
+
+        if [ -z "$PYTHON_PROJECT_NAME" ]; then
+          echo "The project name extraction failed ❌"; exit 1
+        fi
+
+        echo "python_project_name: $PYTHON_PROJECT_NAME ✅"
+
+        # Replace all dashes in the name with underscores
+        PYTHON_BUILD_NAME=$(echo "$PYTHON_PROJECT_NAME" | tr '-' '_')
+        echo "python_build_name: $PYTHON_BUILD_NAME"
+
+        # Make available to the GitHub environment
+        echo "python_project_name=$PYTHON_PROJECT_NAME" >> "$GITHUB_ENV"
+        echo "python_project_name=$PYTHON_PROJECT_NAME" >> "$GITHUB_OUTPUT"
+        echo "python_build_name=$PYTHON_BUILD_NAME" >> "$GITHUB_ENV"
+        echo "python_build_name=$PYTHON_BUILD_NAME" >> "$GITHUB_OUTPUT"

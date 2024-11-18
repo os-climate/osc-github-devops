@@ -1,0 +1,109 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+
+name: "🧱 [R] Python Build"
+# Builds a project for any number of specified Python versions"
+
+on:
+  workflow_call:
+    inputs:
+      BUILD_PYTHON_VERSION:
+        description: "Version used to upload/store artefacts for publishing"
+        required: false
+        type: string
+        default: 3.11
+      ARTEFACT_LOCATION:
+        description: "Build artefacts will be output to this folder/directory"
+        required: false
+        type: string
+        default: "dist"
+      BUILD_TAG:
+        description: "Tag version/name for this specific build (semantic)"
+        required: false
+        type: string
+      SIGSTORE_SIGN:
+        description: "Sign build artefacts with Sigstore"
+        required: false
+        type: boolean
+        default: true
+
+permissions: {}
+
+jobs:
+  ### Always builds WITH artefact attestations
+
+  python-build:
+    name: "Python Project"
+    runs-on: "ubuntu-latest"
+    permissions:
+      contents: write
+      # Required by SigStore signing action
+      id-token: write
+      # Required for attestations
+      attestations: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Set up Python ${{ inputs.build_python_version }}"
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.build_python_version }}
+
+      - name: "Install PDM tooling"
+        uses: pdm-project/setup-pdm@v4
+        with:
+          python-version: ${{ inputs.build_python_version }}
+
+      - name: "Extract python project name"
+        id: project-name
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/python-project-name@main
+
+      - name: "Extract python project version"
+        id: project-version
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/python-project-version@main
+
+      - name: "Build versioning"
+        id: versioning
+        if: inputs.build_tag
+        shell: bash
+        run: |
+          # Explicit build versioning
+          echo "Explicit build versioning: ${{ inputs.build_tag }}"
+          echo "build_tag=${{ inputs.build_tag }}" >> "$GITHUB_ENV"
+
+      - name: "Patch project versioning metadata"
+        if: env.python_project_version != inputs.build_tag
+        uses: os-climate/osc-github-devops/.github/actions/python-project-version-patch@main
+        with:
+          replacement_version: ${{ env.build_tag }}
+
+      - name: "Build Python project"
+        id: python-build-attest
+        uses: os-climate/osc-github-devops/.github/actions/python-project-build@main
+
+      - name: "Validate artefacts with Twine"
+        id: python-twine-check
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/python-twine-check@main
+
+      # This step optional and must be explicitly requested (passed the relevant input)
+      - name: "Sign packages with SigStore"
+        uses: sigstore/gh-action-sigstore-python@v3.0.0
+        if: inputs.SIGSTORE_SIGN
+        env:
+          package-path: ${{ inputs.ARTEFACT_LOCATION }}
+        with:
+          inputs: >-
+            ./${{ inputs.ARTEFACT_LOCATION }}/*.tar.gz
+            ./${{ inputs.ARTEFACT_LOCATION }}/*.whl
+
+      - name: "Upload build artefacts"
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.python_project_name }}
+          path: ${{ inputs.ARTEFACT_LOCATION }}
+          if-no-files-found: error

@@ -1,0 +1,120 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+
+name: "📃 Multi-line Text String Matching"
+
+inputs:
+  STRING:
+    description: "String/line to match"
+    required: true
+  ENCODED_TEXT:
+    description: "Text to search for match"
+    required: true
+  SUBSTRING_MATCH:
+    description: "Match if LINE contains STRING"
+    required: false
+    default: "false"
+  CASE_INSENSITIVE:
+    required: false
+    default: "false"
+
+outputs:
+  MATCH:
+    description: "True if string matches based on provided inputs/parameters"
+    value: ${{ steps.compare.outputs.match }}
+  COUNT:
+    description: "True if string matches based on provided inputs/parameters"
+    value: ${{ steps.compare.outputs.count }}
+
+runs:
+  using: "composite"
+
+  steps:
+    - name: "Perform comparison of string values"
+      id: compare
+      shell: bash
+      env:
+        SUBSTRING_MATCH: ${{ inputs.SUBSTRING_MATCH }}
+        CASE_INSENSITIVE: ${{ inputs.CASE_INSENSITIVE }}
+      run: |
+        # Perform comparison of string values
+
+        #SHELLCODESTART
+
+        # Allows for testing from a local shell
+        if [ -z "$GITHUB_OUTPUT" ]; then
+          echo "Running from a shell, NOT workflow"
+          export GITHUB_OUTPUT="/dev/null"
+          export GITHUB_ENV="/dev/null"
+          if [ $# -ne 4 ]; then
+            echo "Usage:  $0 [string] [base64 text] [match substring true|false] [case-insensitive true|false]"
+            echo "Error: invalid arguments specified"; exit 1
+          else
+            STRING="$1"
+            ENCODED_TEXT="$2"
+            SUBSTRING_MATCH="$3"
+            CASE_INSENSITIVE="$4"
+          fi
+        else
+          STRING="${{ inputs.STRING }}"
+          ENCODED_TEXT="${{ inputs.ENCODED_TEXT }}"
+          SUBSTRING_MATCH="${{ inputs.SUBSTRING_MATCH }}"
+          CASE_INSENSITIVE="${{ inputs.CASE_INSENSITIVE }}"
+        fi
+
+        if [ "$SUBSTRING_MATCH" != "true" ] && [ "$SUBSTRING_MATCH" != "false" ]; then
+          echo "Error: substring match argument != [true|false]"; exit 1
+        fi
+        if [ "$CASE_INSENSITIVE" != "true" ] && [ "$CASE_INSENSITIVE" != "false" ]; then
+          echo "Error: case-insentivive match argument != [true|false]"; exit 1
+        fi
+
+        COUNT="0"
+
+        if [ "$CASE_INSENSITIVE" = "true" ]; then
+          echo "Case-insensitive string comparison requested"
+          shopt -s nocasematch
+        fi
+
+        echo "String to match: $STRING"
+        echo "Multi-line base64 encoded text:"
+        echo "$ENCODED_TEXT"
+
+        TEXT=$(base64 -d <<< "$ENCODED_TEXT")
+        echo "Decoded text:"
+        echo "$TEXT"
+
+        MATCH="false"
+
+        while read -r LINE
+        do
+          # Check if string A contains string B
+          if [[ "$SUBSTRING_MATCH" == "true" ]]; then
+            if [[ "$LINE" =~ "$STRING" ]]; then
+              MATCH="true"
+              COUNT=$((COUNT+1))
+            fi
+          # Check for an exact match between strings
+          else
+            if [[ "$STRING" == "$LINE" ]]; then
+              MATCH="true"
+              COUNT=$((COUNT+1))
+            fi
+          fi
+
+        done <<< "$TEXT"
+
+        if [ "$MATCH" = "true" ]; then
+          echo "String WAS matched, count: $COUNT"
+        else
+          echo "String was NOT matched"
+        fi
+
+        # Allows for testing from a local shell
+        if [ -n "$GITHUB_OUTPUT" ]; then
+          echo "match=$MATCH" >> "$GITHUB_OUTPUT"
+          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+        fi
+
+        #SHELLCODEEND

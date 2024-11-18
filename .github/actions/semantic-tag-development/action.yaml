@@ -1,0 +1,133 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+
+name: "🏷️ Development Semantic Tag"
+
+inputs:
+  TAG:
+    description: "The existing semantic tag to be incremented"
+    required: true
+    type: string
+  TYPE:
+    description: "Increment to perform [major|minor|patch]"
+    required: false
+    type: string
+    default: "patch"
+
+outputs:
+  TAG:
+    description: "The next semantic tag"
+    value: ${{ steps.increment.outputs.tag }}
+  VTAG:
+    description: "The next semantic tag with a v prefix"
+    value: ${{ steps.increment.outputs.vtag }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Create development tag"
+      id: increment
+      shell: bash
+      run: |
+        # Create development tag
+
+        #SHELLCODESTART
+
+        # Allows for testing from a local shell
+        if [ -z "$GITHUB_OUTPUT" ]; then
+          echo "Running from a shell, NOT workflow"
+          export GITHUB_OUTPUT="/dev/null"
+          export GITHUB_ENV="/dev/null"
+          if [ $# -ne 2 ]; then
+            echo "Error: invalid arguments specified"
+            echo "Usage: $0 [tag] [increment-type major|minor|patch]"
+            exit 1
+          else
+            TAG="$1"
+            TYPE="$2"
+          fi
+        else
+          TAG="${{ inputs.TAG }}"
+          TYPE="${{ inputs.TYPE }}"
+        fi
+
+        # Validate increment type
+        if	[ ! "$TYPE" = "major" ] && \
+            [ ! "$TYPE" = "minor" ] && \
+            [ ! "$TYPE" = "patch" ]; then
+           echo "Increment type invalid"; exit 1
+        fi
+
+        echo "Input tag: $TAG"
+        echo "Increment type: $TYPE"
+
+        # If present, strip the leading "v" character
+        if [[ "$TAG" == v* ]]; then
+          TAG="${TAG:1}"
+        fi
+
+        # Regular expression to match semantic tag
+        PATTERN="^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-((0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*))?(\+([0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*))?$"
+
+        # Validate supplied (and parsed) tag
+        if ! [[ "$TAG" =~ $PATTERN ]]; then
+          echo "ERROR: invalid semantic tag"; exit 1
+        else
+          echo "Numeric value: $TAG"
+        fi
+
+        REGEX='[^0-9]*\([0-9]*\)[.]\([0-9]*\)[.]\([0-9]*\)\([0-9A-Za-z-]*\)'
+        MAJOR=$(echo "$TAG" | sed -e "s#$REGEX#\1#")
+        MINOR=$(echo "$TAG" | sed -e "s#$REGEX#\2#")
+        PATCH=$(echo "$TAG" | sed -e "s#$REGEX#\3#")
+        echo "Current versioning [ major: $MAJOR  minor: $MINOR  patch: $PATCH ]"
+
+        case "$TYPE" in
+          major)
+            MAJOR=$((MAJOR+1))
+            MINOR="0"
+            PATCH="0"
+            ;;
+          minor)
+            MINOR=$((MINOR+1))
+            PATCH="0"
+            ;;
+          patch)
+            PATCH=$((PATCH+1))
+            ;;
+        esac
+
+        # Start development build number at zero
+        DEV_COUNT=0
+        NEXT_TAG="$MAJOR.$MINOR.$PATCH-dev$DEV_COUNT"
+        echo "Starting from: $NEXT_TAG"
+
+        # Assume tag is NOT safe to use
+        THIS_TAG_CONFLICTS="true"
+
+        while [ "$THIS_TAG_CONFLICTS" = "true" ]; do
+          MATCH="false"
+          # Development releases start at one
+          DEV_COUNT=$((DEV_COUNT+1))
+          NEXT_TAG="$MAJOR.$MINOR.$PATCH-dev$DEV_COUNT"
+          echo "Checking "v$NEXT_TAG" against repository tags"
+          for REPO_TAG in $(git tag -l); do
+            if [ "v$NEXT_TAG" = "$REPO_TAG" ]; then
+              echo "$NEXT_TAG MATCHED to $REPO_TAG"
+              MATCH="true"
+            fi
+          done
+
+          if [ "$MATCH" = "false" ]; then
+            THIS_TAG_CONFLICTS="false"
+          fi
+        done
+
+        echo "Build tag/release: $NEXT_TAG [v$NEXT_TAG]"
+        echo "tag=$NEXT_TAG" >> "$GITHUB_OUTPUT"
+        echo "tag=$NEXT_TAG" >> "$GITHUB_ENV"
+        echo "vtag=v$NEXT_TAG" >> "$GITHUB_OUTPUT"
+        echo "vtag=v$NEXT_TAG" >> "$GITHUB_ENV"
+
+        #SHELLCODEEND

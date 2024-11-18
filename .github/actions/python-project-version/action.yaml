@@ -1,0 +1,78 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+
+name: "🐍 Get Python Project Version"
+description: "Returns the version of the Python Project"
+
+outputs:
+  PYTHON_PROJECT_VERSION:
+    description: "The version of the Python project from pyproject.toml or setup.py"
+    value: ${{ steps.variables.outputs.python_project_version }}
+
+runs:
+  using: "composite"
+  steps:
+    - uses: os-climate/osc-github-devops/.github/actions/path-check@main
+      id: setup-py
+      with:
+        check_path: "setup-py"
+
+    - uses: os-climate/osc-github-devops/.github/actions/path-check@main
+      id: pyproject-toml
+      with:
+        check_path: "pyproject.toml"
+
+    - name: "Use project version from setup.py"
+      id: setup-py-version
+      if: steps.setup-py.outputs.type == 'file'
+      uses: os-climate/osc-github-devops/.github/actions/file-grep-regex@main
+      with:
+        flags: "-oP -m1"
+        # https://regex101.com/r/QKYHId/1
+        regex: '(?<=version=")([^"]*)'
+        filename: "setup.py"
+
+    - name: "Use project version from pyproject.toml"
+      id: pyproject-toml-version
+      if: steps.pyproject-toml.outputs.type == 'file'
+      uses: os-climate/osc-github-devops/.github/actions/file-grep-regex@main
+      with:
+        flags: "-oP -m1"
+        # https://regex101.com/r/MWmRge/1
+        regex: '(?<=^version = ")([^"]*)'
+        filename: "pyproject.toml"
+
+    - name: "Throw error if Python project metadata was NOT found"
+      if: steps.pyproject-toml.outputs.type == 'invalid' &&
+        steps.setup-py.outputs.type == 'invalid'
+      shell: bash
+      run: |
+        # Throw error if Python project metadata was NOT found
+        echo "Neither pyproject.toml NOR setup.py were found"; exit 1
+
+    - name: "Return extracted values"
+      id: variables
+      shell: bash
+      run: |
+        # Return extracted values
+
+        # pyproject.toml is preferred source if both files exist
+        if [ ${{ steps.pyproject-toml.outputs.type == 'file' }} ]; then
+          echo "Using project version from source: pyproject.toml"
+          PYTHON_PROJECT_VERSION="${{ steps.pyproject-toml-version.outputs.extracted_string}}"
+
+        elif [ ${{ steps.setup-py.outputs.type == 'file' }} ]; then
+          echo "Using project version from source: setup.py"
+          PYTHON_PROJECT_VERSION="${{ steps.setup-py-version.outputs.extracted_string}}"
+        fi
+
+        if [ -z "$PYTHON_PROJECT_VERSION" ]; then
+          echo "The project name extraction failed ❌"; exit 1
+        fi
+
+        echo "python_project_version: $PYTHON_PROJECT_VERSION ✅"
+
+        # Make available to the GitHub environment
+        echo "python_project_version=$PYTHON_PROJECT_VERSION" >> "$GITHUB_ENV"
+        echo "python_project_version=$PYTHON_PROJECT_VERSION" >> "$GITHUB_OUTPUT"

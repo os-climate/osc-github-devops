@@ -1,0 +1,75 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+
+name: "🛠️ Python Project Setup"
+description: "Extracts required project metadata"
+
+outputs:
+  # Enumerated values
+  PYTHON_PROJECT_NAME:
+    description: "The name of the Python project from pyproject.toml or setup.py"
+    value: ${{ steps.project-naming.outputs.python_project_name }}
+  PYTHON_BUILD_NAME:
+    # Any dashes in the name will be replaced with underscores
+    description: "The name of the Python project when built"
+    value: ${{ steps.project-naming.outputs.python_build_name }}
+  VERSIONING_TYPE:
+    description: "Project supported Python versions as JSON"
+    value: ${{ steps.versioning-type.outputs.versioning_type }}
+  MATRIX_JSON:
+    description: "Project supported Python versions as JSON"
+    value: ${{ steps.versions-matrix.outputs.matrix_json }}
+  BUILD_PYTHON_VERSION:
+    description: "Python version to use for build (creates artefacts)"
+    value: ${{ steps.artefact-build-python.outputs.build_python_version }}
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v4
+
+    - name: "Extract Python project naming"
+      id: project-naming
+      # yamllint disable-line rule:line-length
+      uses: os-climate/osc-github-devops/.github/actions/python-project-name@main
+
+    - name: "Determine versioning type [static|dynamic]"
+      id: versioning-type
+      # yamllint disable-line rule:line-length
+      uses: os-climate/osc-github-devops/.github/actions/python-versioning-type@main
+
+    - name: "Artefact/build Python version"
+      id: artefact-build-python
+      shell: bash
+      run: |
+        # Artefact/build Python version
+        build_python_version='3.11'
+        echo "Using artefact/build Python version: $build_python_version"
+        echo "build_python_version=$build_python_version" >> "$GITHUB_OUTPUT"
+
+    - name: "Extract Python supported versions (JSON)"
+      id: versions-matrix
+      # yamllint disable-line rule:line-length
+      uses: os-climate/osc-github-devops/.github/actions/python-versions-matrix@main
+
+    - name: "Display summary output"
+      shell: bash
+      run: |
+        # Display summary output
+        echo "# 🐍 Python Project" >> "$GITHUB_STEP_SUMMARY"
+
+        echo "Gathered Python project metadata"
+
+        echo "| Key | Value |" >> "$GITHUB_STEP_SUMMARY"
+        echo "| -------- | ------- |" >> "$GITHUB_STEP_SUMMARY"
+        echo "| Project name | ${{ steps.project-naming.outputs.python_project_name }} |" >> "$GITHUB_STEP_SUMMARY"
+        echo "| Package name | ${{ steps.project-naming.outputs.python_build_name }} |" >> "$GITHUB_STEP_SUMMARY"
+        echo "| Versioning type | ${{ steps.versioning-type.outputs.versioning_type }} |" >> "$GITHUB_STEP_SUMMARY"
+        echo "| Build Python | ${{ steps.artefact-build-python.outputs.build_python_version }} |" \
+          >> "$GITHUB_STEP_SUMMARY"
+
+        echo "## JSON Output" >> "$GITHUB_STEP_SUMMARY"
+
+        echo "### Versions JSON for Matrix jobs:" >> "$GITHUB_STEP_SUMMARY"
+        echo "${{ steps.versions-matrix.outputs.matrix_json }}" >> "$GITHUB_STEP_SUMMARY"

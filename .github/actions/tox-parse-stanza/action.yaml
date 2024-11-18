@@ -1,0 +1,59 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+
+name: "🗒️ Tox: Parse Stanza"
+
+outputs:
+  STANZA:
+    description: "Returns the TOX stanza found in tox.ini"
+    value: ${{ steps.parse-tox-ini.outputs.stanza }}
+  ENCODED_STANZA:
+    description: "Stores TOX stanza from tox.ini base64 encoded"
+    value: ${{ steps.parse-tox-ini.outputs.encoded_stanza }}
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v4
+
+    - name: "Parse TOX Configuration"
+      id: parse-tox-ini
+      shell: bash
+      run: |
+        # Parse TOX Configuration
+
+        if [ ! -f tox.ini ]; then
+          echo "Error: TOX configuration file NOT found";
+          echo "This action should be called conditionally"
+          exit 1
+        else
+          STANZA=$(grep -E -w "^\[(.*?)\]" tox.ini | tr -d '[],')
+          ENCODED_STANZA=$(echo -n "$STANZA" | base64)
+          echo 'stanza<<EOF' >> "$GITHUB_OUTPUT"
+          echo "$STANZA" >> "$GITHUB_OUTPUT"
+          echo 'EOF' >> "$GITHUB_OUTPUT"
+          # echo -n "encoded_stanza=$ENCODED_STANZA" >> "$GITHUB_OUTPUT"
+          echo "encoded_stanza<<EOF"$'\n'"$ENCODED_STANZA"$'\n'EOF >> "$GITHUB_OUTPUT"
+        fi
+
+        echo "TOX configuration stanza:"
+        echo "$STANZA"
+        echo "Base64 encoded:"
+        echo "$ENCODED_STANZA"
+
+# Sample output:
+# % grep -E -w "^\[(.*?)\]" tox.ini | tr -d '[],'
+# gh-actions
+# tox
+# testenv
+# testenv:tests
+# testenv:lint
+# testenv:{buildclean}
+# testenv:cov
+# testenv:{docsdoctestslinkcheck}
+# tool.flake8
+
+# Base64 encoded:
+# yamllint disable-line rule:line-length
+# Z2gtYWN0aW9ucwp0b3gKdGVzdGVudgp0ZXN0ZW52OnRlc3RzCnRlc3RlbnY6bGludAp0ZXN0ZW52OntidWlsZGNsZWFufQp0ZXN0ZW52OmNvdgp0ZXN0ZW52Ontkb2NzZG9jdGVzdHNsaW5rY2hlY2t9CnRvb2wuZmxha2U4Cg==
