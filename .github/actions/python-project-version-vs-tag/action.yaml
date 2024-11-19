@@ -31,7 +31,7 @@ runs:
           export GITHUB_ENV="/dev/null"
         fi
 
-        PROJECT_VERSION="${{ steps.fetch.outputs.version }}"
+        PROJECT_VERSION="${{ steps.fetch.outputs.python_project_version }}"
 
         # Get version from pushed tag
         TAG_VERSION="${{ github.ref_name }}"
