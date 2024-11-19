@@ -194,7 +194,7 @@ jobs:
       - python-security
       - pypi-test
     with:
-      ENVIRONMENT: "production"
+      environment: "production"
       build_tag: ${{ needs.repository.outputs.build_tag }}
     permissions:
       contents: read
