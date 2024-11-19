@@ -17,7 +17,8 @@ on:
         # Environment MUST match the trusted publishing setup in PyPI
         description: "Mandatory environment, e.g. development, production"
         type: string
-        required: true
+        required: false
+        default: "production"
       BUILD_TAG:
         description: "Semantic tag for this release/build"
         type: string
@@ -63,11 +64,11 @@ jobs:
           if [ -z ${{ inputs.TEST }} ]; then
             PUBLISH_URL="https://pypi.org"
             PYPI_CREDENTIAL="op://hdiyadcjno2knqgvcy4wj5ulya/vds5rebqxeqfrjqwpszxxicmzq/password"
-            PYPI_ENVIRONMENT="production"
+            PYPI_ENVIRONMENT="${{ inputs.environment }}"
           else
             PUBLISH_URL="https://test.pypi.org"
             PYPI_CREDENTIAL="op://hdiyadcjno2knqgvcy4wj5ulya/tm2ffuusrynfivtcsnamginhm4/password"
-            PYPI_ENVIRONMENT="test"
+            PYPI_ENVIRONMENT="${{ inputs.environment }}"
           fi
           echo "Environment set to: $PYPI_ENVIRONMENT"
           echo "Using publishing URL/prefix: $PUBLISH_URL"
@@ -152,22 +153,27 @@ jobs:
           echo "Build present in PyPI: ${{ steps.build-url-check.outputs.valid }}"
           echo "Checks passed: this build has not yet been published/released ✅"
 
+      # Temporarily disabled due to OIDC (and token/claim complications)
+      # job_workflow_ref vs ref
+      # e.g. https://github.com/pypi/warehouse/issues/11096
+      # https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/using-openid-connect-with-reusable-workflows
+
       # Primary/default method uses trusted publishing
-      - name: "Publish PyPI [Trusted Publishing]"
-        uses: pypa/gh-action-pypi-publish@15c56dba361d8335944d31a2ecd17d700fc7bcbc # v1.12.2
-        # yamllint disable-line rule:line-length
-        if: steps.project-url-check.outputs.valid == 'true' && steps.build-url-check.outputs.valid == 'false'
-        with:
-          repository-url: "${{ env.PUBLISH_URL }}/legacy/"
-          # Show checksum values
-          print-hash: true
-          packages-dir: ${{ env.ARTEFACT_LOCATION }}
-          # We already validated earlier in the pipeline (using twine)
-          verify-metadata: false
-          # Optional debugging, pretty much essential for information on failures
-          verbose: true
-          # Reminder: mandatory for this action with trusted publishing
-          attestations: false # Currently too buggy to enable
+      # - name: "Publish PyPI [Trusted Publishing]"
+      #   uses: pypa/gh-action-pypi-publish@15c56dba361d8335944d31a2ecd17d700fc7bcbc # v1.12.2
+      #   # yamllint disable-line rule:line-length
+      #   if: steps.project-url-check.outputs.valid == 'true' && steps.build-url-check.outputs.valid == 'false'
+      #   with:
+      #     repository-url: "${{ env.PUBLISH_URL }}/legacy/"
+      #     # Show checksum values
+      #     print-hash: true
+      #     packages-dir: ${{ env.ARTEFACT_LOCATION }}
+      #     # We already validated earlier in the pipeline (using twine)
+      #     verify-metadata: false
+      #     # Optional debugging, pretty much essential for information on failures
+      #     verbose: true
+      #     # Reminder: mandatory for this action with trusted publishing
+      #     attestations: false # Currently too buggy to enable
 
       # Only used with the publishing method below
       - name: "Retrieve credential [ 1Password ]"
