@@ -43,7 +43,7 @@ jobs:
     name: "PyPI Packages"
     runs-on: "ubuntu-latest"
     environment:
-      name: ${{ inputs.environment }}
+      name: ${{ inputs.ENVIRONMENT }}
     permissions:
       # Needed for trusted publishing; must also be passed from parent workflows
       id-token: write
