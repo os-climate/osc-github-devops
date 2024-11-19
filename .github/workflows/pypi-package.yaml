@@ -39,7 +39,9 @@ jobs:
     runs-on: "ubuntu-latest"
     environment:
       name: development
-
+    permissions:
+      # Needed for trusted publishing; must also be passed from parent workflows
+      id-token: write
     steps:
       # Need repository content to extract project name
       - uses: actions/checkout@v4
