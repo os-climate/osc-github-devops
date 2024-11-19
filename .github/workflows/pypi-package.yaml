@@ -13,6 +13,11 @@ on:
         type: boolean
         required: false
         default: false
+      ENVIRONMENT:
+        # Environment MUST match the trusted publishing setup in PyPI
+        description: "Mandatory environment, e.g. development, production"
+        type: string
+        required: true
       BUILD_TAG:
         description: "Semantic tag for this release/build"
         type: string
@@ -38,7 +43,7 @@ jobs:
     name: "PyPI Packages"
     runs-on: "ubuntu-latest"
     environment:
-      name: development
+      name: ${{ inputs.environment }}
     permissions:
       # Needed for trusted publishing; must also be passed from parent workflows
       id-token: write
@@ -58,10 +63,13 @@ jobs:
           if [ -z ${{ inputs.TEST }} ]; then
             PUBLISH_URL="https://pypi.org"
             PYPI_CREDENTIAL="op://hdiyadcjno2knqgvcy4wj5ulya/vds5rebqxeqfrjqwpszxxicmzq/password"
+            PYPI_ENVIRONMENT="production"
           else
             PUBLISH_URL="https://test.pypi.org"
             PYPI_CREDENTIAL="op://hdiyadcjno2knqgvcy4wj5ulya/tm2ffuusrynfivtcsnamginhm4/password"
+            PYPI_ENVIRONMENT="test"
           fi
+          echo "Environment set to: $PYPI_ENVIRONMENT"
           echo "Using publishing URL/prefix: $PUBLISH_URL"
           echo "PUBLISH_URL=$PUBLISH_URL" >> "$GITHUB_ENV"
           echo "PYPI_CREDENTIAL=$PYPI_CREDENTIAL" >> "$GITHUB_ENV"
@@ -146,7 +154,7 @@ jobs:
 
       # Primary/default method uses trusted publishing
       - name: "Publish PyPI [Trusted Publishing]"
-        uses: pypa/gh-action-pypi-publish@release/v1
+        uses: pypa/gh-action-pypi-publish@15c56dba361d8335944d31a2ecd17d700fc7bcbc # v1.12.2
         # yamllint disable-line rule:line-length
         if: steps.project-url-check.outputs.valid == 'true' && steps.build-url-check.outputs.valid == 'false'
         with:
@@ -177,7 +185,7 @@ jobs:
       # After that, the project should be configured for trusted publishing
       # Note: this is a manual operation in the PyPI web portal
       - name: "Publish PyPI [Credential from 1Password]"
-        uses: pypa/gh-action-pypi-publish@release/v1
+        uses: pypa/gh-action-pypi-publish@15c56dba361d8335944d31a2ecd17d700fc7bcbc # v1.12.2
         if: steps.project-url-check.outputs.valid == 'false' && env.use_one_password == 'true'
         with:
           repository-url: "${{ env.PUBLISH_URL }}/legacy/"
@@ -191,7 +199,7 @@ jobs:
       # Fallback method using credentials stored in GitHub
       # Only used initially when trusted publishing is unavailable (see above)
       - name: "Publish PyPI [Fallback: Credential from GitHub]"
-        uses: pypa/gh-action-pypi-publish@release/v1
+        uses: pypa/gh-action-pypi-publish@15c56dba361d8335944d31a2ecd17d700fc7bcbc # v1.12.2
         if: steps.project-url-check.outputs.valid == 'false' && env.use_one_password == 'false'
         with:
           repository-url: https://test.pypi.org/legacy/

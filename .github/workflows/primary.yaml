@@ -173,6 +173,7 @@ jobs:
       - python-security
     with:
       test: true
+      environment: test
       build_tag: ${{ needs.repository.outputs.build_tag }}
     permissions:
       contents: read
@@ -193,6 +194,7 @@ jobs:
       - python-security
       - pypi-test
     with:
+      environment: production
       build_tag: ${{ needs.repository.outputs.build_tag }}
     permissions:
       contents: read
