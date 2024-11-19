@@ -22,15 +22,6 @@ runs:
       run: |
         # Check tag/versions for consistency
 
-        #SHELLCODESTART
-
-        # Allows for testing from a local shell
-        if [ -z "$GITHUB_OUTPUT" ]; then
-          echo "Running from a shell, NOT workflow"
-          export GITHUB_OUTPUT="/dev/null"
-          export GITHUB_ENV="/dev/null"
-        fi
-
         PROJECT_VERSION="${{ steps.fetch.outputs.python_project_version }}"
         if [ -z "$PROJECT_VERSION" ]; then
           echo "The python project version string was empty ❌"
@@ -41,15 +32,16 @@ runs:
 
         # Get version from pushed tag
         TAG_VERSION="${{ github.ref_name }}"
+        echo "Version from project metadata: $PROJECT_VERSION"
         echo "Version from tag push: $TAG_VERSION"
 
         # Compare the two version strings
         if [ "$TAG_VERSION" = "$PROJECT_VERSION" ]; then
           echo "Pushed tag matches version string from pyproject.toml ✅"
+          echo "match=true" >> "$GITHUB_ENV"
           echo "match=true" >> "$GITHUB_OUTPUT"
         else
           echo "Pushed tag does NOT match version string from pyproject.toml ❌"
+          echo "match=false" >> "$GITHUB_ENV"
           echo "match=false" >> "$GITHUB_OUTPUT"
         fi
-
-        #SHELLCODEEND
