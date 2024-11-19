@@ -31,7 +31,13 @@ runs:
           export GITHUB_ENV="/dev/null"
         fi
 
-        PROJECT_VERSION="${{ steps.fetch.outputs.version }}"
+        PROJECT_VERSION="${{ steps.fetch.outputs.python_project_version }}"
+        if [ -z "$PROJECT_VERSION" ]; then
+          echo "The python project version string was empty ❌"
+          echo "Check action/workflow inputs and variables"
+          echo "Also verify parsing of python project metadata"
+          exit 1
+        fi
 
         # Get version from pushed tag
         TAG_VERSION="${{ github.ref_name }}"
