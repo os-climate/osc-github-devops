@@ -42,7 +42,7 @@ jobs:
       contents: read
 
   tests:
-    name: "Synthetic Tests"
+    name: "Action/Workflow Tests"
     runs-on: ubuntu-latest
     # if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
     permissions:
