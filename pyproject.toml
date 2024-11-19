@@ -4,7 +4,7 @@
 [project]
 name = "osc-github-devops"
 # Static versioning
-version = "v0.0.4"
+version = "v0.1.0"
 # Uncomment to enable dynamic versioning
 # dynamic = [ "version" ]
 description = "Python project metadata to permit workflow testing."
@@ -34,8 +34,8 @@ classifiers = [
 ]
 
 dependencies = [
-    "typer",
-    "jupyterlab"
+    "typer==0.13.1",
+    "jupyterlab==4.3.1"
 ]
 
 [project.urls]
