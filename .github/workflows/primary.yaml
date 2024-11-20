@@ -173,7 +173,7 @@ jobs:
       - python-security
     with:
       publish_url: "https://test.pypi.org"
-      environment: "test"
+      environment: "development"
       build_tag: ${{ needs.repository.outputs.build_tag }}
       one_password_item: "op://hdiyadcjno2knqgvcy4wj5ulya/tm2ffuusrynfivtcsnamginhm4/password"
     permissions:

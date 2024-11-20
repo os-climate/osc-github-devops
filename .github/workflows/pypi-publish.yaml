@@ -147,7 +147,7 @@ jobs:
               echo "Secret:   OP_SERVICE_ACCOUNT_TOKEN"
               echo "Variable: ONE_PASSWORD_ITEM"
             else
-              echo "Authentication will use 1Password vault ✅"
+              echo "Publishing will use 1Password vault ✅"
               publish_method="1Password Vault"
             fi
 
@@ -158,16 +158,15 @@ jobs:
               echo "Publishing cannot continue without a valid method ❌"
               echo "Publishing cannot continue without a valid method ❌" >> "$GITHUB_STEP_SUMMARY"
               exit 1
-            else
-              echo "Authentication will use GitHub secret ✅"
+            elif [ "$publish_method" != "1Password Vault" ]; then
+              echo "Publishing will use GitHub secret ✅"
               publish_method="GitHub Secret"
             fi
 
           fi
 
           if [ "$publish_method" != "none" ]; then
-            echo "Publishing to: ${{ inputs.PUBLISH_URL }} [${{ inputs.ENVIRONMENT }}]"
-            echo "Publishing method: $publish_method"
+            echo "Publishing to: ${{ inputs.PUBLISH_URL }} [environment: ${{ inputs.ENVIRONMENT }}]"
             echo "publish_method=$publish_method" >> "$GITHUB_ENV"
             echo "publish_method=$publish_method" >> "$GITHUB_OUTPUT"
           fi
@@ -177,7 +176,7 @@ jobs:
       # e.g. https://github.com/pypi/warehouse/issues/11096
       # https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/using-openid-connect-with-reusable-workflows
 
-      - name: "Publish PyPI [${{ steps.conditions.outputs.publish_method }}]"
+      - name: "Publish PyPI [Trusted Publishing]"
         uses: pypa/gh-action-pypi-publish@15c56dba361d8335944d31a2ecd17d700fc7bcbc # v1.12.2
         # yamllint disable-line rule:line-length
         if: steps.conditions.outputs.publish_method == 'Trusted Publishing'
@@ -205,7 +204,7 @@ jobs:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
 
       # Used only once prior to trusted publishing being configured
-      - name: "Publish PyPI [${{ steps.conditions.outputs.publish_method }}]"
+      - name: "Publish PyPI [1Password Credential]"
         uses: pypa/gh-action-pypi-publish@15c56dba361d8335944d31a2ecd17d700fc7bcbc # v1.12.2
         if: steps.conditions.outputs.publish_method == '1Password Vault'
         with:
@@ -219,7 +218,7 @@ jobs:
           attestations: false
 
       # Fallback method using credential stored as GitHub secret
-      - name: "Publish PyPI [${{ steps.conditions.outputs.publish_method }}]"
+      - name: "Publish PyPI [GitHub Secret]"
         uses: pypa/gh-action-pypi-publish@15c56dba361d8335944d31a2ecd17d700fc7bcbc # v1.12.2
         if: steps.conditions.outputs.publish_method == 'GitHub Secret'
         with:
