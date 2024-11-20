@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
-name: "📦 [R] PyPI Release"
+name: "📦 [R] PyPI Publishing"
 # Publishes a Python package to PyPI"
 
 on:
@@ -43,7 +43,7 @@ permissions: {}
 
 jobs:
   pypi-publish:
-    name: "PyPI Packages"
+    name: "PyPI Publishing"
     runs-on: "ubuntu-latest"
     environment:
       name: ${{ inputs.environment }}
@@ -87,7 +87,7 @@ jobs:
             echo "No SigStore signing artefacts to purge"
           fi
 
-      - name: "Checking PyPI [for PROJECT]"
+      - name: "Checking Destination for Project"
         id: project-url-check
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/url-validity-check@main
@@ -97,7 +97,7 @@ jobs:
           string: "/${{ steps.naming.outputs.python_project_name }}"
           suffix: "/"
 
-      - name: "Checking PyPI [for BUILD]"
+      - name: "Checking Destination for Build/Release"
         id: build-url-check
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/url-validity-check@main
@@ -176,7 +176,7 @@ jobs:
       # e.g. https://github.com/pypi/warehouse/issues/11096
       # https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/using-openid-connect-with-reusable-workflows
 
-      - name: "Publish PyPI [Trusted Publishing]"
+      - name: "Publish PyPI [${{ steps.conditions.outputs.publish_method }}]"
         uses: pypa/gh-action-pypi-publish@15c56dba361d8335944d31a2ecd17d700fc7bcbc # v1.12.2
         # yamllint disable-line rule:line-length
         if: steps.conditions.outputs.publish_method == 'Trusted Publishing'
@@ -192,7 +192,7 @@ jobs:
           attestations: false # Currently too buggy to enable
           # attestations: true
 
-      - name: "Retrieve credential [ 1Password ]"
+      - name: "Retrieve Credential [1Password]"
         id: one-password-pypi-test
         if: steps.conditions.outputs.publish_method == '1Password Vault'
         uses: 1password/load-secrets-action@581a835fb51b8e7ec56b71cf2ffddd7e68bb25e0 # v2.0.0
@@ -204,7 +204,7 @@ jobs:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
 
       # Used only once prior to trusted publishing being configured
-      - name: "Publish PyPI [Credential from 1Password]"
+      - name: "Publish PyPI [${{ steps.conditions.outputs.publish_method }}]"
         uses: pypa/gh-action-pypi-publish@15c56dba361d8335944d31a2ecd17d700fc7bcbc # v1.12.2
         if: steps.conditions.outputs.publish_method == '1Password Vault'
         with:
@@ -218,7 +218,7 @@ jobs:
           attestations: false
 
       # Fallback method using credential stored as GitHub secret
-      - name: "Publish PyPI [Fallback: Credential from GitHub]"
+      - name: "Publish PyPI [${{ steps.conditions.outputs.publish_method }}]"
         uses: pypa/gh-action-pypi-publish@15c56dba361d8335944d31a2ecd17d700fc7bcbc # v1.12.2
         if: steps.conditions.outputs.publish_method == 'GitHub Secret'
         with:
