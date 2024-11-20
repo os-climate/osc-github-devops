@@ -172,7 +172,7 @@ jobs:
       - python-test
       - python-security
     with:
-      publish_url: "https://test.pypi.org/legacy/"
+      repository_url: "https://test.pypi.org/legacy/"
       environment: "development"
       build_tag: ${{ needs.repository.outputs.build_tag }}
       one_password_item: "op://hdiyadcjno2knqgvcy4wj5ulya/tm2ffuusrynfivtcsnamginhm4/password"
@@ -195,7 +195,7 @@ jobs:
       - python-security
       - pypi-test
     with:
-      publish_url: "https://pypi.org/"
+      repository_url: "https://pypi.org/"
       environment: "production"
       build_tag: ${{ needs.repository.outputs.build_tag }}
       one_password_item: "op://hdiyadcjno2knqgvcy4wj5ulya/vds5rebqxeqfrjqwpszxxicmzq/password"
