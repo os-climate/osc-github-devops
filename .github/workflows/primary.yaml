@@ -178,6 +178,8 @@ jobs:
       one_password_item: "op://hdiyadcjno2knqgvcy4wj5ulya/tm2ffuusrynfivtcsnamginhm4/password"
     permissions:
       contents: read
+      # Needed for trusted publishing
+      id-token: write
     secrets:
       OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.ONE_PASSWORD_PRODUCTION }}
       PYPI_CREDENTIAL: ${{ secrets.PYPI_DEVELOPMENT }}
@@ -199,6 +201,8 @@ jobs:
       one_password_item: "op://hdiyadcjno2knqgvcy4wj5ulya/vds5rebqxeqfrjqwpszxxicmzq/password"
     permissions:
       contents: read
+      # Needed for trusted publishing
+      id-token: write
     secrets:
       OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.ONE_PASSWORD_PRODUCTION }}
       PYPI_CREDENTIAL: ${{ secrets.PYPI_PRODUCTION }}
