@@ -192,7 +192,9 @@ jobs:
       # Note: this is a manual operation in the PyPI web portal
       - name: "Publish PyPI [Credential from 1Password]"
         uses: pypa/gh-action-pypi-publish@15c56dba361d8335944d31a2ecd17d700fc7bcbc # v1.12.2
-        if: steps.project-url-check.outputs.valid == 'false' && env.use_one_password == 'true'
+        if: env.use_one_password == 'true'
+        # Needs re-instating once trusted publishinbg is enabled again
+        # if: steps.project-url-check.outputs.valid == 'false' && env.use_one_password == 'true'
         with:
           repository-url: "${{ env.PUBLISH_URL }}/legacy/"
           print-hash: true
@@ -206,7 +208,9 @@ jobs:
       # Only used initially when trusted publishing is unavailable (see above)
       - name: "Publish PyPI [Fallback: Credential from GitHub]"
         uses: pypa/gh-action-pypi-publish@15c56dba361d8335944d31a2ecd17d700fc7bcbc # v1.12.2
-        if: steps.project-url-check.outputs.valid == 'false' && env.use_one_password == 'false'
+        if: env.use_one_password == 'false'
+        # Needs re-instating once trusted publishinbg is enabled again
+        # if: steps.project-url-check.outputs.valid == 'false' && env.use_one_password == 'true'
         with:
           repository-url: https://test.pypi.org/legacy/
           print-hash: true
