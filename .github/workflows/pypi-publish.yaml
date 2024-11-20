@@ -136,7 +136,7 @@ jobs:
             echo "This build/release has NOT previously been published ✅"
           fi
 
-          if [ "$publish_method" != "Trusted Publishing" ] && [ "$publish_method" = "Skipped" ]; then
+          if [ "$publish_method" != "Trusted Publishing" ] && [ "$publish_method" != "Skipped" ]; then
             echo "Trusted publishing NOT available, using fallback methods 👇🏻"
 
             ### 1Password Vault Credential ###
@@ -166,7 +166,8 @@ jobs:
           fi
 
           if [ "$publish_method" != "none" ]; then
-            echo "Publishing to: ${{ inputs.PUBLISH_URL }} [ ${{ inputs.ENVIRONMENT }} ]"
+            echo "Publishing to: ${{ inputs.PUBLISH_URL }} [${{ inputs.ENVIRONMENT }}]"
+            echo "Publishing method: $publish_method"
             echo "publish_method=$publish_method" >> "$GITHUB_ENV"
             echo "publish_method=$publish_method" >> "$GITHUB_OUTPUT"
           fi
