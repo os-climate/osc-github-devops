@@ -4,7 +4,7 @@
 [project]
 name = "osc-github-devops"
 # Static versioning
-version = "v0.1.0"
+version = "v0.1.1"
 # Uncomment to enable dynamic versioning
 # dynamic = [ "version" ]
 description = "Python project metadata to permit workflow testing."
