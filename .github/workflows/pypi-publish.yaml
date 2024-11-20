@@ -43,7 +43,7 @@ permissions: {}
 
 jobs:
   pypi-publish:
-    name: "PyPI Publishing"
+    name: "PyPI publishing"
     runs-on: "ubuntu-latest"
     environment:
       name: ${{ inputs.environment }}
@@ -141,7 +141,7 @@ jobs:
 
             ### 1Password Vault Credential ###
 
-            if [ -z "$OP_SERVICE_ACCOUNT_TOKEN" ] || [ -z "$ONE_PASSWORD_ITEM" ]; then
+            if [ -z "${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}" ] || [ -z "${{ inputs.ONE_PASSWORD_ITEM }}" ]; then
               echo "Unable to use 1Password to retrieve publishing key ❌"
               echo "Two required parameters MUST be set/available"
               echo "Secret:   OP_SERVICE_ACCOUNT_TOKEN"
@@ -153,7 +153,7 @@ jobs:
 
             ### GitHub Secret ###
 
-            if [ -z "$PYPI_CREDENTIAL" ]; then
+            if [ -z "${{ secrets.PYPI_CREDENTIAL }}" ]; then
               echo "GitHub credential NOT set/available: PYPI_CREDENTIAL"
               echo "Publishing cannot continue without a valid method ❌"
               echo "Publishing cannot continue without a valid method ❌" >> "$GITHUB_STEP_SUMMARY"

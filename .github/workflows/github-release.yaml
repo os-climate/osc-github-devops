@@ -27,7 +27,7 @@ permissions: {}
 
 jobs:
   github-release:
-    name: "GitHub Release"
+    name: "GitHub release"
     runs-on: "ubuntu-latest"
     permissions:
       contents: write

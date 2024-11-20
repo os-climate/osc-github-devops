@@ -40,7 +40,7 @@ permissions: {}
 
 jobs:
   repository:
-    name: "Check Content"
+    name: "Check content"
     runs-on: ubuntu-latest
     outputs:
       # Repository metadata

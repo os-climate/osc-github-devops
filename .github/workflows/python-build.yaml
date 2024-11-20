@@ -34,7 +34,7 @@ jobs:
   ### Always builds WITH artefact attestations
 
   python-build:
-    name: "Python Project"
+    name: "Python project"
     runs-on: "ubuntu-latest"
     permissions:
       contents: write
