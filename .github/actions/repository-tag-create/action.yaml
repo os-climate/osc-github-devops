@@ -3,18 +3,23 @@
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 name: "🏷️ Repository Tag Create"
-# Create a tag in the repository
 
 inputs:
   TAG:
     description: "Tag to create in repository"
-    required: false
+    required: true
   PRERELEASE:
     description: "Tag release as a development release"
-    # Will use context awareness if NOT explicitly set
     required: false
     type: boolean
-    default: true
+    default: false
+  MAKE_LATEST:
+    description: "Mark as latest release in the repository"
+    required: false
+    # See: https://github.com/softprops/action-gh-release
+    # Can be either: true, false, or legacy
+    type: string
+    default: false
   GITHUB_TOKEN:
     description: "Required to push new tags to the repository"
     required: true
@@ -22,41 +27,26 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: "Evaluate action/workflow context"
+    - name: "Check tag is semantic"
+      id: validate
+      uses: os-climate/osc-github-devops/.github/actions/tag-validate-semantic@main
+      with:
+        tag: ${{ inputs.tag }}
+
+    - name: "Abort when tag is NOT semantic"
+      if: ${{ steps.outputs.validate.semantic }} == 'false'
       shell: bash
       run: |
-        # Evaluate action/workflow context
+        # Abort workflow when tag is NOT semantic
+        echo "Abort workflow when tag is NOT semantic: ${{ inputs.TAG }} ❌"
+        echo "### Abort workflow when tag is NOT semantic: ${{ inputs.TAG }} ❌" >> "$GITHUB_STEP_SUMMARY"
+        exit 1
 
-        TAG="${{ inputs.TAG }}"
-        PRERELEASE="${{ inputs.PRERELEASE }}"
-
-        if [ -n "$TAG" ]; then
-          TAG="v0.0.0"
-        fi
-
-        if [ "$PRERELEASE" = "true" ]; then
-          echo "Tag to create: $TAG [development]"
-        else
-          echo "Tag to create: $TAG [production]"
-        fi
-
-        # NOT IMPLEMENTED YET
-        # Evaluate commit message contents for release type
-        if [ ${{ contains(github.event.head_commit.message, '[release]') }} ]; then
-          echo "Possible production release?"
-        elif [ ${{ contains(github.event.head_commit.message, '[development]') }} ]; then
-          echo "Possible development release?"
-        fi
-
-        echo "tag=$TAG" >> "$GITHUB_ENV"
-        echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-        echo "prerelease=$PRERELEASE" >> "$GITHUB_ENV"
-        echo "prerelease=$PRERELEASE" >> "$GITHUB_OUTPUT"
-
-    - name: "Add tag to repository: ${{ env.TAG }}"
+    - name: "Add tag to repository: ${{ inputs.TAG }}"
       id: create-tag
-      uses: softprops/action-gh-release@v2
+      uses: softprops/action-gh-release@01570a1f39cb168c169c802c3bceb9e93fb10974 # v2.1.0
       with:
         token: ${{ inputs.GITHUB_TOKEN }}
-        prerelease: ${{ env.PRERELEASE }}
-        tag_name: ${{ env.TAG }}
+        prerelease: ${{ inputs.PRERELEASE }}
+        tag_name: ${{ inputs.TAG }}
+        make_latest: ${{ inputs.MAKE_LATEST }}
