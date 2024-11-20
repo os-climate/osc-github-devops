@@ -8,11 +8,10 @@ name: "📦 [R] PyPI Release"
 on:
   workflow_call:
     inputs:
-      TEST:
-        description: "URL/prefix for package index"
-        type: boolean
-        required: false
-        default: false
+      PUBLISH_URL:
+        description: "URL/prefix for package repository"
+        type: string
+        required: true
       ENVIRONMENT:
         # Environment MUST match the trusted publishing setup in PyPI, if defined
         description: "Mandatory environment, e.g. development, production"
@@ -28,13 +27,16 @@ on:
         type: string
         required: false
         default: "dist"
-
-    secrets:
-      ONE_PASSWORD_PRODUCTION:
-        description: "1Password service account credential"
+      ONE_PASSWORD_ITEM:
+        description: "Path to 1Password vault credential for PyPI"
+        type: string
         required: false
-      PYPI_CREDENTIAL_FROM_GITHUB:
-        description: "PyPI credential from GitHub"
+    secrets:
+      OP_SERVICE_ACCOUNT_TOKEN:
+        description: "1Password service account credential to access vault"
+        required: false
+      PYPI_CREDENTIAL:
+        description: "PyPI API credential from GitHub secrets"
         required: false
 
 permissions: {}
@@ -51,36 +53,37 @@ jobs:
     steps:
       # Need repository content to extract project name
       - uses: actions/checkout@v4
-      - name: "Extract project/repository naming"
-        id: naming
-        # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/python-project-name@main
 
       - name: "Set workflow parameters and variables"
         id: parameters
         shell: bash
         run: |
           # Set workflow parameters and variables
-          if [ -z ${{ inputs.TEST }} ]; then
-            PUBLISH_URL="https://pypi.org"
-            PYPI_CREDENTIAL="op://hdiyadcjno2knqgvcy4wj5ulya/vds5rebqxeqfrjqwpszxxicmzq/password"
-            PYPI_ENVIRONMENT="${{ inputs.environment }}"
+          echo "PyPI Package Publishing"
+
+          if [ -z "$OP_SERVICE_ACCOUNT_TOKEN" ] || [ -z "$ONE_PASSWORD_ITEM" ]; then
+            echo "Unable to use 1Password to retrieve publishing key ❌"
+            echo "Both variables must be set:"
+            echo "OP_SERVICE_ACCOUNT_TOKEN and ONE_PASSWORD_ITEM"
+            echo "method=secret" >> "$GITHUB_ENV"
           else
-            PUBLISH_URL="https://test.pypi.org"
-            PYPI_CREDENTIAL="op://hdiyadcjno2knqgvcy4wj5ulya/tm2ffuusrynfivtcsnamginhm4/password"
-            PYPI_ENVIRONMENT="${{ inputs.environment }}"
+            echo "Authentication will use 1Password vault ✅"
+            echo "method=1password" >> "$GITHUB_ENV"
           fi
-          echo "Environment set to: $PYPI_ENVIRONMENT"
-          echo "Using publishing URL/prefix: $PUBLISH_URL"
-          echo "PUBLISH_URL=$PUBLISH_URL" >> "$GITHUB_ENV"
-          echo "PYPI_CREDENTIAL=$PYPI_CREDENTIAL" >> "$GITHUB_ENV"
-          if [ -n ${{ secrets.ONE_PASSWORD_PRODUCTION }} ]; then
-            echo "1Password service account credential is available"
-            echo "Will load: $PYPI_CREDENTIAL"
-            echo "use_one_password=true" >> "$GITHUB_ENV"
+
+          if [ ${{ env.method }} = "secret" ] && [ -z "$PYPI_CREDENTIAL" ]; then
+            echo "Static API key NOT set OR available: PYPI_CREDENTIAL"
+            echo "Publishing cannot continue without a valid method ❌"; exit 1
           else
-            echo "use_one_password=false" >> "$GITHUB_ENV"
+            echo "Authentication will use GitHub secret ✅"
           fi
+          echo "Sending to URL: ${{ inputs.PUBLISH_URL}}"
+          echo "Environment is: ${{ inputs.ENVIRONMENT }}"
+
+      - name: "Extract project/repository naming"
+        id: naming
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/python-project-name@main
 
       - name: "⬇ Download build artefacts"
         uses: actions/download-artifact@v4
@@ -116,7 +119,7 @@ jobs:
         uses: os-climate/osc-github-devops/.github/actions/url-validity-check@main
         with:
           # e.g. "https://test.pypi.org/project/ITR/"
-          prefix: "${{ env.PUBLISH_URL }}/project"
+          prefix: "${{ inputs.PUBLISH_URL }}/project"
           string: "/${{ steps.naming.outputs.python_project_name }}"
           suffix: "/"
 
@@ -125,7 +128,7 @@ jobs:
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/url-validity-check@main
         with:
-          prefix: "${{ env.PUBLISH_URL }}/project"
+          prefix: "${{ inputs.PUBLISH_URL }}/project"
           # e.g. "https://test.pypi.org/project/ITR/v1.0.0/"
           string: "/${{ steps.naming.outputs.python_project_name }}"
           suffix: "/${{ inputs.build_tag }}/"
@@ -135,17 +138,16 @@ jobs:
         shell: bash
         run: |
           # Conditional publishing checks
-          if [ "$PUBLISH_URL" = "https://pypi.org" ] && \
+          if [ "${{ inputs.PUBLISH_URL }}" = "https://pypi.org" ] && \
             [ "${{ steps.build-url-check.outputs.valid }}" == 'true' ]; then
             echo "This production build/release has already been published"
             echo "An attempt to release more than once should always fail"
-            echo "# ❌ Cannot publish a production build/release more than once" >> "$GITHUB_STEP_SUMMARY"
             echo "### $PUBLISH_URL" >> "$GITHUB_STEP_SUMMARY"
+            echo "# This production build/release already published ❌" >> "$GITHUB_STEP_SUMMARY"
             exit 1
-          elif [ "$PUBLISH_URL" = "https://test.pypi.org" ] && \
-            [ "${{ steps.build-url-check.outputs.valid }}" == 'true' ]; then
+          elif [ "${{ steps.build-url-check.outputs.valid }}" == 'true' ]; then
+            # NOT considered an error unless pushing to the production repository
             echo "This test/development build/release has already been published"
-            echo "This is not considered an error for test/development build/releases"
             echo "PUBLISH=false" >> "$GITHUB_ENV"
             exit 0
           fi
@@ -164,7 +166,7 @@ jobs:
       #   # yamllint disable-line rule:line-length
       #   if: steps.project-url-check.outputs.valid == 'true' && steps.build-url-check.outputs.valid == 'false'
       #   with:
-      #     repository-url: "${{ env.PUBLISH_URL }}/legacy/"
+      #     repository-url: "${{ inputs.PUBLISH_URL }}/legacy/"
       #     # Show checksum values
       #     print-hash: true
       #     packages-dir: ${{ env.ARTEFACT_LOCATION }}
@@ -172,23 +174,23 @@ jobs:
       #     verify-metadata: false
       #     # Optional debugging, pretty much essential for information on failures
       #     verbose: true
-      #     # Reminder: mandatory for this action with trusted publishing
       #     attestations: false # Currently too buggy to enable
+      #     # attestations: true
 
       # Only used with the publishing method below
       - name: "Retrieve credential [ 1Password ]"
         id: one-password-pypi-test
-        if: steps.project-url-check.outputs.valid == 'false' && env.use_one_password == 'true'
-        uses: 1password/load-secrets-action@v2
+        if: env.method == '1password'
+        uses: 1password/load-secrets-action@581a835fb51b8e7ec56b71cf2ffddd7e68bb25e0 # v2.0.0
         with:
           # Export loaded secrets as environment variables
           export-env: true
         env:
-          PYPI_CREDENTIAL: "${{ env.PYPI_CREDENTIAL}}"
-          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.one_password_production }}
+          PYPI_CREDENTIAL: "${{ inputs.ONE_PASSWORD_ITEM}}"
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
 
-      # Used once when trusted publishing is unavailable
-      # After that, the project should be configured for trusted publishing
+      # Used only once prior to trusted publishing
+      # After that, the project can be configured
       # Note: this is a manual operation in the PyPI web portal
       - name: "Publish PyPI [Credential from 1Password]"
         uses: pypa/gh-action-pypi-publish@15c56dba361d8335944d31a2ecd17d700fc7bcbc # v1.12.2
@@ -196,20 +198,21 @@ jobs:
         # Needs re-instating once trusted publishinbg is enabled again
         # if: steps.project-url-check.outputs.valid == 'false' && env.use_one_password == 'true'
         with:
-          repository-url: "${{ env.PUBLISH_URL }}/legacy/"
+          repository-url: "${{ inputs.PUBLISH_URL }}/legacy/"
           print-hash: true
           packages-dir: ${{ env.ARTEFACT_LOCATION }}
           verify-metadata: false
           verbose: true
           # Credential retrieved from 1Password using service account
           password: "${{ env.PYPI_CREDENTIAL}}"
+          attestations: false
 
-      # Fallback method using credentials stored in GitHub
+      # Fallback method using credentials stored as GitHub secret
       # Only used initially when trusted publishing is unavailable (see above)
       - name: "Publish PyPI [Fallback: Credential from GitHub]"
         uses: pypa/gh-action-pypi-publish@15c56dba361d8335944d31a2ecd17d700fc7bcbc # v1.12.2
         if: env.use_one_password == 'false'
-        # Needs re-instating once trusted publishinbg is enabled again
+        # Needs re-instating once trusted publishing is enabled again
         # if: steps.project-url-check.outputs.valid == 'false' && env.use_one_password == 'true'
         with:
           repository-url: https://test.pypi.org/legacy/
@@ -218,19 +221,26 @@ jobs:
           verify-metadata: false
           verbose: true
           # Publishing API key stored as secret/variable in GitHub
-          password: ${{ secrets.PYPI_CREDENTIAL_FROM_GITHUB }}
+          password: ${{ secrets.PYPI_CREDENTIAL }}
+          attestations: false
 
       - name: "Print summary/job output"
         shell: bash
         run: |
           # Print summary/job output
-          if [ ${{ inputs.TEST }} = "true" ] && [ "$PUBLISH" = "false" ]; then
-            echo "## Publishing test skipped due to existing content ⛔️"
-            echo "${{ env.PUBLISH_URL }}/project/\
-            ${{ steps.naming.outputs.python_project_name }}/${{ inputs.build_tag }}/"
-          elif [ ${{ inputs.TEST }} = "true" ]; then
-            echo "Publishing test successful: $PUBLISH_URL ✅" >> "$GITHUB_STEP_SUMMARY"
+          if [ ${{ inputs.PUBLISH_URL }} != "https://pypi.org" ] && [ "$PUBLISH" = "false" ]; then
+            echo "## Publishing skipped due to existing content ⛔️" >> "$GITHUB_STEP_SUMMARY"
+            echo "${{ inputs.PUBLISH_URL }}/project/\
+            ${{ steps.naming.outputs.python_project_name }}/${{ inputs.build_tag }}/" \
+            >> "$GITHUB_STEP_SUMMARY"
+          elif [ ${{ inputs.PUBLISH_URL }} != "https://pypi.org" ]; then
+            echo "## Publishing successful: ${{ inputs.PUBLISH_URL }} ✅" >> "$GITHUB_STEP_SUMMARY"
+            echo "${{ inputs.PUBLISH_URL }}/project/\
+            ${{ steps.naming.outputs.python_project_name }}/${{ inputs.build_tag }}/" \
+            >> "$GITHUB_STEP_SUMMARY"
           else
             echo "# 🚀 Published packages to PyPI" >> "$GITHUB_STEP_SUMMARY"
-            echo "### $PUBLISH_URL" >> "$GITHUB_STEP_SUMMARY"
+            echo "${{ inputs.PUBLISH_URL }}/project/\
+            ${{ steps.naming.outputs.python_project_name }}/${{ inputs.build_tag }}/" \
+            >> "$GITHUB_STEP_SUMMARY"
           fi
