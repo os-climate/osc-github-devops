@@ -46,16 +46,19 @@ runs:
         echo "Tag to check: $TAG"
 
         # If present, strip the leading "v" character
-        if [[ "$TAG" == v* ]]; then
+        if [[ "$TAG" == v* ]] || [[ "$TAG" == V* ]]; then
           TAG="${TAG:1}"
         fi
+        # Could potentially use the strategy below instead; currently NOT used
+        # Extract only numbers and dots; useful for later manipulation
+        NUMERIC_TAG=$(echo $TAG | grep -oe '\([0-9.]*\)')
 
         # Regular expression to match semantic tag
         PATTERN="^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-((0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*))?(\+([0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*))?$"
 
         # Validate supplied (and parsed) tag
         if ! [[ "$TAG" =~ $PATTERN ]]; then
-          echo "ERROR: invalid semantic tag ❌"
+          echo "Tag is NOT semantic/valid ❌"
           semantic="false"
         else
           echo "Tag is semantic/valid ✅"

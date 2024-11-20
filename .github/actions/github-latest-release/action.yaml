@@ -31,12 +31,12 @@ runs:
         )
 
         if [ -z "$GITHUB_LATEST" ]; then
-          echo "Warning: no GitHub release is currently marked as the latest ❌"
+          echo "Warning: no GitHub release is currently marked latest ❌"
         else
           echo "github_latest=$GITHUB_LATEST" >> "$GITHUB_ENV"
           echo "github_latest=$GITHUB_LATEST" >> "$GITHUB_OUTPUT"
-          echo "Github release marked latest: $GITHUB_LATEST ✳️"
-          echo "Github release marked latest: $GITHUB_LATEST" >> "$GITHUB_STEP_SUMMARY"
+          echo "✳️" Github release marked latest: $GITHUB_LATEST
+          echo "✳️" Github release marked latest: $GITHUB_LATEST" >> "$GITHUB_STEP_SUMMARY"
         fi
 
         if [[ "${GITHUB_LATEST}" == "${{ github.event.release.tag_name }}" ]]; then
