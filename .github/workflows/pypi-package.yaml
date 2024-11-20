@@ -14,7 +14,7 @@ on:
         required: false
         default: false
       ENVIRONMENT:
-        # Environment MUST match the trusted publishing setup in PyPI
+        # Environment MUST match the trusted publishing setup in PyPI, if defined
         description: "Mandatory environment, e.g. development, production"
         type: string
         required: false
@@ -154,7 +154,7 @@ jobs:
           echo "Checks passed: this build has not yet been published/released ✅"
 
       # Temporarily disabled due to OIDC (and token/claim complications)
-      # job_workflow_ref vs ref
+      # This is all about job_workflow_ref vs ref
       # e.g. https://github.com/pypi/warehouse/issues/11096
       # https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/using-openid-connect-with-reusable-workflows
 

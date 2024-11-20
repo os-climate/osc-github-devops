@@ -53,7 +53,14 @@ jobs:
         with:
           # Does not currently work: https://github.com/actions/checkout/issues/1471
           fetch-tags: true
-          # The semantic-tag-current action currently contains a workaround for this behaviour
+          # The repository-tag-current action currently contains a workaround for this behaviour
+
+      - name: "Action: github-latest-release"
+        id: github-latest-release
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/github-latest-release@main
+
+        # ToDo: Validate step for github-latest-release (above)
 
       - name: "Action: git-commit-message"
         id: git-commit-message
@@ -122,30 +129,30 @@ jobs:
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/python-versions-matrix@main
 
-      - name: "Action: semantic-tag-validate [semantic tag]"
-        id: semantic-tag-validate-good
+      - name: "Action: tag-validate-semantic [semantic tag]"
+        id: tag-validate-semantic-good
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/semantic-tag-validate@main
+        uses: os-climate/osc-github-devops/.github/actions/tag-validate-semantic@main
         with:
           tag: "v1.2.3"
 
-      - name: "Action: semantic-tag-validate [junk tag]"
-        id: semantic-tag-validate-junk
+      - name: "Action: tag-validate-semantic [junk tag]"
+        id: tag-validate-semantic-junk
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/semantic-tag-validate@main
+        uses: os-climate/osc-github-devops/.github/actions/tag-validate-semantic@main
         with:
           tag: "v1.not-valid.3.garbage"
 
-      - name: "Validate: semantic-tag-validate"
+      - name: "Validate: tag-validate-semantic"
         shell: bash
         run: |
-          # Check output from: semantic-tag-validate [semantic/junk]
+          # Check output from: tag-validate-semantic [semantic/junk]
           ERRORS="false"
-          if [ "${{ steps.semantic-tag-validate-good.outputs.semantic }}" != "true" ]; then
-            echo "Errors with: semantic-tag-validate v1.2.3"
+          if [ "${{ steps.tag-validate-semantic-good.outputs.semantic }}" != "true" ]; then
+            echo "Errors with: tag-validate-semantic v1.2.3"
             ERRORS="true"
           fi
-          if [ "${{ steps.semantic-tag-validate-junk.outputs.semantic }}" != "false" ]; then
+          if [ "${{ steps.tag-validate-semantic-junk.outputs.semantic }}" != "false" ]; then
             echo "Errors with: semantic-tag-production v1.not-valid.3.garbage"
             ERRORS="true"
           fi
@@ -155,10 +162,10 @@ jobs:
             echo "All tag validation tests passed, no errors found"
           fi
 
-      - name: "Action: semantic-tag-current"
-        id: semantic-tag-current
+      - name: "Action: repository-tag-current"
+        id: repository-tag-current
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/semantic-tag-current@main
+        uses: os-climate/osc-github-devops/.github/actions/repository-tag-current@main
 
       - name: "Action: semantic-tag-production [patch]"
         id: semantic-tag-production-patch

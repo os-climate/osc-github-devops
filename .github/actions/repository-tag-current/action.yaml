@@ -2,25 +2,21 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
 
-name: "🏷️ Return Current/Latest Repository Tag"
+name: "🏷️ Current/Latest Repository Tag"
 
 inputs:
   TYPE:
-    description: "Return current tag from repository [all|production|development]"
+    description: "Returns the current/latest tag from repository [all|production|development]"
     required: false
     type: string
     default: "all"
-  CREATE_MISSING:
-    description: "If NO tags found, create default tag v0.0.0"
-    type: boolean
-    default: false
 
 outputs:
   TAG_COUNT:
     description: "The number of tags in this repository"
     value: ${{ steps.fetch.outputs.count }}
   TAG:
-    # A leading non-numeric "v" character will be stripped
+    # The leading non-numeric "v" character will be stripped
     description: "Return the latest semantic tag from repository"
     value: ${{ steps.results.outputs.tag }}
   VTAG:
@@ -53,27 +49,19 @@ runs:
         echo "tag_count=$TAG_COUNT" >> "$GITHUB_ENV"
         echo "tag_count=$TAG_COUNT" >> "$GITHUB_OUTPUT"
 
-    - name: "No tags found/set in this repository"
+    - name: "Warning: no tags currently found in repository"
       if: env.tag_count == '0'
       shell: bash
       run: |
-        echo "Warning: No tags were found in this repository"
-        echo "tag=0.0.0" >> $GITHUB_ENV
+        echo "Warning: no tags currently found in repository ❌"
+        echo "Warning: no tags currently found in repository ❌" >> "$GITHUB_STEP_SUMMARY"
 
-    - name: "Create initial tag [OPTIONAL]"
-      if: env.tag_count == '0' && inputs.create_missing == 'true'
-      uses: os-climate/osc-github-devops/.github/actions/repository-tag-create@main
-      with:
-        tag: "v0.0.0"
-        prerelease: true
-        token: ${{ inputs.GITHUB_TOKEN }}
-
-    - name: "Get latest tag"
+    - name: "Return latest tag"
       if: env.tag_count != '0'
       id: retrieve
       shell: bash
       run: |
-        # Get latest tag
+        # Return latest tag
         TAG=$(git tag -l --sort=committerdate | grep -o '?*.*.*' | sort -rV | head -1 || true)
 
         if [ ${{ env.tag_count}} == '0' ]; then
@@ -86,22 +74,38 @@ runs:
           grep -Ev '(dev|alpha|beta|test)' | sort -rV | head -1 || true)
         elif [ ${{ inputs.TYPE }} = "development" ]; then
           TAG=$(git tag -l --sort=committerdate | grep -o '?*.*.*' | \
-          grep -E '(dev|alpha|beta|test)' | sort -rV | head -1 || true)
+          grep -E '(dev|pre|beta|test|alpha)' | sort -rV | head -1 || true)
         fi
 
         # If present, strip the leading "v" character
-        if [[ "$TAG" == v* ]]; then
+        if [[ "$TAG" == v* ]] || [[ "$TAG" == V* ]]; then
           TAG="${TAG:1}"
         fi
 
-        # Report and record result
         echo "tag: ${TAG} [v${TAG}]"
+        echo "Current repository tag: ${TAG} [v${TAG}] 🏷️" >> "$GITHUB_STEP_SUMMARY"
         echo "tag=${TAG}" >> "$GITHUB_ENV"
         echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+        echo "vtag=v${TAG}" >> "$GITHUB_ENV"
         echo "vtag=v${TAG}" >> "$GITHUB_OUTPUT"
 
     - name: "Check semantic/validity"
       id: validate
-      uses: os-climate/osc-github-devops/.github/actions/semantic-tag-validate@main
+      uses: os-climate/osc-github-devops/.github/actions/tag-validate-semantic@main
       with:
         tag: ${{ env.tag }}
+
+    - name: "Set flag if semantic"
+      id: report
+      shell: bash
+      run: |
+        # Set flag if semantic
+        if [ "${{ steps.validate.outputs.semantic }}" = "true" ]; then
+          echo "semantic=true" >> "$GITHUB_ENV"
+          echo "semantic=true" >> "$GITHUB_OUTPUT"
+          echo "Tag is semantic ✅" >> "$GITHUB_STEP_SUMMARY"
+        else
+          echo "semantic=false" >> "$GITHUB_ENV"
+          echo "semantic=false" >> "$GITHUB_OUTPUT"
+          echo "Tag is NOT semantic ❌" >> "$GITHUB_STEP_SUMMARY"
+        fi
