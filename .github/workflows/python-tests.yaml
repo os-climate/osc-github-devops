@@ -18,7 +18,7 @@ permissions: {}
 
 jobs:
   python-test-matrix:
-    name: "Unit Tests"
+    name: "Unit tests"
     runs-on: "ubuntu-latest"
     permissions:
       contents: read
