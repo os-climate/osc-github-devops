@@ -173,7 +173,6 @@ jobs:
       - python-security
     with:
       publish_url: "https://test.pypi.org"
-      test: true
       environment: "test"
       build_tag: ${{ needs.repository.outputs.build_tag }}
       one_password_item: "op://hdiyadcjno2knqgvcy4wj5ulya/tm2ffuusrynfivtcsnamginhm4/password"
@@ -197,7 +196,6 @@ jobs:
       - pypi-test
     with:
       publish_url: "https://pypi.org"
-      test: false
       environment: "production"
       build_tag: ${{ needs.repository.outputs.build_tag }}
       one_password_item: "op://hdiyadcjno2knqgvcy4wj5ulya/vds5rebqxeqfrjqwpszxxicmzq/password"
