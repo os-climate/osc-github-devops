@@ -148,6 +148,7 @@ jobs:
           elif [ "${{ steps.build-url-check.outputs.valid }}" == 'true' ]; then
             # NOT considered an error unless pushing to the production repository
             echo "This test/development build/release has already been published"
+            # Set a flag; used to selectively format summary output
             echo "PUBLISH=false" >> "$GITHUB_ENV"
             exit 0
           fi
@@ -226,21 +227,14 @@ jobs:
 
       - name: "Print summary/job output"
         shell: bash
+        # yamllint disable rule:line-length
         run: |
           # Print summary/job output
           if [ ${{ inputs.PUBLISH_URL }} != "https://pypi.org" ] && [ "$PUBLISH" = "false" ]; then
-            echo "## Publishing skipped due to existing content ⛔️" >> "$GITHUB_STEP_SUMMARY"
-            echo "${{ inputs.PUBLISH_URL }}/project/\
-            ${{ steps.naming.outputs.python_project_name }}/${{ inputs.build_tag }}/" \
-            >> "$GITHUB_STEP_SUMMARY"
+            echo "### Publishing skipped due to existing content ⛔️" >> "$GITHUB_STEP_SUMMARY"
           elif [ ${{ inputs.PUBLISH_URL }} != "https://pypi.org" ]; then
-            echo "## Publishing successful: ${{ inputs.PUBLISH_URL }} ✅" >> "$GITHUB_STEP_SUMMARY"
-            echo "${{ inputs.PUBLISH_URL }}/project/\
-            ${{ steps.naming.outputs.python_project_name }}/${{ inputs.build_tag }}/" \
-            >> "$GITHUB_STEP_SUMMARY"
+            echo "# ✅ Published packages successfully: ${{ inputs.PUBLISH_URL }}" >> "$GITHUB_STEP_SUMMARY"
           else
             echo "# 🚀 Published packages to PyPI" >> "$GITHUB_STEP_SUMMARY"
-            echo "${{ inputs.PUBLISH_URL }}/project/\
-            ${{ steps.naming.outputs.python_project_name }}/${{ inputs.build_tag }}/" \
-            >> "$GITHUB_STEP_SUMMARY"
           fi
+          echo "${{ inputs.PUBLISH_URL }}/project/${{ steps.naming.outputs.python_project_name }}/${{ inputs.build_tag }}/" >> "$GITHUB_STEP_SUMMARY"
