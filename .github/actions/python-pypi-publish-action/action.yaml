@@ -148,7 +148,7 @@ runs:
 
           ### 1Password Vault Credential ###
 
-          if [ -z "${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}" ] || [ -z "${{ inputs.ONE_PASSWORD_ITEM }}" ]; then
+          if [ -z "${{ inputs.OP_SERVICE_ACCOUNT_TOKEN }}" ] || [ -z "${{ inputs.ONE_PASSWORD_ITEM }}" ]; then
             echo "Unable to use 1Password to retrieve publishing key ❌"
             echo "Two required parameters MUST be set/available"
             echo "Secret:   OP_SERVICE_ACCOUNT_TOKEN"
@@ -160,7 +160,7 @@ runs:
 
           ### GitHub Secret ###
 
-          if [ -z "${{ secrets.PYPI_CREDENTIAL }}" ]; then
+          if [ -z "${{ inputs.PYPI_CREDENTIAL }}" ]; then
             echo "GitHub credential NOT set/available: PYPI_CREDENTIAL"
             echo "Publishing cannot continue without a valid method ❌"
             echo "Publishing cannot continue without a valid method ❌" >> "$GITHUB_STEP_SUMMARY"
@@ -208,7 +208,7 @@ runs:
         export-env: true
       env:
         PYPI_CREDENTIAL: "${{ inputs.ONE_PASSWORD_ITEM}}"
-        OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+        OP_SERVICE_ACCOUNT_TOKEN: ${{ inputs.OP_SERVICE_ACCOUNT_TOKEN }}
 
     # Used only once prior to trusted publishing being configured
     - name: "Publish PyPI [1Password Credential]"
@@ -235,7 +235,7 @@ runs:
         verify-metadata: false
         verbose: true
         # Publishing API key stored as secret/variable in GitHub
-        password: ${{ secrets.PYPI_CREDENTIAL }}
+        password: ${{ inputs.PYPI_CREDENTIAL }}
         attestations: false
 
     - name: "Print summary/job output"
