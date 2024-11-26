@@ -189,6 +189,7 @@ runs:
       if: steps.conditions.outputs.publish_method == 'Trusted Publishing'
       with:
         repository-url: "${{ env.publish_url }}"
+        repository_url: "${{ env.publish_url }}"
         # Show checksum values
         print-hash: true
         packages-dir: ${{ env.ARTEFACT_LOCATION }}
@@ -216,6 +217,7 @@ runs:
       if: steps.conditions.outputs.publish_method == '1Password Vault'
       with:
         repository-url: "${{ env.publish_url }}"
+        repository_url: "${{ env.publish_url }}"
         print-hash: true
         packages-dir: ${{ env.ARTEFACT_LOCATION }}
         verify-metadata: false
@@ -230,6 +232,7 @@ runs:
       if: steps.conditions.outputs.publish_method == 'GitHub Secret'
       with:
         repository-url: "${{ env.publish_url }}"
+        repository_url: "${{ env.publish_url }}"
         print-hash: true
         packages-dir: ${{ env.ARTEFACT_LOCATION }}
         verify-metadata: false
