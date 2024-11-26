@@ -54,9 +54,9 @@ runs:
       shell: bash
       run: |
         # Set publishing parameters
-        if [ ${{ inputs.ENVIRONMENT }} = "test" ] \
-        if [ ${{ inputs.ENVIRONMENT }} = "testing" ] \
-        if [ ${{ inputs.ENVIRONMENT }} = "staging" ] \
+        if [ ${{ inputs.ENVIRONMENT }} = "test" ] || \
+        if [ ${{ inputs.ENVIRONMENT }} = "testing" ] || \
+        if [ ${{ inputs.ENVIRONMENT }} = "staging" ] || \
         if [ ${{ inputs.ENVIRONMENT }} = "development" ]; then
           echo "base_url=https://test.pypi.org" >> "$GITHUB_ENV"
           echo "publish_url=https://test.pypi.org/legacy/" >> "$GITHUB_ENV"
@@ -96,7 +96,7 @@ runs:
       uses: os-climate/osc-github-devops/.github/actions/url-validity-check@main
       with:
         # e.g. "https://test.pypi.org/project/ITR/"
-        prefix: "${{ env.BASE_URL }}/project"
+        prefix: "${{ env.base_url }}/project"
         string: "/${{ steps.naming.outputs.python_project_name }}"
         suffix: "/"
 
@@ -105,7 +105,7 @@ runs:
       # yamllint disable-line rule:line-length
       uses: os-climate/osc-github-devops/.github/actions/url-validity-check@main
       with:
-        prefix: "${{ env.BASE_URL }}/project"
+        prefix: "${{ env.base_url }}/project"
         # e.g. "https://test.pypi.org/project/ITR/v1.0.0/"
         string: "/${{ steps.naming.outputs.python_project_name }}"
         suffix: "/${{ inputs.build_tag }}/"
@@ -133,7 +133,7 @@ runs:
           echo "Publishing will use Trusted Publishing ✅"
         fi
 
-        if [ "${{ inputs.REPOSITORY_URL }}" = "https://pypi.org/" ] && \
+        if [ "${{ env.base_url }}" = "https://pypi.org/" ] && \
         [ "${{ steps.build-url-check.outputs.valid }}" == 'true' ]; then
           echo "This build/release has already been published ❌"
           echo "This build/release has already been published ❌" >> "$GITHUB_STEP_SUMMARY"
@@ -175,7 +175,7 @@ runs:
         fi
 
         if [ "$publish_method" != "none" ]; then
-          echo "Publishing to: ${{ inputs.REPOSITORY_URL }} [environment: ${{ inputs.ENVIRONMENT }}]"
+          echo "Publishing to: ${{ env.base_url }} [environment: ${{ inputs.ENVIRONMENT }}]"
           echo "publish_method=$publish_method" >> "$GITHUB_ENV"
           echo "publish_method=$publish_method" >> "$GITHUB_OUTPUT"
         fi
