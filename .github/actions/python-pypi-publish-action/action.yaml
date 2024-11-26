@@ -51,6 +51,7 @@ runs:
 
     - name: "Set publishing parameters"
       id: parameters
+      shell: bash
       run: |
         # Set publishing parameters
         if [ ${{ inputs.ENVIRONMENT }} = "test" ] \
@@ -68,6 +69,7 @@ runs:
 
     - name: "Remove unsupported artefact file types"
       id: files
+      shell: bash
       run: |
         # Remove unsupported artefact file types
         if [ ! -d  ${{ inputs.artefact_location }} ]; then
