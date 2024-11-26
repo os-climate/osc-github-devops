@@ -176,6 +176,8 @@ jobs:
       contents: read
       # Needed for trusted publishing; must also be passed from parent workflows
       id-token: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       # Need repository content to extract project name
       - name: "Publish to Test PyPI"
@@ -202,6 +204,8 @@ jobs:
       contents: read
       # Needed for trusted publishing; must also be passed from parent workflows
       id-token: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       # Need repository content to extract project name
       - name: "Publish to PyPI"
