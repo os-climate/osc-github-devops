@@ -55,9 +55,9 @@ runs:
       run: |
         # Set publishing parameters
         if [ ${{ inputs.ENVIRONMENT }} = "test" ] || \
-        if [ ${{ inputs.ENVIRONMENT }} = "testing" ] || \
-        if [ ${{ inputs.ENVIRONMENT }} = "staging" ] || \
-        if [ ${{ inputs.ENVIRONMENT }} = "development" ]; then
+        [ ${{ inputs.ENVIRONMENT }} = "testing" ] || \
+        [ ${{ inputs.ENVIRONMENT }} = "staging" ] || \
+        [ ${{ inputs.ENVIRONMENT }} = "development" ]; then
           echo "base_url=https://test.pypi.org" >> "$GITHUB_ENV"
           echo "publish_url=https://test.pypi.org/legacy/" >> "$GITHUB_ENV"
         else
