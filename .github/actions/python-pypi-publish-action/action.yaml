@@ -64,8 +64,6 @@ runs:
           echo "base_url=https://pypi.org" >> "$GITHUB_ENV"
           echo "publish_url=https://upload.pypi.org/legacy/" >> "$GITHUB_ENV"
         fi
-        echo "Publishing to: ${{ env.base_url }}"
-        echo "Uploading to: ${{ env.publish_url }}"
 
     - name: "Remove unsupported artefact file types"
       id: files
