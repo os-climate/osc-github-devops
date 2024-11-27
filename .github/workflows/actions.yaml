@@ -214,26 +214,26 @@ jobs:
             echo "All tag check tests passed, no errors found"
           fi
 
-      - name: "Action: semantic-tag-development [patch]"
-        id: semantic-tag-development-patch
+      - name: "Action: repository-tag-next-action [patch]"
+        id: repository-tag-next-action-patch
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/semantic-tag-development@main
+        uses: os-climate/osc-github-devops/.github/actions/repository-tag-next-action@main
         with:
           tag: "v0.0.4"
           type: "patch"
 
-      - name: "Action: semantic-tag-development [minor]"
-        id: semantic-tag-development-minor
+      - name: "Action: repository-tag-next-action [minor]"
+        id: repository-tag-next-action-minor
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/semantic-tag-development@main
+        uses: os-climate/osc-github-devops/.github/actions/repository-tag-next-action@main
         with:
           tag: "v1.8.3"
           type: "minor"
 
-      - name: "Action: semantic-tag-development [major]"
-        id: semantic-tag-development-major
+      - name: "Action: repository-tag-next-action [major]"
+        id: repository-tag-next-action-major
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/semantic-tag-development@main
+        uses: os-climate/osc-github-devops/.github/actions/repository-tag-next-action@main
         with:
           tag: "v4.1.1"
           type: "major"
@@ -241,24 +241,24 @@ jobs:
       - name: "Validate Incremented DEV Tags"
         shell: bash
         run: |
-          # Check output from: semantic-tag-development
+          # Check output from: repository-tag-next-action
           ERRORS='false'
           EXPECTED='0.0.5-dev1'
-          if [ "${{ steps.semantic-tag-development-patch.outputs.tag }}" != "$EXPECTED" ]; then
-            echo "Errors with: semantic-tag-development [patch]"
-            echo "Received: ${{ steps.semantic-tag-development-patch.outputs.tag }} Expected: $EXPECTED"
+          if [ "${{ steps.repository-tag-next-action-patch.outputs.tag }}" != "$EXPECTED" ]; then
+            echo "Errors with: repository-tag-next-action [patch]"
+            echo "Received: ${{ steps.repository-tag-next-action-patch.outputs.tag }} Expected: $EXPECTED"
             ERRORS='true'
           fi
           EXPECTED='1.9.0-dev1'
-          if [ "${{ steps.semantic-tag-development-minor.outputs.tag }}" != "$EXPECTED" ]; then
-            echo "Errors with: semantic-tag-development [minor]"
-            echo "Received: ${{ steps.semantic-tag-development-patch.outputs.tag }} Expected: $EXPECTED"
+          if [ "${{ steps.repository-tag-next-action-minor.outputs.tag }}" != "$EXPECTED" ]; then
+            echo "Errors with: repository-tag-next-action [minor]"
+            echo "Received: ${{ steps.repository-tag-next-action-patch.outputs.tag }} Expected: $EXPECTED"
             ERRORS='true'
           fi
           EXPECTED='5.0.0-dev1'
-          if [ "${{ steps.semantic-tag-development-major.outputs.tag }}" != "$EXPECTED" ]; then
-            echo "Errors with: semantic-tag-development [major]"
-            echo "Received: ${{ steps.semantic-tag-development-patch.outputs.tag }} Expected: $EXPECTED"
+          if [ "${{ steps.repository-tag-next-action-major.outputs.tag }}" != "$EXPECTED" ]; then
+            echo "Errors with: repository-tag-next-action [major]"
+            echo "Received: ${{ steps.repository-tag-next-action-patch.outputs.tag }} Expected: $EXPECTED"
             ERRORS='true'
           fi
           if [ "$ERRORS" = 'true' ]; then
