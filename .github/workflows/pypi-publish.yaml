@@ -8,10 +8,6 @@ name: "📦 [R] PyPI Publishing"
 on:
   workflow_call:
     inputs:
-      REPOSITORY_URL:
-        description: "URL/prefix for package repository"
-        type: string
-        required: true
       ENVIRONMENT:
         # Environment MUST match the trusted publishing setup in PyPI, if defined
         description: "Mandatory environment, e.g. development, production"
@@ -65,10 +61,27 @@ jobs:
           name: ${{ env.python_project_name }}
           path: ${{ inputs.artefact_location }}
 
-      - name: "Manicure artefacts directory"
-        id: files
+      - name: "Set publishing parameters"
+        id: parameters
+        shell: bash
         run: |
-          # Remove file types unsupported by the Python Package Index
+          # Set publishing parameters
+          if [ ${{ inputs.ENVIRONMENT }} = "test" ] || \
+          [ ${{ inputs.ENVIRONMENT }} = "testing" ] || \
+          [ ${{ inputs.ENVIRONMENT }} = "staging" ] || \
+          [ ${{ inputs.ENVIRONMENT }} = "development" ]; then
+            echo "base_url=https://test.pypi.org" >> "$GITHUB_ENV"
+            echo "publish_url=https://test.pypi.org/legacy/" >> "$GITHUB_ENV"
+          else
+            echo "base_url=https://pypi.org" >> "$GITHUB_ENV"
+            echo "publish_url=https://upload.pypi.org/legacy/" >> "$GITHUB_ENV"
+          fi
+
+      - name: "Remove unsupported artefact file types"
+        id: files
+        shell: bash
+        run: |
+          # Remove unsupported artefact file types
           if [ ! -d  ${{ inputs.artefact_location }} ]; then
             echo "Early exit; build artefacts path NOT found:  ${{ inputs.artefact_location }}"
             exit 0
@@ -87,24 +100,13 @@ jobs:
             echo "No SigStore signing artefacts to purge"
           fi
 
-      - name: "Extract base URL for location checks"
-        shell: bash
-        run: |
-          # Extract base URL of repository
-          if [ "${{ inputs.REPOSITORY_URL }}" = "https://test.pypi.org/legacy/" ]; then
-            echo "Test PyPI instance requires mangling of upload URL"
-            echo "base_url=https://test.pypi.org/" >> "$GITHUB_ENV"
-          else
-            echo "base_url=${{ inputs.REPOSITORY_URL }}" >> "$GITHUB_ENV"
-          fi
-
       - name: "Checking Destination for Project"
         id: project-url-check
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/url-validity-check@main
         with:
           # e.g. "https://test.pypi.org/project/ITR/"
-          prefix: "${{ env.BASE_URL }}project"
+          prefix: "${{ env.base_url }}/project"
           string: "/${{ steps.naming.outputs.python_project_name }}"
           suffix: "/"
 
@@ -113,7 +115,7 @@ jobs:
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/url-validity-check@main
         with:
-          prefix: "${{ env.BASE_URL }}project"
+          prefix: "${{ env.base_url }}/project"
           # e.g. "https://test.pypi.org/project/ITR/v1.0.0/"
           string: "/${{ steps.naming.outputs.python_project_name }}"
           suffix: "/${{ inputs.build_tag }}/"
@@ -141,7 +143,7 @@ jobs:
             echo "Publishing will use Trusted Publishing ✅"
           fi
 
-          if [ "${{ inputs.REPOSITORY_URL }}" = "https://pypi.org/" ] && \
+          if [ "${{ env.base_url }}" != "https://pypi.org" ] && \
           [ "${{ steps.build-url-check.outputs.valid }}" == 'true' ]; then
             echo "This build/release has already been published ❌"
             echo "This build/release has already been published ❌" >> "$GITHUB_STEP_SUMMARY"
@@ -183,7 +185,7 @@ jobs:
           fi
 
           if [ "$publish_method" != "none" ]; then
-            echo "Publishing to: ${{ inputs.REPOSITORY_URL }} [environment: ${{ inputs.ENVIRONMENT }}]"
+            echo "Publishing to: ${{ env.base_url }} [environment: ${{ inputs.ENVIRONMENT }}]"
             echo "publish_method=$publish_method" >> "$GITHUB_ENV"
             echo "publish_method=$publish_method" >> "$GITHUB_OUTPUT"
           fi
@@ -198,7 +200,7 @@ jobs:
         # yamllint disable-line rule:line-length
         if: steps.conditions.outputs.publish_method == 'Trusted Publishing'
         with:
-          repository-url: "${{ inputs.REPOSITORY_URL }}"
+          repository-url: "${{ env.publish_url }}"
           # Show checksum values
           print-hash: true
           packages-dir: ${{ env.ARTEFACT_LOCATION }}
@@ -225,7 +227,7 @@ jobs:
         uses: pypa/gh-action-pypi-publish@15c56dba361d8335944d31a2ecd17d700fc7bcbc # v1.12.2
         if: steps.conditions.outputs.publish_method == '1Password Vault'
         with:
-          repository-url: "${{ inputs.REPOSITORY_URL }}"
+          repository-url: "${{ env.publish_url }}"
           print-hash: true
           packages-dir: ${{ env.ARTEFACT_LOCATION }}
           verify-metadata: false
@@ -239,7 +241,7 @@ jobs:
         uses: pypa/gh-action-pypi-publish@15c56dba361d8335944d31a2ecd17d700fc7bcbc # v1.12.2
         if: steps.conditions.outputs.publish_method == 'GitHub Secret'
         with:
-          repository-url: "${{ inputs.REPOSITORY_URL }}"
+          repository-url: "${{ env.publish_url }}"
           print-hash: true
           packages-dir: ${{ env.ARTEFACT_LOCATION }}
           verify-metadata: false
@@ -256,10 +258,10 @@ jobs:
           if [ "${{ steps.conditions.outputs.publish_method }}" = "Skipped" ]; then
             echo "# Publishing skipped due to existing content ⛔️" >> "$GITHUB_STEP_SUMMARY"
             exit 0
-          elif [ ${{ inputs.REPOSITORY_URL }} != "https://pypi.org" ]; then
+          elif [ ${{ env.base_url }} != "https://pypi.org" ]; then
             echo "# ✅ Published successfully" >> "$GITHUB_STEP_SUMMARY"
           else
             echo "# 🚀 Published to PyPI" >> "$GITHUB_STEP_SUMMARY"
           fi
           echo "Publishing method: ${{ steps.conditions.outputs.publish_method }}"
-          echo "${{ env.BASE_URL }}project/${{ steps.naming.outputs.python_project_name }}/${{ inputs.build_tag }}/" >> "$GITHUB_STEP_SUMMARY"
+          echo "${{ env.base_url }}/project/${{ steps.naming.outputs.python_project_name }}/${{ inputs.build_tag }}/" >> "$GITHUB_STEP_SUMMARY"
