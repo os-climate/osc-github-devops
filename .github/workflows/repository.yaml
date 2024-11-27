@@ -93,7 +93,7 @@ jobs:
           # Pushed tag values
           if [ ${{ steps.tag-validate.outputs.semantic }} == 'true' ]; then
             pushed_tag="${{ github.ref_name }}"
-            echo "Pushed semantic tag: $pushed_tag ✅"
+            echo "Pushed tag: $pushed_tag ✅"
             echo "Pushed tag: $pushed_tag ✅" >> "$GITHUB_STEP_SUMMARY"
             echo "pushed_tag=$pushed_tag" >> "$GITHUB_ENV"
             echo "pushed_tag=$pushed_tag" >> "$GITHUB_OUTPUT"
@@ -115,14 +115,16 @@ jobs:
         with:
           tag: "${{ steps.current-tag.outputs.tag }}"
 
-      - name: "Build tag"
+      - name: "Report build tag"
         id: build-tag
         run: |
           # Build tag
           if [ -z ${{ env.pushed_tag }} ]; then
             build_tag="${{ steps.development-tag.outputs.tag }}"
-            echo "Build tag: $build_tag"
           else
             build_tag="${{ env.pushed_tag }}"
           fi
+          echo "Build tag: $build_tag"
+          echo "### Build tag: $build_tag" >> "$GITHUB_STEP_SUMMARY"
+          echo "build_tag=$build_tag" >> "$GITHUB_ENV"
           echo "build_tag=$build_tag" >> "$GITHUB_OUTPUT"

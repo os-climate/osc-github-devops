@@ -25,7 +25,7 @@ runs:
         echo "### Repository Data ###"
         echo "GitHub Owner: $GITHUB_REPOSITORY_OWNER"
         echo "repository_owner=${GITHUB_REPOSITORY_OWNER}" >> "$GITHUB_OUTPUT"
-        REPOSITORY_NAME=${GITHUB_REPOSITORY_NAME#$GITHUB_REPOSITORY_OWNER/}
+        REPOSITORY_NAME="${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}"
         echo "GitHub Repository: ${REPOSITORY_NAME}"
         echo "repository_name=${REPOSITORY_NAME}" >> "$GITHUB_OUTPUT"
 
