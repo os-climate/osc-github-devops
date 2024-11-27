@@ -24,6 +24,7 @@ permissions: {}
 jobs:
   repository:
     name: "Repository Checks"
+    if: startsWith(github.ref, 'dep/update-pdm-lock') != true
     uses: os-climate/osc-github-devops/.github/workflows/repository.yaml@main
     permissions:
       # Required for action that creates labels: github-mandatory-labels
@@ -34,8 +35,9 @@ jobs:
     needs:
       - repository
     # Only run if Python code is present in repository
-    if: needs.repository.outputs.python_project  == 'true' ||
-      needs.repository.outputs.jupyter_notebooks  == 'true'
+    if: (needs.repository.outputs.python_project  == 'true' ||
+      needs.repository.outputs.jupyter_notebooks  == 'true') &&
+      startsWith(github.ref, 'dep/update-pdm-lock') != true
     runs-on: ubuntu-latest
     permissions:
       # IMPORTANT: mandatory to raise the PR

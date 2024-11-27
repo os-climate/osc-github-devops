@@ -243,19 +243,19 @@ jobs:
         run: |
           # Check output from: repository-tag-next-action
           ERRORS='false'
-          EXPECTED='0.0.5-dev1'
+          EXPECTED='v0.0.5-dev1'
           if [ "${{ steps.repository-tag-next-action-patch.outputs.tag }}" != "$EXPECTED" ]; then
             echo "Errors with: repository-tag-next-action [patch]"
             echo "Received: ${{ steps.repository-tag-next-action-patch.outputs.tag }} Expected: $EXPECTED"
             ERRORS='true'
           fi
-          EXPECTED='1.9.0-dev1'
+          EXPECTED='v1.9.0-dev1'
           if [ "${{ steps.repository-tag-next-action-minor.outputs.tag }}" != "$EXPECTED" ]; then
             echo "Errors with: repository-tag-next-action [minor]"
             echo "Received: ${{ steps.repository-tag-next-action-patch.outputs.tag }} Expected: $EXPECTED"
             ERRORS='true'
           fi
-          EXPECTED='5.0.0-dev1'
+          EXPECTED='v5.0.0-dev1'
           if [ "${{ steps.repository-tag-next-action-major.outputs.tag }}" != "$EXPECTED" ]; then
             echo "Errors with: repository-tag-next-action [major]"
             echo "Received: ${{ steps.repository-tag-next-action-patch.outputs.tag }} Expected: $EXPECTED"
