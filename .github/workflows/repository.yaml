@@ -113,7 +113,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/') != true
         uses: os-climate/osc-github-devops/.github/actions/repository-tag-next-action@main
         with:
-          tag: startsWith(github.ref, 'refs/tags/')
+          tag: "${{ steps.current-tag.outputs.tag }}"
 
       - name: "Build tag"
         id: build-tag
