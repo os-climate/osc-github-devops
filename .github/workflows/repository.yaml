@@ -103,19 +103,24 @@ jobs:
             exit 1
           fi
 
-      #- name: "Generate build tag"
-      #  id: development-tag
-      #  uses: os-climate/osc-github-devops/.github/actions/semantic-tag-development@main
-      #  with:
-      #    tag: startsWith(github.ref, 'refs/tags/')
+      - name: "Get current repository tag"
+        id: current-tag
+        if: startsWith(github.ref, 'refs/tags/') != true
+        uses: os-climate/osc-github-devops/.github/actions/repository-tag-current@main
+
+      - name: "Generate build tag"
+        id: development-tag
+        if: startsWith(github.ref, 'refs/tags/') != true
+        uses: os-climate/osc-github-devops/.github/actions/repository-tag-next-action@main
+        with:
+          tag: startsWith(github.ref, 'refs/tags/')
 
       - name: "Build tag"
         id: build-tag
         run: |
           # Build tag
           if [ -z ${{ env.pushed_tag }} ]; then
-            # ToDo: Replace with development tag
-            build_tag="v5.0.0-dev7"
+            build_tag="${{ steps.development-tag.outputs.tag }}"
             echo "Build tag: $build_tag"
           else
             build_tag="${{ env.pushed_tag }}"

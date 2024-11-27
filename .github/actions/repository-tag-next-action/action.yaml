@@ -19,8 +19,8 @@ outputs:
   TAG:
     description: "The next semantic tag"
     value: ${{ steps.increment.outputs.tag }}
-  VTAG:
-    description: "The next semantic tag with a v prefix"
+  NUMERIC_TAG:
+    description: "Purely numeric value of next tag"
     value: ${{ steps.increment.outputs.vtag }}
 
 runs:
@@ -124,10 +124,10 @@ runs:
           fi
         done
 
-        echo "Build tag/release: $NEXT_TAG [v$NEXT_TAG]"
-        echo "tag=$NEXT_TAG" >> "$GITHUB_OUTPUT"
-        echo "tag=$NEXT_TAG" >> "$GITHUB_ENV"
-        echo "vtag=v$NEXT_TAG" >> "$GITHUB_OUTPUT"
-        echo "vtag=v$NEXT_TAG" >> "$GITHUB_ENV"
+        echo "Build tag/release: v$NEXT_TAG [$NEXT_TAG]"
+        echo "tag=v$NEXT_TAG" >> "$GITHUB_OUTPUT"
+        echo "tag=v$NEXT_TAG" >> "$GITHUB_ENV"
+        echo "numeric_tag=$NEXT_TAG" >> "$GITHUB_OUTPUT"
+        echo "numeric_tag=$NEXT_TAG" >> "$GITHUB_ENV"
 
         #SHELLCODEEND

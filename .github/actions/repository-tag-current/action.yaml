@@ -74,6 +74,10 @@ runs:
         elif [ ${{ inputs.TYPE }} = "development" ]; then
           TAG=$(git tag -l --sort=committerdate | grep -o '?*.*.*' | \
           grep -E '(dev|pre|beta|test|alpha)' | sort -rV | head -1 || true)
+        else
+          echo "Error: invalid tag type requested ❌"
+          echo "Error: invalid tag type requested ❌" >> "$GITHUB_STEP_SUMMARY"
+          exit 1
         fi
 
         # Extract only numbers and dots; useful for later manipulation
