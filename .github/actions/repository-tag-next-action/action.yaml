@@ -17,11 +17,11 @@ inputs:
 
 outputs:
   TAG:
-    description: "The next semantic tag"
+    description: "The next incremented tag"
     value: ${{ steps.increment.outputs.tag }}
   NUMERIC_TAG:
-    description: "Purely numeric value of next tag"
-    value: ${{ steps.increment.outputs.vtag }}
+    description: "Numeric value of next tag"
+    value: ${{ steps.increment.outputs.numeric_tag }}
 
 runs:
   using: "composite"
@@ -50,6 +50,10 @@ runs:
         else
           TAG="${{ inputs.TAG }}"
           TYPE="${{ inputs.TYPE }}"
+        fi
+
+        if [ -z ${{ inputs.TAG }} ]; then
+          echo "Error: input tag value cannot be empty ❌"; exit 1
         fi
 
         # Validate increment type

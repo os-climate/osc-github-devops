@@ -17,10 +17,10 @@ outputs:
     value: ${{ steps.fetch.outputs.count }}
   TAG:
     description: "Return the latest semantic tag from repository"
-    value: ${{ steps.results.outputs.tag }}
+    value: ${{ steps.latest.outputs.tag }}
   NUMERIC_TAG:
     description: "The tag [without any v/V prefix] e.g. 1.2.3"
-    value: ${{ steps.results.outputs.numeric_tag }}
+    value: ${{ steps.latest.outputs.numeric_tag }}
   SEMANTIC:
     description: "Set true if current tag is semantic"
     value: ${{ steps.validate.outputs.semantic }}
@@ -57,7 +57,7 @@ runs:
 
     - name: "Return latest tag"
       if: env.tag_count != '0'
-      id: retrieve
+      id: latest
       shell: bash
       run: |
         # Return latest tag
@@ -97,16 +97,12 @@ runs:
         tag: ${{ env.tag }}
 
     - name: "Set flag if semantic"
-      id: report
+      id: report-semantic
       shell: bash
       run: |
         # Set flag if semantic
         if [ "${{ steps.validate.outputs.semantic }}" = "true" ]; then
-          echo "semantic=true" >> "$GITHUB_ENV"
-          echo "semantic=true" >> "$GITHUB_OUTPUT"
           echo "Current repository tag is semantic ✅" >> "$GITHUB_STEP_SUMMARY"
         else
-          echo "semantic=false" >> "$GITHUB_ENV"
-          echo "semantic=false" >> "$GITHUB_OUTPUT"
           echo "Current repository tag is NOT semantic ❌" >> "$GITHUB_STEP_SUMMARY"
         fi
