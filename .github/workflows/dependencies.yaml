@@ -13,6 +13,8 @@ on:
     branches:
       - "main"
       - "master"
+    paths:
+      - "!pdm.lock"
 
 env:
   python-version: 3.11
