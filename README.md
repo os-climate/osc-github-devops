@@ -21,7 +21,7 @@
 This repository contains a number of GitHub composite actions, reusable workflows,
 and workflows. The purpose of these is to provide small modular components and
 larger pieces of shared DevOps functionality which may be helpful to the OS-Climate
-community, and indeed other open-source projects. Right now, the current focus is\
+community, and indeed other open-source projects. Right now, the current focus is
 on Python and the tooling around Python projects, since that is the language
 currently used for the vast majority of OS-Climate projects and repositories.
 

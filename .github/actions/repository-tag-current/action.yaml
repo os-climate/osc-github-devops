@@ -84,7 +84,7 @@ runs:
         NUMERIC_TAG=$(echo $TAG | grep -oe '\([0-9.]*\)')
 
         echo "tag: ${TAG} [${NUMERIC_TAG}]"
-        echo "🏷️ Current repository tag: ${TAG} [${NUMERIC_TAG}]" >> "$GITHUB_STEP_SUMMARY"
+        echo "Current repository tag: ${TAG} [${NUMERIC_TAG}] 🏷️" >> "$GITHUB_STEP_SUMMARY"
         echo "tag=${TAG}" >> "$GITHUB_ENV"
         echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
         echo "numeric_tag=${NUMERIC_TAG}" >> "$GITHUB_ENV"
