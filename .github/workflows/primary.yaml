@@ -15,7 +15,7 @@ on:
       - "!pdm.lock"
       - "!tox.ini"
 
-permissions: {}
+# permissions: {}
 
 jobs:
   one-password:

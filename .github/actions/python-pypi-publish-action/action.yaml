@@ -124,12 +124,12 @@ runs:
         fi
 
         # ToDo: remove line below when supporting reusable workflows
-        if [ "$publish_method" = "Trusted Publishing" ]; then
-          echo "⚠️ Trusting published is temporarily disabled"
-          publish_method="Trusted Publishing Bypassed"
-        else
-          echo "Publishing will use Trusted Publishing ✅"
-        fi
+        #if [ "$publish_method" = "Trusted Publishing" ]; then
+        #  echo "⚠️ Trusting published is temporarily disabled"
+        #  publish_method="Trusted Publishing Bypassed"
+        #else
+        #  echo "Publishing will use Trusted Publishing ✅"
+        #fi
 
         if [ "${{ env.base_url }}" = "https://pypi.org/" ] && \
         [ "${{ steps.build-url-check.outputs.valid }}" == 'true' ]; then
