@@ -61,13 +61,11 @@ jobs:
           grep -Fvf changed.txt listed.txt > excluded.txt
           while IFS= read -r YAMLFILE
           do
-            echo "Disabling: $YAMLFILE"
             mv "$YAMLFILE" "$YAMLFILE.excluded"
           done < excluded.txt
           echo "Files to process:"
           find .github -type f -name '*.yaml' -o -name '*.yml'
 
-      # Otherwise, just check the current pull request
       - name: "Ensure SHA pinned actions"
         # yamllint disable-line rule:line-length
         uses: zgosalvez/github-actions-ensure-sha-pinned-actions@5d6ac37a4cef8b8df67f482a8e384987766f0213 # v3.0.17
