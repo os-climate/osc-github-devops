@@ -25,8 +25,7 @@ jobs:
     name: "Check GitHub Workflows"
     runs-on: ubuntu-latest
     permissions:
-      # Write access needed to change file extensions
-      contents: write
+      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -41,6 +40,7 @@ jobs:
       - name: Get changed files
         if: ${{ github.event_name != 'workflow_dispatch' }}
         id: changed-files
+        # yamllint disable-line rule:line-length
         uses: tj-actions/changed-files@bab30c2299617f6615ec02a68b9a40d10bd21366 # v45.0.5
         with:
           since_last_remote_commit: true
@@ -50,6 +50,7 @@ jobs:
       - name: Prune files NOT changed in pull request
         if: ${{ github.event_name != 'workflow_dispatch' }}
         env:
+          # yamllint disable-line rule:line-length
           ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
         shell: bash
         run: |
