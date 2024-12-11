@@ -1,4 +1,15 @@
-# Generates a synthetic Gerrit "Change-Id" string
+<!--
+[comment]: # SPDX-License-Identifier: Apache-2.0
+[comment]: # SPDX-FileCopyrightText: 2024 The Linux Foundation
+-->
+
+# 🏷️ Generates a synthetic Gerrit "Change-Id" string
+
+Returns a unique value/string to be inserted in GIT COMMIT messages.
+
+## gerrit-change-id-action
+
+## Usage Example
 
 Returns a unique value/string to be inserted in GIT COMMIT messages.
 
@@ -19,8 +30,3 @@ environment and also outputting them to be used explicitly in other steps.
 | --------------- | ---------------------------------------------------- |
 | CHANGE_ID_LINE  | Change-Id: Ic8aaa0728a43936cd4c6e1ed590e01ba8f0fbf5b |
 | CHANGE_ID_VALUE | Ic8aaa0728a43936cd4c6e1ed590e01ba8f0fbf5b            |
-
-<!--
-[comment]: # SPDX-License-Identifier: Apache-2.0
-[comment]: # SPDX-FileCopyrightText: 2024 The Linux Foundation
--->
