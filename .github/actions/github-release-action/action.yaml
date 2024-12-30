@@ -63,8 +63,10 @@ runs:
           echo "The pushed tag was NOT semantic: ${{ inputs.build_tag }} ❌" >> "$GITHUB_STEP_SUMMARY"
           exit 1
         fi
-        if [ -z ${{ inputs.RELEASE_TITLE }} ]; then
-          echo "PROJECT_NAME=${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/} ${{ inputs.build_tag }}" >> $GITHUB_ENV
+
+        PROJECT_NAME="${{ inputs.PROJECT_NAME }}"
+        if [ -z "$PROJECT_NAME" ]; then
+          echo "PROJECT_NAME=${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}" >> $GITHUB_ENV
         else
           echo "PROJECT_NAME=${{ inputs.PROJECT_NAME }}" >> $GITHUB_ENV
         fi
