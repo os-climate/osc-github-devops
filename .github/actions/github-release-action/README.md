@@ -27,14 +27,32 @@ steps:
 
 <!-- markdownlint-disable MD013 -->
 
-| Variable Name     | Required | Default | Description                                 |
-| ----------------- | -------- | ------- | ------------------------------------------- |
-| BUILD_TAG         | True     | N/A     | Fixed preamble/string to embed/inject       |
-| GITHUB_TOKEN      | True     | N/A     | Mandatory token for content write access    |
-| PRERELEASE        | False    | False   | Marks the release as a development release  |
-| ARTEFACT_LOCATION | False    | None    | When not set, no artefacts will be packaged |
-| MAKE_LATEST       | False    | True    | Marks the release as the latest release     |
+| Variable Name     | Required | Default   | Description                                 |
+| ----------------- | -------- | --------- | ------------------------------------------- |
+| BUILD_TAG         | True     | N/A       | Fixed preamble/string to embed/inject       |
+| GITHUB_TOKEN      | True     | N/A       | Mandatory token for content write access    |
+| RELEASE_TITLE     | False    | See Below | Title for the release                       |
+| PRERELEASE        | False    | False     | Marks the release as a development release  |
+| ARTEFACT_LOCATION | False    | None      | When not set, no artefacts will be packaged |
+| MAKE_LATEST       | False    | True      | Marks the release as the latest release     |
 
 <!-- markdownlint-enable MD013 -->
 
-Note: the GITHUB_TOKEN passed to the action must have repository write permissions
+Note: GITHUB_TOKEN requires repository write permissions to create a release
+
+### Release Title
+
+When not explicitly provided, the release title will be set to the compound value:
+
+`[GitHub Repository Name] [Build Tag]`
+
+So, when the following values are enumerated by the release action:
+
+```console
+repository = osc-github-devops
+build_tag  = v1.0.1
+```
+
+The GitHub release title would be presented as:
+
+osc-github-devops v1.0.1
