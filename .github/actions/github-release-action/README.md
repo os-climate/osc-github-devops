@@ -31,6 +31,7 @@ steps:
 | ----------------- | -------- | --------- | ------------------------------------------- |
 | BUILD_TAG         | True     | N/A       | Fixed preamble/string to embed/inject       |
 | GITHUB_TOKEN      | True     | N/A       | Mandatory token for content write access    |
+| PROJECT_NAME      | False    | See Below | Project/product name                        |
 | RELEASE_TITLE     | False    | See Below | Title for the release                       |
 | PRERELEASE        | False    | False     | Marks the release as a development release  |
 | ARTEFACT_LOCATION | False    | None      | When not set, no artefacts will be packaged |
@@ -40,11 +41,15 @@ steps:
 
 Note: GITHUB_TOKEN requires repository write permissions to create a release
 
+### Project Name
+
+When not provided, the project/product title will default to the repository name.
+
 ### Release Title
 
 When not explicitly provided, the release title will be set to the compound value:
 
-`[GitHub Repository Name] [Build Tag]`
+`[Project Name] [Build Tag]`
 
 So, when the following values are enumerated by the release action:
 
