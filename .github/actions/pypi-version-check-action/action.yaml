@@ -13,7 +13,7 @@ inputs:
     required: true
   # Optional
   PACKAGE_VERSION:
-    # Note: versions reported by the index don't have a leading "v" prefix
+    # A leading "v" character will be automatically stripped
     description: "Package build/version/tag"
     required: false
   INDEX_URL:
@@ -56,7 +56,13 @@ runs:
         PACKAGE_NAME="${{ inputs.PACKAGE_NAME }}"
         PACKAGE_VERSION="${{ inputs.PACKAGE_VERSION }}"
 
+        # If present, strip the leading "v" character
+        if [[ "$PACKAGE_VERSION" == v* ]]; then
+          PACKAGE_VERSION="${PACKAGE_VERSION:1}"
+        fi
+
         echo "Searching index: $INDEX_URL"
+        echo "For package:     $PACKAGE_NAME $PACKAGE_VERSION"
 
         # Note: pip index is experimental and NOT fully supported
         OUTPUT=$(pip index --disable-pip-version-check \
