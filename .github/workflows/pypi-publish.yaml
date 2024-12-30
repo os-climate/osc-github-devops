@@ -100,25 +100,14 @@ jobs:
             echo "No SigStore signing artefacts to purge"
           fi
 
-      - name: "Checking Destination for Project"
-        id: project-url-check
+      - name: "Checking package index for build/release"
+        id: check-package-index
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/url-validity-check@main
+        uses: os-climate/osc-github-devops/.github/actions/pypi-version-check-action@main
         with:
-          # e.g. "https://test.pypi.org/project/ITR/"
-          prefix: "${{ env.base_url }}/project"
-          string: "/${{ steps.naming.outputs.python_project_name }}"
-          suffix: "/"
-
-      - name: "Checking Destination for Build/Release"
-        id: build-url-check
-        # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/url-validity-check@main
-        with:
-          prefix: "${{ env.base_url }}/project"
-          # e.g. "https://test.pypi.org/project/ITR/v1.0.0/"
-          string: "/${{ steps.naming.outputs.python_project_name }}"
-          suffix: "/${{ inputs.build_tag }}/"
+          index_url: "${{ env.base_url }}/simple"
+          package_name: "/${{ steps.naming.outputs.python_project_name }}"
+          package_version: "/${{ inputs.build_tag }}/"
 
       - name: "Conditional publishing checks"
         id: conditions
@@ -126,12 +115,12 @@ jobs:
         run: |
           # Conditional publishing checks
 
-          if [ "${{ steps.project-url-check.outputs.valid }}" = "true" ]; then
+          if [ "${{ steps.check-package-index.outputs.package_match }}" = "true" ]; then
             echo "Project has previously been published ✅"
             publish_method="Trusted Publishing"
           fi
 
-          if [ "${{ steps.build-url-check.outputs.valid }}" == 'false' ]; then
+          if [ "${{ steps.check-package-index.outputs.version_match }}" != 'true' ]; then
             echo "This build/release has NOT previously been published ✅"
           fi
 
@@ -144,11 +133,11 @@ jobs:
           fi
 
           if [ "${{ env.base_url }}" != "https://pypi.org" ] && \
-          [ "${{ steps.build-url-check.outputs.valid }}" == 'true' ]; then
+          [ "${{ steps.check-package-index.outputs.version_match }}" == 'true' ]; then
             echo "This build/release has already been published ❌"
             echo "This build/release has already been published ❌" >> "$GITHUB_STEP_SUMMARY"
             exit 1
-          elif [ "${{ steps.build-url-check.outputs.valid }}" == 'true' ]; then
+          elif [ "${{ steps.check-package-index.outputs.version_match }}" == 'true' ]; then
             echo "This build/release has already been published ❌"
             publish_method="Skipped"
             # Skip the rest of the logic in this step for test/development builds
