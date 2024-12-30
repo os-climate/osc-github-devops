@@ -52,7 +52,8 @@ jobs:
         uses: os-climate/osc-github-devops/.github/actions/python-project-version-vs-tag@main
 
       - name: "Create GitHub release"
-        uses: softprops/action-gh-release@v2
+        # Note: a bug in release v2.20 causes upload failures
+        uses: softprops/action-gh-release@01570a1f39cb168c169c802c3bceb9e93fb10974 # v2.1.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           prerelease: ${{ inputs.prerelease }}
