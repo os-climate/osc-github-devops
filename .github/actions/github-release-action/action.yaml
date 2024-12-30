@@ -14,6 +14,12 @@ inputs:
     description: "Required to push new tags to the repository"
     required: true
   # Optional
+  RELEASE_TITLE:
+    description: "Title of release/product"
+    type: string
+    required: false
+    # Note: when not explicitly supplied, defaults to repository name and pushed tag
+    # e.g. osc-github-devops v1.0.0
   PRERELEASE:
     description: "Mark release as pre-release/development version"
     type: string
@@ -23,7 +29,6 @@ inputs:
     description: "Path/location for build artefacts"
     type: string
     required: false
-    default: "dist"
   MAKE_LATEST:
     description: Marks this release as the latest release"
     required: false
@@ -40,7 +45,7 @@ runs:
       with:
         tag: ${{ inputs.build_tag }}
 
-    - name: "Report pushed tag"
+    - name: "Report pushed tag, setup ENV"
       shell: bash
       run: |
         # Pushed tag values
@@ -52,6 +57,11 @@ runs:
           echo "The pushed tag was NOT semantic: ${{ inputs.build_tag }} ❌"
           echo "The pushed tag was NOT semantic: ${{ inputs.build_tag }} ❌" >> "$GITHUB_STEP_SUMMARY"
           exit 1
+        fi
+        if [ -z ${{ inputs.RELEASE_TITLE }} ]; then
+          echo "RELEASE_TITLE=${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/} ${{ inputs.build_tag }}" >> $GITHUB_ENV
+        else
+          echo "RELEASE_TITLE=${{ inputs.RELEASE_TITLE }}" >> $GITHUB_ENV
         fi
 
     - name: "⬇ Download build artefacts [conditional]"
@@ -69,7 +79,7 @@ runs:
         prerelease: ${{ inputs.prerelease }}
         make_latest: ${{ inputs.MAKE_LATEST }}
         tag_name: ${{ inputs.build_tag }}
-        name: ${{ inputs.tag }}"
+        name: ${{ env.RELEASE_TITLE }}
         # ToDo: Incorporate release notes, etc.
         # body_path: ${{ github.workspace }}/CHANGELOG.rst
         files: |
@@ -83,7 +93,7 @@ runs:
         prerelease: ${{ inputs.prerelease }}
         make_latest: ${{ inputs.MAKE_LATEST }}
         tag_name: ${{ inputs.build_tag }}
-        name: ${{ inputs.tag }}"
+        name: ${{ env.RELEASE_TITLE }}
 
     - name: "Print summary/job output"
       shell: bash
