@@ -93,7 +93,7 @@ runs:
         # ToDo: Incorporate release notes, etc.
         # body_path: ${{ github.workspace }}/CHANGELOG.rst
         files: |
-          ${{ inputs.artefact_location }}/**
+          ${{ inputs.artefact_location }}/*
 
     - name: "GitHub release [no artefacts]"
       if: inputs.artefact_location == ''
