@@ -16,21 +16,12 @@ runs:
     - uses: os-climate/osc-github-devops/.github/actions/path-check@main
       id: setup-py
       with:
-        check_path: "setup-py"
+        check_path: "setup.py"
 
     - uses: os-climate/osc-github-devops/.github/actions/path-check@main
       id: pyproject-toml
       with:
         check_path: "pyproject.toml"
-
-    - name: "Patch Python project version: pyproject.toml"
-      id: patch-version-pyprject-toml
-      if: steps.pyproject-toml.outputs.type == 'file'
-      uses: os-climate/osc-github-devops/.github/actions/file-sed-regex@main
-      with:
-        flags: "-i -E"
-        regex: 's:^version =.*$:version = "${{ inputs.REPLACEMENT_VERSION }}":'
-        filename: "pyproject.toml"
 
     - name: "Patch Python project version: setup.py"
       id: patch-version-setup-py
@@ -38,6 +29,14 @@ runs:
       uses: os-climate/osc-github-devops/.github/actions/file-sed-regex@main
       with:
         flags: "-i -E"
-        # ToDo: This REGEX likely broken, needs to pad whitespace before "version"
-        regex: 's:^version=.*$:version="${{ inputs.REPLACEMENT_VERSION }}":'
+        regex: 's:version=.*$:version="${{ inputs.REPLACEMENT_VERSION }}":'
+        filename: "setup.py"
+
+    - name: "Patch Python project version: pyproject.toml"
+      id: patch-version-pyproject-toml
+      if: steps.pyproject-toml.outputs.type == 'file'
+      uses: os-climate/osc-github-devops/.github/actions/file-sed-regex@main
+      with:
+        flags: "-i -E"
+        regex: 's:^version =.*$:version = "${{ inputs.REPLACEMENT_VERSION }}":'
         filename: "pyproject.toml"
