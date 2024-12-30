@@ -1,0 +1,97 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation
+
+# Checks the PyPI index for a given package name (and optional build/release)
+name: "📦 PyPI Package Check"
+
+inputs:
+  # Mandatory
+  PACKAGE_NAME:
+    description: "Python package name"
+    type: string
+    required: true
+  # Optional
+  PACKAGE_VERSION:
+    # Note: versions reported by the index don't have a leading "v" prefix
+    description: "Package build/version/tag"
+    required: false
+  INDEX_URL:
+    description: "Package index search URL"
+    type: string
+    required: false
+    default: "https://pypi.org/simple"
+
+outputs:
+  PACKAGE_MATCH:
+    description: "Set true when package exists in index"
+    value: ${{ steps.check.outputs.package_match }}
+  VERSION_MATCH:
+    description: "Set true when web package/version exists"
+    value: ${{ steps.check.outputs.version_match }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Check pip installed/available"
+      shell: bash
+      run: |
+        # Check pip installed/available
+        PIP_CMD=$(which pip)
+        if [ ! -x $PIP_CMD ]; then
+          if ! (python -m ensurepip --upgrade > /dev/null); then
+            echo "Unable to find/install pip command ❌"
+            echo "Check instance type and OS environment"; exit 1
+          else
+            echo "Successfully installed pip ✅"
+          fi
+        fi
+
+    - name: "Python package index"
+      id: check
+      shell: bash
+      run: |
+        # Check Python package index
+        INDEX_URL="${{ inputs.INDEX_URL }}"
+        PACKAGE_NAME="${{ inputs.PACKAGE_NAME }}"
+        PACKAGE_VERSION="${{ inputs.PACKAGE_VERSION }}"
+
+        echo "Searching index: $INDEX_URL"
+
+        # Note: pip index is experimental and NOT fully supported
+        OUTPUT=$(pip index --disable-pip-version-check \
+            "--index-url=$INDEX_URL" versions "$PACKAGE_NAME" 2>/dev/null)
+
+        if [ $? -eq 0 ]; then
+           PACKAGE_MATCH="true"
+           echo "Package $PACKAGE_NAME found in index ✅"
+        else
+           PACKAGE_MATCH="false"
+           echo "Package $PACKAGE_NAME NOT found in index ❌"
+        fi
+
+        VERSION_MATCH="untested"
+
+        if [ -n "$PACKAGE_VERSION" ]; then
+          VERSIONS=$(echo "$OUTPUT" | grep 'Available versions' \
+            | sed "s/,//g" | sed "s/Available versions://")
+
+           # Assume no match, then iterate over all reported versions
+           VERSION_MATCH="false"
+           for VERSION in $VERSIONS; do
+             if [ "$VERSION" = "$PACKAGE_VERSION" ]; then
+               # A package with the requested version was found
+               VERSION_MATCH="true"
+               break
+             fi
+           done
+           if [ "$VERSION_MATCH" = "true" ]; then
+              echo "Version $PACKAGE_VERSION was found in index ✅"
+           else
+              echo "Version $PACKAGE_VERSION was NOT found in index ❌"
+           fi
+        fi
+        echo "package_match=$PACKAGE_MATCH" >> "$GITHUB_ENV"
+        echo "package_match=$PACKAGE_MATCH" >> "$GITHUB_OUTPUT"
+        echo "version_match=$VERSION_MATCH" >> "$GITHUB_ENV"
+        echo "version_match=$VERSION_MATCH" >> "$GITHUB_OUTPUT"

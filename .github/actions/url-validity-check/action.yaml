@@ -28,7 +28,7 @@ runs:
   using: "composite"
   steps:
     - name: "Check Tooling is Available"
-      id: prerequiresites
+      id: prerequisites
       shell: bash
       run: |
         # Verify tooling is available
@@ -38,7 +38,7 @@ runs:
           apt-get -y install wget
           WGET_CMD=$(which wget)
           if [ ! -x $WGET_CMD ]; then
-            echo "Unable to find/install WGET commend"
+            echo "Unable to find/install WGET command"
             echo "Check instance type and OS environment"; exit 1
           fi
         else
