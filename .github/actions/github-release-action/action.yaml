@@ -14,11 +14,16 @@ inputs:
     description: "Required to push new tags to the repository"
     required: true
   # Optional
+  PROJECT_NAME:
+    description: "Project/product name"
+    type: string
+    # When not provided, defaults to repository name
+    required: false
   RELEASE_TITLE:
     description: "Title of release/product"
     type: string
     required: false
-    # Note: when not explicitly supplied, defaults to repository name and pushed tag
+    # When not provided, defaults to project name followed by pushed tag
     # e.g. osc-github-devops v1.0.0
   PRERELEASE:
     description: "Mark release as pre-release/development version"
@@ -59,7 +64,12 @@ runs:
           exit 1
         fi
         if [ -z ${{ inputs.RELEASE_TITLE }} ]; then
-          echo "RELEASE_TITLE=${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/} ${{ inputs.build_tag }}" >> $GITHUB_ENV
+          echo "PROJECT_NAME=${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/} ${{ inputs.build_tag }}" >> $GITHUB_ENV
+        else
+          echo "PROJECT_NAME=${{ inputs.PROJECT_NAME }}" >> $GITHUB_ENV
+        fi
+        if [ -z ${{ inputs.RELEASE_TITLE }} ]; then
+          echo "RELEASE_TITLE=$PROJECT_NAME ${{ inputs.build_tag }}" >> $GITHUB_ENV
         else
           echo "RELEASE_TITLE=${{ inputs.RELEASE_TITLE }}" >> $GITHUB_ENV
         fi
