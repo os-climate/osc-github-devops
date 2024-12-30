@@ -41,6 +41,7 @@ runs:
         tag: ${{ inputs.build_tag }}
 
     - name: "Report pushed tag"
+      shell: bash
       run: |
         # Pushed tag values
         if [ ${{ steps.tag-validate.outputs.semantic }} == 'true' ]; then
