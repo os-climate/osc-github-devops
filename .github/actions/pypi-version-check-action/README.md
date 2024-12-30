@@ -44,6 +44,9 @@ Query URL examples:
 
 <!-- markdownlint-enable MD013 -->
 
+Note: If the version has a leading "v" character it will automatically be
+stripped, as the Python package index uses purely numerical versioning.
+
 ## Outputs
 
 <!-- markdownlint-disable MD013 -->
