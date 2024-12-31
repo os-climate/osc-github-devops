@@ -53,9 +53,9 @@ jobs:
 
 <!-- markdownlint-disable MD013 -->
 
-| Variable Name     | Required | Default											  											  											  				    |
-| ----------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| CONFIG_URL        | False    | [pre-commit-config.yaml](https://raw.githubusercontent.com/os-climate/osc-github-devops/refs/heads/main/.github/actions/linting-action/pre-commit-config.yaml) |
-| DEPENDENCIES_URL  | False    | [requirements.txt](https://raw.githubusercontent.com/os-climate/osc-github-devops/refs/heads/main/linting/requirements.txt)                                    |
+| Variable Name    | Required | Default                                                                                                                                                        |
+| ---------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CONFIG_URL       | False    | [pre-commit-config.yaml](https://raw.githubusercontent.com/os-climate/osc-github-devops/refs/heads/main/.github/actions/linting-action/pre-commit-config.yaml) |
+| DEPENDENCIES_URL | False    | [requirements.txt](https://raw.githubusercontent.com/os-climate/osc-github-devops/refs/heads/main/linting/requirements.txt)                                    |
 
 <!-- markdownlint-enable MD013 -->
