@@ -152,6 +152,7 @@ jobs:
     name: "Release"
     if: startsWith(github.ref, 'refs/tags/') || contains(github.event.head_commit.message, '[release]')
     uses: os-climate/osc-github-devops/.github/workflows/python-github-release.yaml@main
+    secrets: inherit
     needs:
       - repository
       - python-project
@@ -164,8 +165,6 @@ jobs:
     with:
       build_tag: ${{ needs.repository.outputs.build_tag }}
       project_name: ${{ needs.python-project.outputs.python_project_name }}
-    secrets:
-      token: "${{ secrets.GITHUB_TOKEN }}"
 
   # New action replaced with reusable
 
