@@ -151,59 +151,40 @@ jobs:
   github-release:
     name: "Release"
     if: startsWith(github.ref, 'refs/tags/') || contains(github.event.head_commit.message, '[release]')
-    uses: os-climate/osc-github-devops/.github/workflows/python-github-release.yaml@main
-    secrets: inherit
     needs:
       - repository
       - python-project
       - python-build
       - python-test
       - python-security
+    runs-on: "ubuntu-latest"
     permissions:
-      # Needed both here and in the called workflow
       contents: write
-    with:
-      build_tag: ${{ needs.repository.outputs.build_tag }}
-      project_name: ${{ needs.python-project.outputs.python_project_name }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-  # New action replaced with reusable
+      - name: "Extract project/repository naming"
+        id: naming
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/python-project-name@main
 
-  # github-release:
-  #   name: "Release"
-  #   if: startsWith(github.ref, 'refs/tags/') || contains(github.event.head_commit.message, '[release]')
-  #   needs:
-  #     - repository
-  #     - python-build
-  #     - python-test
-  #     - python-security
-  #   runs-on: "ubuntu-latest"
-  #   permissions:
-  #     contents: write
-  #   steps:
-  #     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: "⬇ Download build artefacts"
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.python_project_name }}
+          path: "dist"
 
-  #     - name: "Extract project/repository naming"
-  #       id: naming
-  #       # yamllint disable-line rule:line-length
-  #       uses: os-climate/osc-github-devops/.github/actions/python-project-name@main
+      - name: "Check project version matches pushed tags"
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: os-climate/osc-github-devops/.github/actions/python-project-version-vs-tag@main
 
-  #     - name: "⬇ Download build artefacts"
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: ${{ env.python_project_name }}
-  #         path: "dist"
-
-  #     - name: "Check project version matches pushed tags"
-  #       if: startsWith(github.ref, 'refs/tags/')
-  #       uses: os-climate/osc-github-devops/.github/actions/python-project-version-vs-tag@main
-
-  #     - name: "GitHub Release"
-  #       uses: os-climate/osc-github-devops/.github/actions/github-release-action@main
-  #       with:
-  #         project_name: ${{ env.python_project_name }}
-  #         artefact_location: "dist"
-  #         build_tag: ${{ needs.repository.outputs.build_tag }}
-  #         github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: "GitHub Release"
+        uses: os-climate/osc-github-devops/.github/actions/github-release-action@main
+        with:
+          project_name: ${{ env.python_project_name }}
+          artefact_location: "dist"
+          build_tag: ${{ needs.repository.outputs.build_tag }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
   ### Action code
 
