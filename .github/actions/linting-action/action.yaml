@@ -17,7 +17,7 @@ inputs:
     type: string
     required: false
     # yamllint disable-line rule:line-length
-    default: "https://raw.githubusercontent.com/os-climate/osc-github-devops/refs/heads/main/linting/requirements.txt"
+    default: "https://raw.githubusercontent.com/os-climate/osc-github-devops/refs/heads/main/.github/actions/linting-action/requirements.txt"
 
 runs:
   using: "composite"
@@ -44,7 +44,7 @@ runs:
       run: |
         # Download Python dependencies file
         echo "Downloading configuration from: ${{ inputs.DEPENDENCIES_URL }}"
-        "$CURL_CMD" -sS -o requirements.txt "${{ inputs.DEPENDENCIES_URL }}"
+        curl -sS -o requirements.txt "${{ inputs.DEPENDENCIES_URL }}"
         echo "Python dependencies file downloaded ✅"
         cat requirements.txt
 
@@ -59,7 +59,7 @@ runs:
       run: |
         # Download pre-commit configuration file
         echo "Downloading configuration from: ${{ inputs.CONFIG_URL }}"
-        "$CURL_CMD" -sS -o .pre-commit-config.yaml "${{ inputs.CONFIG_URL }}"
+        curl -sS -o .pre-commit-config.yaml "${{ inputs.CONFIG_URL }}"
         echo "Pre-commit configuration file downloaded ✅"
         cat .pre-commit-config.yaml
 
