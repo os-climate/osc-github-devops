@@ -5,7 +5,12 @@
 ci:
   autofix_commit_msg: "Chore: pre-commit autoupdate"
 
-exclude: ^tests/resources/
+exclude: |
+  (?x)(
+      ^docs\/conf.py|
+      ^dco-signoffs/|
+      ^tests/resources
+  )
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -65,6 +70,7 @@ repos:
     rev: v0.19.1
     hooks:
       - id: gitlint
+        args: ["-c body-max-line-length=120", "-c title-max-length=120"]
 
   - repo: https://github.com/openstack/bashate
     rev: 2.1.1
