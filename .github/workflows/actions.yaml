@@ -365,30 +365,30 @@ jobs:
       - name: "Action: path test [valid file]"
         id: path-check-file
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/path-check@main
+        uses: os-climate/osc-github-devops/.github/actions/path-check-action@main
         with:
-          check_path: "tests/resources/test-folder/test-file"
+          path: "tests/resources/test-folder/test-file"
 
       - name: "Action: path test [valid folder]"
         id: path-check-folder
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/path-check@main
+        uses: os-climate/osc-github-devops/.github/actions/path-check-action@main
         with:
-          check_path: "tests/resources/test-folder"
+          path: "tests/resources/test-folder"
 
       - name: "Action: path test [valid symlink to file]"
         id: path-check-symlink-file
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/path-check@main
+        uses: os-climate/osc-github-devops/.github/actions/path-check-action@main
         with:
-          check_path: "tests/resources/test-valid-file-symlink"
+          path: "tests/resources/test-valid-file-symlink"
 
       - name: "Action: path test [valid symlink to folder]"
         id: path-check-symlink-folder
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/path-check@main
+        uses: os-climate/osc-github-devops/.github/actions/path-check-action@main
         with:
-          check_path: "tests/resources/test-valid-folder-symlink"
+          path: "tests/resources/test-valid-folder-symlink"
 
       # Tests: path-check
       - name: "Error with path tests (files/directories/symlinks)"

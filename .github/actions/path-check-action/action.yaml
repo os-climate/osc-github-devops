@@ -5,7 +5,7 @@
 name: "✅ Check path exists in repository"
 
 inputs:
-  CHECK_PATH:
+  PATH:
     description: "File system path to check"
     required: true
 
@@ -40,7 +40,7 @@ runs:
             CHECK_PATH="$1"
           fi
         else
-          CHECK_PATH="${{ inputs.CHECK_PATH }}"
+          CHECK_PATH="${{ inputs.PATH }}"
         fi
 
         # Check if path is a symbolic link

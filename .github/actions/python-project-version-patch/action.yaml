@@ -13,15 +13,15 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: os-climate/osc-github-devops/.github/actions/path-check@main
+    - uses: os-climate/osc-github-devops/.github/actions/path-check-action@main
       id: setup-py
       with:
-        check_path: "setup.py"
+        path: "setup.py"
 
-    - uses: os-climate/osc-github-devops/.github/actions/path-check@main
+    - uses: os-climate/osc-github-devops/.github/actions/path-check-action@main
       id: pyproject-toml
       with:
-        check_path: "pyproject.toml"
+        path: "pyproject.toml"
 
     - name: "Patch Python project version: setup.py"
       id: patch-version-setup-py
