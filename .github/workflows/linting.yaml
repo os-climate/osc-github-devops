@@ -22,4 +22,5 @@ jobs:
     name: "Standalone linting check"
     permissions:
       contents: read
-    uses: os-climate/osc-github-devops/.github/workflows/linting-action.yaml@main
+    # yamllint disable-line rule:line-length
+    uses: os-climate/osc-github-devops/.github/workflows/reuse-linting.yaml@ead07107d37425766864b6a3b1da459136dd9952 # 2024-12-31
