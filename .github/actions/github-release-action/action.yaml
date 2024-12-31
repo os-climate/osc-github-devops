@@ -35,9 +35,12 @@ inputs:
     type: string
     required: false
   MAKE_LATEST:
-    description: Marks this release as the latest release"
+    description: "Mark as latest release in the repository"
+    # See: https://github.com/softprops/action-gh-release
+    # Can be either: true, false, or legacy
+    type: string
     required: false
-    default: true
+    default: false
 
 runs:
   using: "composite"
@@ -114,7 +117,8 @@ runs:
       run: |
         # Print summary/job output
         echo "# 🚀 GitHub Release" >> "$GITHUB_STEP_SUMMARY"
-        echo "Build version/tag: ${{ inputs.build_tag }}" >> "$GITHUB_STEP_SUMMARY"
+        echo "${{ env.RELEASE_TITLE }}" >> "$GITHUB_STEP_SUMMARY"
+        # ToDo: Add release notes here
         if [ "${{ inputs.prerelease }}" = "true" ]; then
           echo "Pre-release/Development Build: ✅"
         else
