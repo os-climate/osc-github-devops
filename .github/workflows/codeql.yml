@@ -1,6 +1,6 @@
 ---
 # SPDX-License-Identifier: Apache-2.0
-# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+# SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 # For most projects, this workflow file will not need changing; you simply need
 # to commit it to your repository.
@@ -13,14 +13,16 @@
 # the `language` matrix defined below to confirm you have the correct set of
 # supported CodeQL languages.
 #
+
 name: "🔐 CodeQL"
 
 on:
   workflow_dispatch:
-  #pull_request:
-  #  branches: ["main", "master"]
-  #push:
-  #  branches: ["main", "master"]
+  push:
+    branches: ["main", "master"]
+    paths:
+      - "!.github/**"
+      - "!.docs/**"
   schedule:
     - cron: "39 20 * * 6"
 
@@ -59,7 +61,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v.4.2.2
 
       # Initializes the CodeQL tools for scanning.
       - name: Initialize CodeQL
@@ -86,6 +88,4 @@ jobs:
           exit 1
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
-        with:
-          category: "/language:${{matrix.language}}"
+        uses: github/codeql-action/analyze@48ab28a6f5dbc2a99bf1e0131198dd8f1df78169 # v3.28.0
