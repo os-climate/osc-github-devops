@@ -11,12 +11,18 @@ inputs:
     type: string
     required: false
     # yamllint disable-line rule:line-length
-    default: "https://raw.githubusercontent.com/os-climate/osc-github-devops/refs/heads/main/linting/pre-commit-config.yaml"
+    default: "https://raw.githubusercontent.com/os-climate/osc-github-devops/refs/heads/main/.github/actions/linting-action/pre-commit-config.yaml"
+  DEPENDENCIES_URL:
+    description: "Download location for Python dependencies"
+    type: string
+    required: false
+    # yamllint disable-line rule:line-length
+    default: "https://raw.githubusercontent.com/os-climate/osc-github-devops/refs/heads/main/linting/requirements.txt"
 
 runs:
   using: "composite"
   steps:
-    - name: Setup Python
+    - name: "Setup Python"
       # yamllint disable-line rule:line-length
       uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
       with:
@@ -26,26 +32,49 @@ runs:
       # yamllint disable-line rule:line-length
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-    - name: "Patch linting configuration"
+    - name: "Check prerequisites"
       shell: bash
       run: |
-        # Download the centralised standalone linting configuration
+        # Check prerequisites
         CURL_CMD=$(which curl)
         if [ ! -x $CURL_CMD ]; then echo "curl binary not found"; exit 1; fi
-        "$CURL_CMD" -sS -O "${{ inputs.CONFIG_URL }}" > .pre-commit-config.yaml
 
-    - name: "Install linting dependencies"
+    - name: "Download Python dependencies file"
       shell: bash
       run: |
-        # Install linting dependencies
-        pip install --disable-pip-version-check pre-commit mypy
+        # Download Python dependencies file
+        echo "Downloading configuration from: ${{ inputs.DEPENDENCIES_URL }}"
+        "$CURL_CMD" -sS -o requirements.txt "${{ inputs.DEPENDENCIES_URL }}"
+        echo "Python dependencies file downloaded ✅"
+        cat requirements.txt
 
-    - name: "Run MyPy with Pre-commit"
+    - name: "Install Python dependencies"
       shell: bash
       run: |
-        # Run MyPy with Pre-commit
+        # Install Python dependencies
+        pip install --disable-pip-version-check --upgrade -r requirements.txt
+
+    - name: "Download pre-commit configuration file"
+      shell: bash
+      run: |
+        # Download pre-commit configuration file
+        echo "Downloading configuration from: ${{ inputs.CONFIG_URL }}"
+        "$CURL_CMD" -sS -o .pre-commit-config.yaml "${{ inputs.CONFIG_URL }}"
+        echo "Pre-commit configuration file downloaded ✅"
+        cat .pre-commit-config.yaml
+
+    - name: "Validate configuration"
+      shell: bash
+      run: |
+        # Validate configuration
+        pre-commit validate-config
+
+    - name: "Run all pre-commit hooks"
+      shell: bash
+      run: |
+        # Run all pre-commit hooks
         if [ ! -d .mypy_cache ]; then /bin/mkdir .mypy_cache; fi
-        pre-commit run mypy -a
+        pre-commit run -a
 
       # Provided below as an example, in case needed in future
 
