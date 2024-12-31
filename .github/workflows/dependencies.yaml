@@ -15,6 +15,7 @@ on:
       - "master"
     paths:
       - "!pdm.lock"
+      - "!.github/**"
 
 env:
   python-version: 3.11
@@ -27,7 +28,6 @@ jobs:
     if: startsWith(github.ref, 'dep/update-pdm-lock') != true
     uses: os-climate/osc-github-devops/.github/workflows/repository.yaml@main
     permissions:
-      # Required for action that creates labels: github-mandatory-labels
       contents: read
 
   python-dependencies:
