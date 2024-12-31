@@ -43,6 +43,10 @@ runs:
           CHECK_PATH="${{ inputs.PATH }}"
         fi
 
+        if [ -z "$CHECK_PATH" ]; then
+          echo "Path to check was NOT provided/valid ❌"
+        fi
+
         # Check if path is a symbolic link
         if [ -L "$CHECK_PATH" ]; then
           SYMLINK="true"
