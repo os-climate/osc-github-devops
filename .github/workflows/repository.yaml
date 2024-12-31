@@ -93,8 +93,8 @@ jobs:
           # Pushed tag values
           if [ ${{ steps.tag-validate.outputs.semantic }} == 'true' ]; then
             pushed_tag="${{ github.ref_name }}"
-            echo "Pushed tag: $pushed_tag ✅"
-            echo "Pushed tag: $pushed_tag ✅" >> "$GITHUB_STEP_SUMMARY"
+            echo "Pushed semantic tag: $pushed_tag ✅"
+            echo "Pushed semantic tag: $pushed_tag ✅" >> "$GITHUB_STEP_SUMMARY"
             echo "pushed_tag=$pushed_tag" >> "$GITHUB_ENV"
             echo "pushed_tag=$pushed_tag" >> "$GITHUB_OUTPUT"
           else
