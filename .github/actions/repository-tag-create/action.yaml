@@ -15,10 +15,10 @@ inputs:
     default: false
   MAKE_LATEST:
     description: "Mark as latest release in the repository"
-    required: false
     # See: https://github.com/softprops/action-gh-release
     # Can be either: true, false, or legacy
     type: string
+    required: false
     default: false
   GITHUB_TOKEN:
     description: "Required to push new tags to the repository"

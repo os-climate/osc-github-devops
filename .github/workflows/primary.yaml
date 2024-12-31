@@ -60,16 +60,16 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       # Gather Python project metadata
-      python_project_name: ${{ steps.python_project_metadata.outputs.python_project_name }}
-      python_build_name: ${{ steps.python_project_metadata.outputs.python_build_name }}
-      versioning_type: ${{ steps.python_project_metadata.outputs.versioning_type }}
-      matrix_json: ${{ steps.python_project_metadata.outputs.matrix_json }}
-      build_python_version: ${{ steps.python_project_metadata.outputs.build_python_version }}
+      python_project_name: ${{ steps.python_metadata.outputs.python_project_name }}
+      python_build_name: ${{ steps.python_metadata.outputs.python_build_name }}
+      versioning_type: ${{ steps.python_metadata.outputs.versioning_type }}
+      matrix_json: ${{ steps.python_metadata.outputs.matrix_json }}
+      build_python_version: ${{ steps.python_metadata.outputs.build_python_version }}
     permissions:
       contents: read
     steps:
       - name: "Extract project metadata"
-        id: python_project_metadata
+        id: python_metadata
         uses: os-climate/osc-github-devops/.github/actions/python-project-setup@main
 
       - name: "Check pushed tag [CONDITIONAL/tag push]"
@@ -148,57 +148,63 @@ jobs:
     permissions:
       contents: read
 
+  github-release:
+    name: "Release"
+    if: startsWith(github.ref, 'refs/tags/') || contains(github.event.head_commit.message, '[release]')
+    uses: os-climate/osc-github-devops/.github/workflows/python-github-release.yaml@main
+    needs:
+      - repository
+      - python-project
+      - python-build
+      - python-test
+      - python-security
+    permissions:
+      # Needed both here and in the called workflow
+      contents: write
+    with:
+      build_tag: ${{ needs.repository.outputs.build_tag }}
+      project_name: ${{ needs.python-project.outputs.python_project_name }}
+    secrets:
+      token: "${{ secrets.GITHUB_TOKEN }}"
+
+  # New action replaced with reusable
+
   # github-release:
   #   name: "Release"
   #   if: startsWith(github.ref, 'refs/tags/') || contains(github.event.head_commit.message, '[release]')
-  #   uses: os-climate/osc-github-devops/.github/workflows/python-github-release.yaml@main
   #   needs:
   #     - repository
   #     - python-build
   #     - python-test
   #     - python-security
+  #   runs-on: "ubuntu-latest"
   #   permissions:
-  #     # Needed both here and in the called workflow
   #     contents: write
-  #   with:
-  #     build_tag: ${{ needs.repository.outputs.build_tag }}
+  #   steps:
+  #     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-  github-release:
-    name: "Release"
-    if: startsWith(github.ref, 'refs/tags/') || contains(github.event.head_commit.message, '[release]')
-    needs:
-      - repository
-      - python-build
-      - python-test
-      - python-security
-    runs-on: "ubuntu-latest"
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+  #     - name: "Extract project/repository naming"
+  #       id: naming
+  #       # yamllint disable-line rule:line-length
+  #       uses: os-climate/osc-github-devops/.github/actions/python-project-name@main
 
-      - name: "Extract project/repository naming"
-        id: naming
-        # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/python-project-name@main
+  #     - name: "⬇ Download build artefacts"
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: ${{ env.python_project_name }}
+  #         path: "dist"
 
-      - name: "⬇ Download build artefacts"
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ env.python_project_name }}
-          path: "dist"
+  #     - name: "Check project version matches pushed tags"
+  #       if: startsWith(github.ref, 'refs/tags/')
+  #       uses: os-climate/osc-github-devops/.github/actions/python-project-version-vs-tag@main
 
-      - name: "Check project version matches pushed tags"
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: os-climate/osc-github-devops/.github/actions/python-project-version-vs-tag@main
-
-      - name: "GitHub Release"
-        uses: os-climate/osc-github-devops/.github/actions/github-release-action@main
-        with:
-          project_name: ${{ env.python_project_name }}
-          artefact_location: "dist"
-          build_tag: ${{ needs.repository.outputs.build_tag }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+  #     - name: "GitHub Release"
+  #       uses: os-climate/osc-github-devops/.github/actions/github-release-action@main
+  #       with:
+  #         project_name: ${{ env.python_project_name }}
+  #         artefact_location: "dist"
+  #         build_tag: ${{ needs.repository.outputs.build_tag }}
+  #         github_token: ${{ secrets.GITHUB_TOKEN }}
 
   ### Action code
 
