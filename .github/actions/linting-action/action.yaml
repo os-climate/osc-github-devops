@@ -3,10 +3,10 @@
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 name: "Linting action"
-description: "Intended for linting tools that do NOT work under pre-commit.ci"
+description: "Runs linting tools that do NOT work under pre-commit.ci"
 
 inputs:
-  URL:
+  CONFIG_URL:
     description: "Download location for standalone linting configuration file"
     type: string
     required: false
@@ -32,7 +32,7 @@ runs:
         # Download the centralised standalone linting configuration
         CURL_CMD=$(which curl)
         if [ ! -x $CURL_CMD ]; then echo "curl binary not found"; exit 1; fi
-        "$CURL_CMD" -sS -O "$URL" > .pre-commit-config.yaml
+        "$CURL_CMD" -sS -O "${{ inputs.CONFIG_URL }}" > .pre-commit-config.yaml
 
     - name: "Install linting dependencies"
       shell: bash
