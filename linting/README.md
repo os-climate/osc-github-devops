@@ -6,9 +6,10 @@
 # 🛠️ Standalone Linting Configuration
 
 This folder contains a configuration file for a standalone linting setup. It is
-designed to be run and invoked as a separate step from pre-commit.ci. It
-exists because in certain circumstances, MyPy is unable to run correctly and
-in the GitHub application and it then has to be broken out into a separate step.
+designed to be run (and invoked) as a separate step from the pre-commit.ci
+GitHub marketplace application. It exists because in certain circumstances,
+MyPy is unable to run correctly and then has to be broken out into a separate
+step.
 
 ## pre-commit-config.yaml
 
