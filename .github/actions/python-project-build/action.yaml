@@ -29,6 +29,12 @@ outputs:
   MATRIX_JSON:
     description: "Project supported Python versions as JSON"
     value: ${{ steps.project-setup.outputs.matrix_json }}
+  ARTEFACT_NAME:
+    description: "Build artefacts will be output to this folder/directory"
+    value: ${{ steps.project-setup.outputs.python_project_name }}
+  ARTEFACT_PATH:
+    description: "Build artefacts will be output to this folder/directory"
+    value: ${{ steps.project-setup.outputs.matrix_json }}
 
 runs:
   using: "composite"
@@ -66,11 +72,11 @@ runs:
       with:
         replacement_version: ${{ env.build_tag }}
 
-    - name: "Perform Python project build"
+    - name: "Build Python project"
       id: perform-build
       shell: bash
       run: |
-        # Perform Python project build
+        # Build Python project
 
         # Set build parameters/variables
         echo "Action triggered by: ${GITHUB_TRIGGERING_ACTOR}"
@@ -78,6 +84,13 @@ runs:
         echo "Build date and time stamp: $datetime"
         echo "datetime=$datetime" >> "$GITHUB_ENV"
         echo "datetime=${datetime}" >> "$GITHUB_OUTPUT"
+
+        if [ ${{ inputs.PURGE_OUTPUT_PATH }} ] && \
+           [ -d ${{ inputs.ARTEFACT_PATH }} ]; then
+          echo "Purging artefact output path prior to build ⚠️"
+          echo "Path: ${{ inputs.ARTEFACT_PATH }}"
+          rm -Rf ${{ inputs.ARTEFACT_PATH }}/*
+        fi
 
         python -m pip install --disable-pip-version-check -q --upgrade pip
         if [ -f pyproject.toml ]; then
@@ -97,22 +110,12 @@ runs:
           python -m pip install --disable-pip-version-check -q --upgrade build
           python -m build --outdir ${{ inputs.ARTEFACT_PATH }}
         fi
-        echo "Build succeeded"
 
     - name: "Package dependency graph"
       shell: bash
       run: |
         # Package dependency graph
         pdm list --graph
-
-    - name: "Capture build artefact names"
-      shell: bash
-      run: |
-        # Capture build artefact names
-        WHL_FILE=$(ls ${{ inputs.ARTEFACT_PATH }}/*.whl)
-        TGZ_FILE=$(ls ${{ inputs.ARTEFACT_PATH }}/*.tar.gz)
-        echo "whl_file=$WHL_FILE" >> "$GITHUB_OUTPUT"
-        echo "tgz_file=$TGZ_FILE" >> "$GITHUB_OUTPUT"
 
     - name: "Artefact attestation for: ${{ inputs.ARTEFACT_PATH }}"
       uses: actions/attest-build-provenance@7668571508540a607bdfd90a87a560489fe372eb # v2.1.0
@@ -142,3 +145,13 @@ runs:
         name: ${{ env.python_project_name }}
         path: ${{ inputs.ARTEFACT_PATH }}
         if-no-files-found: error
+
+    - name: "Set build output variables"
+      shell: bash
+      run: |
+        # Set build output variables
+        echo "artefact_name=${{ env.python_project_name }}" >> "$GITHUB_OUTPUT"
+        echo "artefact_path=${{ inputs.ARTEFACT_PATH }}" >> "$GITHUB_OUTPUT"
+        echo "Artefact name: ${{ env.python_project_name }}"
+        echo "Artefact path: ${{ inputs.ARTEFACT_PATH }}"
+        echo "Build successful ✅"
