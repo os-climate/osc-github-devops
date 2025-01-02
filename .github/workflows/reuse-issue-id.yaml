@@ -14,7 +14,7 @@ permissions: {}
 jobs:
   github-pr:
     name: "Inject Issue-ID"
-    runs-on: "ubuntu-latest"
+    runs-on: "ubuntu-24.04"
     if: vars.ISSUE_ID_LOOKUP_JSON != ''
     permissions:
       contents: write
