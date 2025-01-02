@@ -60,6 +60,7 @@ jobs:
     runs-on: ubuntu-24.04
     outputs:
       matrix_json: ${{ steps.python-project.outputs.matrix_json }}
+      artefact_path: ${{ steps.python-project.outputs.artefact_path }}
     permissions:
       contents: write
       # Required by SigStore signing action
@@ -70,6 +71,8 @@ jobs:
       - name: "Build Python project"
         id: python-project
         uses: os-climate/osc-github-devops/.github/actions/python-project-build@main
+        with:
+          build_tag: ${{ needs.repository.outputs.build_tag }}
 
   python-test:
     name: "Test"
