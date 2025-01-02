@@ -73,7 +73,7 @@ runs:
         if [ "${{ inputs.ENVIRONMENT }}" == "production" ]; then
           OUTPUT=$(pip index --disable-pip-version-check \
               "--index-url=$INDEX_URL" versions \
-              "$PACKAGE_NAME" 2>/dev/null)        else
+              "$PACKAGE_NAME" 2>/dev/null)
         else
           # Additional flag to report development builds
           OUTPUT=$(pip index --disable-pip-version-check \
