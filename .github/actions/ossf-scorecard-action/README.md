@@ -5,7 +5,16 @@
 
 # 🔐 Scorecard Auditing
 
-Implements OpenSSF Scorecard reports.
+Implements [OpenSSF](https://openssf.org/) Scorecard reports.
+
+Audits the contents of a given GitHub repository for standard best practices.
+Provides detailed security reporting and optional badging, etc.
+
+See:
+
+- <https://openssf.org/projects/scorecard/>
+- <https://github.com/ossf/scorecard>
+- <https://github.com/ossf/scorecard?tab=readme-ov-file#scorecard-github-action>
 
 ## ossf-scorecard-action
 
