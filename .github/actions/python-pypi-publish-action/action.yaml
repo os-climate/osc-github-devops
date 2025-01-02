@@ -108,11 +108,11 @@ runs:
         string: "/${{ steps.naming.outputs.python_project_name }}"
         suffix: "/${{ inputs.build_tag }}/"
 
-    - name: "Conditional publishing checks"
+    - name: "Determine publishing method"
       id: conditions
       shell: bash
       run: |
-        # Conditional publishing checks
+        # Determine publishing method
 
         if [ "${{ steps.project-url-check.outputs.valid }}" = "true" ]; then
           echo "Project has previously been published ✅"

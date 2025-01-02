@@ -48,7 +48,7 @@ jobs:
       id-token: write
     steps:
       # Need repository content to extract project name
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: "Extract project/repository naming"
         id: naming
@@ -109,11 +109,11 @@ jobs:
           package_name: "${{ steps.naming.outputs.python_project_name }}"
           package_version: "${{ inputs.build_tag }}"
 
-      - name: "Conditional publishing checks"
+      - name: "Determine publishing method"
         id: conditions
         shell: bash
         run: |
-          # Conditional publishing checks
+          # Determine publishing method
 
           if [ "${{ steps.check-package-index.outputs.package_match }}" = "true" ]; then
             echo "Project has previously been published ✅"
