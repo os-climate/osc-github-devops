@@ -60,9 +60,6 @@ runs:
         INDEX_URL="${{ inputs.INDEX_URL }}"
         PACKAGE_NAME="${{ inputs.PACKAGE_NAME }}"
         PACKAGE_VERSION="${{ inputs.PACKAGE_VERSION }}"
-        if [ "${{ inputs.ENVIRONMENT }}" != "production" ]; then
-          PIP_INDEX_FLAGS="--pre"
-        fi
 
         # If present, strip the leading "v" character
         if [[ "$PACKAGE_VERSION" == v* ]]; then
@@ -73,9 +70,16 @@ runs:
         echo "For package:     $PACKAGE_NAME $PACKAGE_VERSION"
 
         # Note: pip index is experimental and NOT fully supported
-        OUTPUT=$(pip index --disable-pip-version-check \
-            "--index-url=$INDEX_URL" versions "$PIP_INDEX_FLAGS" \
+        if [ "${{ inputs.ENVIRONMENT }}" == "production" ]; then
+          OUTPUT=$(pip index --disable-pip-version-check \
+              "--index-url=$INDEX_URL" versions \
+              "$PACKAGE_NAME" 2>/dev/null)        else
+        else
+          # Additional flag to report development builds
+          OUTPUT=$(pip index --disable-pip-version-check \
+            "--index-url=$INDEX_URL" versions --pre \
             "$PACKAGE_NAME" 2>/dev/null)
+        fi
 
         if [ $? -eq 0 ]; then
            PACKAGE_MATCH="true"
