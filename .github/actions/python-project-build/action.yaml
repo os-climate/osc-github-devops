@@ -25,11 +25,17 @@ inputs:
     type: boolean
     default: true
 
+outputs:
+  MATRIX_JSON:
+    description: "Project supported Python versions as JSON"
+    value: ${{ steps.project-setup.outputs.matrix_json }}
+
 runs:
   using: "composite"
   steps:
     # First action performs repository checkout
     - name: "Python project setup"
+      id: project-setup
       uses: os-climate/osc-github-devops/.github/actions/python-project-setup@main
 
     - name: "Set up Python ${{ inputs.build_python_version }}"
@@ -43,7 +49,6 @@ runs:
       uses: pdm-project/setup-pdm@b2472ca4258a9ea3aee813980a0100a2261a42fc # v4.2
       with:
         python-version-file: "pyproject.toml"
-        python-version: ${{ env.build_python_version }}
 
     - name: "Build versioning"
       id: versioning
