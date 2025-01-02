@@ -1,10 +1,10 @@
 # SPDX-License-Identifier: Apache-2.0
-# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+# SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 [project]
 name = "osc-github-devops"
 # Static versioning
-version = "v0.1.7"
+version = "v0.1.8"
 # Uncomment to enable dynamic versioning
 # dynamic = [ "version" ]
 description = "Python project metadata to permit workflow testing."
