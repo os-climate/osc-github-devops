@@ -14,7 +14,7 @@
 # supported CodeQL languages.
 #
 
-name: "CodeQL"
+name: "[R] 🔐 CodeQL"
 
 on:
   workflow_call:
@@ -46,7 +46,7 @@ jobs:
         #  'c-cpp', 'csharp', 'go', 'java-kotlin', 'javascript-typescript', 'python', 'ruby', 'swift'
 
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v.4.2.2
 
       # Initializes the CodeQL tools for scanning.
