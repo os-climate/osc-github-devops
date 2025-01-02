@@ -2,20 +2,10 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
 
-name: "♻️ Update Dependencies"
+name: "♻️ [R] Update Dependencies"
 
-# yamllint disable-line rule:truthy
 on:
-  workflow_dispatch:
-  schedule:
-    - cron: "0 8 1 * *"
-  push:
-    branches:
-      - "main"
-      - "master"
-    paths:
-      - "!pdm.lock"
-      - "!.github/**"
+  workflow_call:
 
 env:
   python-version: 3.11
@@ -26,6 +16,7 @@ jobs:
   repository:
     name: "Repository Checks"
     if: startsWith(github.ref, 'dep/update-pdm-lock') != true
+    # yamllint disable-line rule:line-length
     uses: os-climate/osc-github-devops/.github/workflows/repository.yaml@main
     permissions:
       contents: read
