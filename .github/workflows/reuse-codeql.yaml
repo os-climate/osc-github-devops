@@ -14,7 +14,7 @@
 # supported CodeQL languages.
 #
 
-name: "[R] 🔐 CodeQL"
+name: "🔐 [R] CodeQL"
 
 on:
   workflow_call:
