@@ -3,7 +3,7 @@
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 # Verifies action/workflow calls are pinned to SHA commits
-name: 📌 Audit GitHub Actions
+name: 📌 [R] Audit GitHub Actions
 
 on:
   workflow_call:
