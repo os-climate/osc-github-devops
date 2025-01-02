@@ -47,7 +47,7 @@ In the meantime, here is some general documentation covering the relevant topics
 
 <!--
 [comment]: # SPDX-License-Identifier: Apache-2.0
-[comment]: # SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+[comment]: # SPDX-FileCopyrightText: 2024 The Linux Foundation
 -->
 
 <!--

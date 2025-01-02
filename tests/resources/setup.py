@@ -1,7 +1,7 @@
 # From: origin	https://gerrit.o-ran-sc.org/r/aiml-fw/athp/sdk/feature-store (fetch)
 
 # SPDX-License-Identifier: Apache-2.0
-# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+# SPDX-FileCopyrightText: 2024 The Linux Foundation>
 
 # ==================================================================================
 #
