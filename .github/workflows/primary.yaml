@@ -35,7 +35,7 @@ jobs:
 
   check-secrets:
     name: "Required credentials"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions: {}
     steps:
       - name: "Check for required secrets/API keys/tokens"
@@ -57,7 +57,7 @@ jobs:
     name: "Python project"
     needs: repository
     if: needs.repository.outputs.python_project  == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       # Gather Python project metadata
       python_project_name: ${{ steps.python_metadata.outputs.python_project_name }}
@@ -157,7 +157,7 @@ jobs:
       - python-build
       - python-test
       - python-security
-    runs-on: "ubuntu-latest"
+    runs-on: "ubuntu-24.04"
     permissions:
       contents: write
     steps:
@@ -195,7 +195,7 @@ jobs:
   #      - python-build
   #      - python-security
   #      - python-test
-  #    runs-on: "ubuntu-latest"
+  #    runs-on: "ubuntu-24.04"
   #    # environment: development
   #    permissions:
   #      contents: read
@@ -223,7 +223,7 @@ jobs:
   #      - python-test
   #      - python-security
   #      - pypi-test
-  #    runs-on: "ubuntu-latest"
+  #    runs-on: "ubuntu-24.04"
   #    # environment: production
   #    permissions:
   #      contents: read

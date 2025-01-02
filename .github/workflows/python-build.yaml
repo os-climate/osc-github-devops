@@ -35,7 +35,7 @@ jobs:
 
   python-build:
     name: "Python project"
-    runs-on: "ubuntu-latest"
+    runs-on: "ubuntu-24.04"
     permissions:
       contents: write
       # Required by SigStore signing action
