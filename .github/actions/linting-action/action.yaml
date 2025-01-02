@@ -37,7 +37,7 @@ runs:
       run: |
         # Check prerequisites
         CURL_CMD=$(which curl)
-        if [ ! -x $CURL_CMD ]; then echo "curl binary not found"; exit 1; fi
+        if [ ! -x "$CURL_CMD" ]; then echo "curl binary not found"; exit 1; fi
 
     - name: "Download Python dependencies file"
       shell: bash
