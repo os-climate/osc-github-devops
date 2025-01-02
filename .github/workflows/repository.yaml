@@ -125,6 +125,6 @@ jobs:
             build_tag="${{ env.pushed_tag }}"
           fi
           echo "Build tag: $build_tag"
-          echo "### Build tag: $build_tag" >> "$GITHUB_STEP_SUMMARY"
+          echo "Build tag: $build_tag" >> "$GITHUB_STEP_SUMMARY"
           echo "build_tag=$build_tag" >> "$GITHUB_ENV"
           echo "build_tag=$build_tag" >> "$GITHUB_OUTPUT"
