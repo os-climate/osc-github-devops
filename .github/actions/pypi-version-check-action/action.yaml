@@ -21,6 +21,11 @@ inputs:
     type: string
     required: false
     default: "https://pypi.org/simple"
+  ENVIRONMENT:
+    description: "Query for development and pre-release versions"
+    type: string
+    required: false
+    default: "production"
 
 outputs:
   PACKAGE_MATCH:
@@ -55,6 +60,9 @@ runs:
         INDEX_URL="${{ inputs.INDEX_URL }}"
         PACKAGE_NAME="${{ inputs.PACKAGE_NAME }}"
         PACKAGE_VERSION="${{ inputs.PACKAGE_VERSION }}"
+        if [ "${{ inputs.ENVIRONMENT }}" != "production" ]; then
+          PIP_INDEX_FLAGS="--pre"
+        fi
 
         # If present, strip the leading "v" character
         if [[ "$PACKAGE_VERSION" == v* ]]; then
@@ -66,7 +74,8 @@ runs:
 
         # Note: pip index is experimental and NOT fully supported
         OUTPUT=$(pip index --disable-pip-version-check \
-            "--index-url=$INDEX_URL" versions "$PACKAGE_NAME" 2>/dev/null)
+            "--index-url=$INDEX_URL" versions "$PIP_INDEX_FLAGS" \
+            "$PACKAGE_NAME" 2>/dev/null)
 
         if [ $? -eq 0 ]; then
            PACKAGE_MATCH="true"

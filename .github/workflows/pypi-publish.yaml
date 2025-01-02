@@ -108,6 +108,7 @@ jobs:
           index_url: "${{ env.base_url }}/simple"
           package_name: "${{ steps.naming.outputs.python_project_name }}"
           package_version: "${{ inputs.build_tag }}"
+          environment: ${{ inputs.ENVIRONMENT }}
 
       - name: "Determine publishing method"
         id: conditions
