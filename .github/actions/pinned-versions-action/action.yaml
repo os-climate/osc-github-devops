@@ -38,7 +38,7 @@ runs:
         for YAMLFILE in ${ALL_CHANGED_FILES}; do
           echo "$YAMLFILE" >> changed.txt
         done
-        if [ ! -f changed.txt ]
+        if [ ! -f changed.txt ]; then
           echo "No changes in scope for audit"; exit 0
         fi
         grep -Fvf changed.txt listed.txt > excluded.txt
