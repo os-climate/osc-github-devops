@@ -6,27 +6,67 @@ name: "🧱 Python Build"
 description: "Builds a Python Project"
 
 inputs:
-  ARTEFACT_OUTPUT_PATH:
-    description: "Output path/location for build artefacts"
-    required: false
-    default: "dist"
   PURGE_OUTPUT_PATH:
     description: "Purge target artefact path prior to builds"
     required: false
     default: false
-
-outputs:
-  DATETIME_STAMP:
-    description: "Date/time stamp at build time"
-    value: ${{ steps.parameters.outputs.datetime }}
+  ARTEFACT_PATH:
+    description: "Build artefacts will be output to this folder/directory"
+    required: false
+    type: string
+    default: "dist"
+  BUILD_TAG:
+    description: "Tag version/name for this specific build (semantic)"
+    required: false
+    type: string
+  SIGSTORE_SIGN:
+    description: "Sign build artefacts with Sigstore"
+    required: false
+    type: boolean
+    default: true
 
 runs:
   using: "composite"
   steps:
-    - name: "Set build parameters/variables"
-      id: parameters
+    # First action performs repository checkout
+    - name: "Python project setup"
+      uses: os-climate/osc-github-devops/.github/actions/python-project-setup@main
+
+    - name: "Set up Python ${{ inputs.build_python_version }}"
+      # yamllint disable-line rule:line-length
+      uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+      with:
+        python-version: ${{ env.build_python_version }}
+
+    - name: "Install PDM tooling"
+      # yamllint disable-line rule:line-length
+      uses: pdm-project/setup-pdm@b2472ca4258a9ea3aee813980a0100a2261a42fc # v4.2
+      with:
+        python-version-file: "pyproject.toml"
+        python-version: ${{ env.build_python_version }}
+
+    - name: "Build versioning"
+      id: versioning
+      if: inputs.build_tag
       shell: bash
       run: |
+        # Explicit build versioning
+        echo "Explicit build versioning: ${{ inputs.build_tag }}"
+        echo "build_tag=${{ inputs.build_tag }}" >> "$GITHUB_ENV"
+
+    - name: "Patch project versioning metadata"
+      if: env.python_project_version != inputs.build_tag
+      # yamllint disable-line rule:line-length
+      uses: os-climate/osc-github-devops/.github/actions/python-project-version-patch@main
+      with:
+        replacement_version: ${{ env.build_tag }}
+
+    - name: "Perform Python project build"
+      id: perform-build
+      shell: bash
+      run: |
+        # Perform Python project build
+
         # Set build parameters/variables
         echo "Action triggered by: ${GITHUB_TRIGGERING_ACTOR}"
         datetime=$(date +'%Y-%m-%d-%H%M')
@@ -34,95 +74,66 @@ runs:
         echo "datetime=$datetime" >> "$GITHUB_ENV"
         echo "datetime=${datetime}" >> "$GITHUB_OUTPUT"
 
-    - name: "Check target/path for build products"
-      id: check-target
-      shell: bash
-      run: |
-        # Check target path for build products
-        if [ ! -d ${{ inputs.artefact_output_path }} ]; then
-          if (mkdir -p ${{ inputs.artefact_output_path }}); then
-            echo "Created target path for build products: ${{ inputs.artefact_output_path }}"
-          else
-            echo "Failed to create directory for build products: ${{ inputs.artefact_output_path }}"
-            exit 1
-          fi
-        else
-          echo "Specified directory for artefacts is valid"
-          FILES=$(ls ${{ inputs.artefact_output_path }} | wc -l)
-          if [ "$FILES" -gt 0 ]; then
-            echo "target_populated=true" >> "$GITHUB_OUTPUT"
-            echo "Content already exists in target directory:"
-            ls -l ${{ inputs.artefact_output_path }}
-          fi
-        fi
-
-    - name: "Clean build target directory"
-      id: clean-target
-      shell: bash
-      if: steps.check-target.outputs.target_populated == 'true' && inputs.purge_output_path == 'true'
-      run: |
-        # Clean target path for build products
-        echo "Running command: rm -f ${{ inputs.artefact_output_path }}/*"
-        rm -f "${{ inputs.artefact_output_path }}/*"
-
-    - name: "Perform Python project build"
-      id: perform-build
-      shell: bash
-      run: |
-        # Perform package build
-        python -m pip install -q --upgrade pip
+        python -m pip install --disable-pip-version-check -q --upgrade pip
         if [ -f pyproject.toml ]; then
           echo "Found file: pyproject.toml"
-          echo "Building with command: pdm build --dest ${{ inputs.artefact_output_path }}"
-          pdm build --dest ${{ inputs.artefact_output_path }}
+          echo "Building with command: pdm build --dest ${{ inputs.ARTEFACT_PATH }}"
+          pdm build --dest ${{ inputs.ARTEFACT_PATH }}
         elif [ -f tox.ini ]; then
           echo "Found TOX configuration file: tox.ini"
           echo "Attempting to install TOX..."
-          pip install -q --upgrade tox tox-gh-actions
+          python -m pip install --disable-pip-version-check -q --upgrade tox tox-gh-actions
           echo "Attempting build with: tox -e build"
           echo "WARNING: assumes build artefact path is valid"
           tox -e build
         else
           echo "Neither file found: tox.ini/pyproject.toml"
           echo "Attempting build with: python -m build"
-          pip -q --upgrade install build
-          python -m build --outdir ${{ inputs.artefact_output_path }}
+          python -m pip install --disable-pip-version-check -q --upgrade build
+          python -m build --outdir ${{ inputs.ARTEFACT_PATH }}
         fi
         echo "Build succeeded"
 
     - name: "Package dependency graph"
-      id: show-graph
       shell: bash
       run: |
         # Package dependency graph
         pdm list --graph
 
     - name: "Capture build artefact names"
-      id: artefact-naming
       shell: bash
       run: |
         # Capture build artefact names
-        WHL_FILE=$(ls ${{ inputs.ARTEFACT_OUTPUT_PATH }}/*.whl)
-        TGZ_FILE=$(ls ${{ inputs.ARTEFACT_OUTPUT_PATH }}/*.tar.gz)
+        WHL_FILE=$(ls ${{ inputs.ARTEFACT_PATH }}/*.whl)
+        TGZ_FILE=$(ls ${{ inputs.ARTEFACT_PATH }}/*.tar.gz)
         echo "whl_file=$WHL_FILE" >> "$GITHUB_OUTPUT"
         echo "tgz_file=$TGZ_FILE" >> "$GITHUB_OUTPUT"
 
-    - name: "Artefact attestation for: ${{ inputs.ARTEFACT_OUTPUT_PATH }}"
-      id: attest-whl
-      uses: actions/attest-build-provenance@v1
+    - name: "Artefact attestation for: ${{ inputs.ARTEFACT_PATH }}"
+      uses: actions/attest-build-provenance@7668571508540a607bdfd90a87a560489fe372eb # v2.1.0
       with:
-        subject-path: ${{ inputs.ARTEFACT_OUTPUT_PATH }}/*
+        subject-path: ${{ inputs.ARTEFACT_PATH }}/*
 
-    # - name: "Artefact attestation [WHL]"
-    #   id: attest-whl
-    #   uses: actions/attest-build-provenance@v1
-    #   with:
-    #     # e.g. dist/osc_github_devops-0.0.8.dev1-py3-none-any.whl
-    #     subject-path: "${{ steps.artefact-naming.outputs.whl_file }}"
+    - name: "Validate artefacts with Twine"
+      # yamllint disable-line rule:line-length
+      uses: os-climate/osc-github-devops/.github/actions/python-twine-check@main
 
-    # - name: "Artefact attestation [TGZ]"
-    #   id: attest-tgz
-    #   uses: actions/attest-build-provenance@v1
-    #   with:
-    #     # e.g. dist/osc_github_devops-0.0.8.tar.gz
-    #     subject-path: "${{ steps.artefact-naming.outputs.tgz_file }}"
+    # This step optional and must be explicitly requested (passed the relevant input)
+    - name: "Sign packages with SigStore"
+      # yamllint disable-line rule:line-length
+      uses: sigstore/gh-action-sigstore-python@f514d46b907ebcd5bedc05145c03b69c1edd8b46 # v3.0.0
+      if: inputs.SIGSTORE_SIGN
+      env:
+        package-path: ${{ inputs.ARTEFACT_PATH }}
+      with:
+        inputs: >-
+          ./${{ inputs.ARTEFACT_PATH }}/*.tar.gz
+          ./${{ inputs.ARTEFACT_PATH }}/*.whl
+
+    - name: "Upload build artefacts"
+      # yamllint disable-line rule:line-length
+      uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
+      with:
+        name: ${{ env.python_project_name }}
+        path: ${{ inputs.ARTEFACT_PATH }}
+        if-no-files-found: error
