@@ -20,4 +20,4 @@ jobs:
     steps:
       - name: Check Pinned Versions
         # yamllint disable-line rule:line-length
-        uses: lfit/releng-reusable-workflows/.github/actions/pinned-versions-action@main
+        uses: os-climate/osc-github-devops/.github/actions/pinned-versions-action@2d122a5a8b4b45757774f469d61e26e1d66c94ad # 2025-01-14
