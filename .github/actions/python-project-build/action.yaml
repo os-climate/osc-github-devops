@@ -19,17 +19,18 @@ inputs:
     description: "Tag version/name for this specific build (semantic)"
     required: false
     type: string
-  ATTEST:
-    # Note: Attestations should not be used for development builds
-    description: "Attest artefact for release"
+  GITHUB_ATTEST:
+    # Attestations should not be used for development builds
+    description: "Apply GitHub attestations to artefacts"
     required: false
     type: boolean
     default: false
   SIGSTORE_SIGN:
+    # Signing should not be used for development builds
     description: "Sign build artefacts with Sigstore"
     required: false
     type: boolean
-    default: true
+    default: false
 
 outputs:
   MATRIX_JSON:
