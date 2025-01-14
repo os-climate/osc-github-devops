@@ -138,6 +138,12 @@ runs:
         # Package dependency graph
         pdm list --graph
 
+    # Caution with sequencing; moving twine validation after attestations/signing causes failures
+    # These steps produce additional output files unsupported during package uploads
+    - name: "Validate artefacts with Twine"
+      # yamllint disable-line rule:line-length
+      uses: os-climate/osc-github-devops/.github/actions/python-twine-check@c3c8c6ed8f61e21cef7bf2b4bfb08b8244c5dbc3 # 2025-01-14
+
     - name: "Artefact attestation for: ${{ inputs.ARTEFACT_PATH }}"
       uses: actions/attest-build-provenance@7668571508540a607bdfd90a87a560489fe372eb # v2.1.0
       if: ${{ inputs.github_attest == 'true' }}
@@ -155,10 +161,6 @@ runs:
         inputs: >-
           ./${{ inputs.ARTEFACT_PATH }}/*.tar.gz
           ./${{ inputs.ARTEFACT_PATH }}/*.whl
-
-    - name: "Validate artefacts with Twine"
-      # yamllint disable-line rule:line-length
-      uses: os-climate/osc-github-devops/.github/actions/python-twine-check@c3c8c6ed8f61e21cef7bf2b4bfb08b8244c5dbc3 # 2025-01-14
 
     - name: "Upload build artefacts"
       # yamllint disable-line rule:line-length
