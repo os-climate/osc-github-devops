@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
-# Verifies action/workflow calls are pinned to SHA commits
+# Verifies action/workflow calls are pinned to SHA commit values
 name: 📌 Audit GitHub Actions
 
 on:
@@ -13,7 +13,7 @@ permissions: {}
 jobs:
   check-actions:
     name: Pinned Versions
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
     steps:
