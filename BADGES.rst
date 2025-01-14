@@ -1,7 +1,5 @@
-<!--
-[comment]: # SPDX-License-Identifier: Apache-2.0
-[comment]: # SPDX-FileCopyrightText: 2025 The Linux Foundation
--->
+.. # SPDX-License-Identifier: Apache-2.0
+.. # SPDX-FileCopyrightText: 2025 The Linux Foundation
 
 =============================
 Badge Template for README.rst
@@ -11,7 +9,7 @@ Badge Template for README.rst
 
 |Pre-commit.ci| |OpenSSF Scorecard|
 
-<!-- first badge row -->
+.. # First badge row
 
 .. |osc-climate-project| image:: https://img.shields.io/badge/OS-Climate-blue
   :alt: An OS-Climate Project
@@ -23,11 +21,11 @@ Badge Template for README.rst
 
 .. |osc-climate-github| image:: https://img.shields.io/badge/GitHub-100000?logo=github&logoColor=white&color=blue
   :alt: Source code on GitHub
-  :target: https://github.com/os-climate/osc-transformer-presteps
+  :target: https://github.com/os-climate/osc-github-devops
 
 .. |PyPI| image:: https://img.shields.io/pypi/v/osc-github-devops?logo=python&logoColor=white&color=blue
   :alt: Source code on GitHub
-  :target: https://github.com/os-climate/osc-transformer-presteps
+  :target: https://github.com/os-climate/osc-github-devops
 
 .. |License| image:: https://img.shields.io/badge/License-Apache_2.0-blue.svg
   :alt: Apache-2.0 License
@@ -37,7 +35,7 @@ Badge Template for README.rst
   :alt: Built using PDM
   :target: https://pdm-project.org/en/latest/
 
-<!-- second badge row -->
+.. # Second badge row
 
 .. |Pre-commit.ci| image:: https://results.pre-commit.ci/badge/github/os-climate/osc-github-devops/main.svg
 	:alt: Pre-commit.ci Status
