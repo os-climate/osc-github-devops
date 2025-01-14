@@ -5,6 +5,7 @@
 # Verifies action/workflow calls are pinned to SHA commit values
 name: 📌 Audit GitHub Actions
 
+# yamllint disable-line rule:truthy
 on:
   workflow_call:
 
@@ -18,4 +19,5 @@ jobs:
       contents: read
     steps:
       - name: Check Pinned Versions
-        uses: os-climate/osc-github-devops/.github/actions/pinned-versions-action@main
+        # yamllint disable-line rule:line-length
+        uses: lfit/releng-reusable-workflows/.github/actions/pinned-versions-action@main
