@@ -1,9 +1,9 @@
 ---
 # SPDX-License-Identifier: Apache-2.0
-# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+# SPDX-FileCopyrightText: 2024 The Linux Foundation
 
-name: "📌 Pinned Versions Actions"
-description: "Audits Action/Workflow calls for pins to SHA commits"
+name: "📌 Pinned Versions Action"
+description: "Verifies action/workflow calls are pinned to SHA commit values"
 
 runs:
   using: "composite"
@@ -21,6 +21,7 @@ runs:
     - name: Get changed files
       if: ${{ github.event_name != 'workflow_dispatch' }}
       id: changed-files
+      # yamllint disable-line rule:line-length
       uses: tj-actions/changed-files@bab30c2299617f6615ec02a68b9a40d10bd21366 # v45.0.5
       with:
         since_last_remote_commit: true

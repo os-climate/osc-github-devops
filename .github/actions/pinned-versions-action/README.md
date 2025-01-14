@@ -3,9 +3,9 @@
 [comment]: # SPDX-FileCopyrightText: 2024 The Linux Foundation
 -->
 
-# 📌 Actions Pinned Versions
+# 📌 Pinned Versions Action
 
-Audits GitHub actions/workflows to ensure calls are pinned to SHA commit values.
+Verifies action/workflow calls use SHA commit values
 
 ## pinned-versions-action
 
@@ -23,29 +23,34 @@ on:
 
 ## Usage Example
 
+<!-- markdownlint-disable MD013 -->
+
 ```yaml
 jobs:
   check-actions:
     name: Pinned Versions
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
     steps:
       - name: Check Pinned Versions
-        uses: os-climate/osc-github-devops/.github/actions/pinned-versions-action@main
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/pinned-versions-action@ea8bbd5f4f817abe64b2498e0f1393ca15b86c0e # v1.0.0
 ```
+
+<!-- markdownlint-enable MD013 -->
 
 ## Behaviour
 
 ### Pull Requests
 
-When triggered against un-merged pull requests, will audit the change for any
+When triggered against a pull request, will audit the change content for any
 calls to GitHub actions/workflows that are not pinned to a SHA commit value.
-This only scans files in the pull request, and will NOT block merges where
-GitHub actions elsewhere in the repository have not been pinned to SHA/commit
-values.
+This scans files changed in the pull request, and will NOT block merges
+where GitHub actions elsewhere in the repository do not use SHA/commit values.
 
 ### Manual Invocation
 
 Operates differently when explicitly called using "workflow_dispatch" trigger.
-Will scan the entire repository for action/workflow calls and report results.
+Will scan the entire repository for action/workflow calls and report results
+for all GitHub actions/workflows found.
