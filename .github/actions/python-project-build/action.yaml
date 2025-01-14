@@ -104,8 +104,7 @@ runs:
           if (pdm build --dest ${{ inputs.ARTEFACT_PATH }}); then
             echo "Build with PDM successful ✅"
           else
-            echo "Build with PDM failed ❌"
-            exit 1
+            echo "Build with PDM failed ❌"; exit 1
           fi
 
         # TOX Build
@@ -118,8 +117,7 @@ runs:
           if (tox -e build); then
             echo "Build with TOX successful ✅"
           else
-            echo "Build with TOX failed ❌"
-            exit 1
+            echo "Build with TOX failed ❌"; exit 1
           fi
 
         # Build with Python module
@@ -127,11 +125,10 @@ runs:
           echo "Neither file found: tox.ini/pyproject.toml"
           echo "Attempting build with: python -m build"
           python -m pip install --disable-pip-version-check -q --upgrade build
-          if (python -m build --outdir ${{ inputs.ARTEFACT_PATH }})
+          if (python -m build --outdir ${{ inputs.ARTEFACT_PATH }}); then
             echo "Build with Python module successful ✅"
           else
-            echo "Build with Python module failed ❌"
-            exit 1
+            echo "Build with Python module failed ❌"; exit 1
           fi
         fi
 
