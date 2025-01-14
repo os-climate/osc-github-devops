@@ -1,6 +1,6 @@
 ---
 # SPDX-License-Identifier: Apache-2.0
-# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+# SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 name: "📦 Twine Check Artefacts"
 
@@ -19,7 +19,12 @@ runs:
       run: |
         # Run twine check against build artefacts
         echo -n "Installing Python tool: twine"
-        pip install -q --upgrade twine
+        pip install --disable-pip-version-check -q --upgrade twine
         echo "Path to check: ${{ inputs.path }}"
         echo "Running: twine check ${{ inputs.path }}/*"
-        twine check ${{ inputs.path }}/*
+        if (twine check ${{ inputs.path }}/*); then
+          echo "Checked Artefacts with Twine ✅"
+        else
+          echo "Artefacts failed Twinecheck ❌"
+          exit 1
+        fi
