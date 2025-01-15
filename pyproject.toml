@@ -4,7 +4,7 @@
 [project]
 name = "osc-github-devops"
 # Also bump the version string in file .github/workflows/actions.yaml
-version = "v0.1.14"
+version = "v0.1.15"
 # Uncomment to enable dynamic versioning
 # dynamic = [ "version" ]
 description = "Python project metadata to permit workflow testing."
