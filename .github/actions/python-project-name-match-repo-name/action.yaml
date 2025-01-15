@@ -1,9 +1,9 @@
 ---
 # SPDX-License-Identifier: Apache-2.0
-# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+# SPDX-FileCopyrightText: 2024 The Linux Foundation
 
-name: "Compare Python Project and Repository Names"
-description: "Returns the name of the Python Project"
+name: "Compares Python Project and Repository Names"
+description: "Returns [true|false] if repository name and python project name match"
 
 outputs:
   MATCHES_REPO_NAME:

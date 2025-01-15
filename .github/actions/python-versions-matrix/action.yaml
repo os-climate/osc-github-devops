@@ -1,8 +1,10 @@
 ---
 # SPDX-License-Identifier: Apache-2.0
-# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+# SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 name: "↗️ Supported Python versions matrix as JSON"
+description: "Returns JSON string with the supported Python versions of a project"
+# Used as input for matrix jobs running in other actions/workflows
 
 outputs:
   MATRIX_JSON:

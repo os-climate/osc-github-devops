@@ -1,8 +1,13 @@
 ---
 # SPDX-License-Identifier: Apache-2.0
-# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+# SPDX-FileCopyrightText: 2024 The Linux Foundation
 
+# Publishes documentation to GitHub Pages
 name: "📰 Publish Documentation"
+
+# Note: The initial publish may fail, see the documentation here:
+# https://github.com/peaceiris/actions-gh-pages
+# Heading: First Deployment with GITHUB_TOKEN
 
 # yamllint disable-line rule:truthy
 on:
