@@ -1,9 +1,9 @@
 ---
 # SPDX-License-Identifier: Apache-2.0
-# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+# SPDX-FileCopyrightText: 2024 The Linux Foundation
 
-name: "🧪 Python Test"
-description: "Tests a Python Project"
+name: "🧪 Python Tests"
+description: "Tests a Python Project and generates coverage reports"
 
 inputs:
   # The matrix Python build version should be passed into this action

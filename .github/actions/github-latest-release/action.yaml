@@ -1,8 +1,9 @@
 ---
 # SPDX-License-Identifier: Apache-2.0
-# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+# SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 name: "✳️ GitHub Latest Release"
+description: "Returns the Github release marked as latest"
 
 outputs:
   GITHUB_LATEST:

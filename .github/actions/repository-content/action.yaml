@@ -1,9 +1,9 @@
 ---
 # SPDX-License-Identifier: Apache-2.0
-# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+# SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 name: "🔍 Repository Checks"
-description: "Scans repository content and identifies supported content"
+description: "Scans repository content and sets output variables for subsequent actions"
 
 outputs:
   PYTHON_PROJECT:

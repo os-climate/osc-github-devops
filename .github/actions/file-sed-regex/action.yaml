@@ -1,9 +1,9 @@
 ---
 # SPDX-License-Identifier: Apache-2.0
-# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+# SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 name: "Perform action on file using SED"
-description: "Uses sed, flags, and a regular expression to work on a file"
+description: "Uses sed, options/flags, and a regular expression to perform actions on a file"
 
 inputs:
   FLAGS:

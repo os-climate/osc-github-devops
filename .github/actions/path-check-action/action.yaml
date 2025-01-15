@@ -1,8 +1,9 @@
 ---
 # SPDX-License-Identifier: Apache-2.0
-# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+# SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 name: "✅ Check path exists in repository"
+description: "Check if a given path exists in the repository, reports type"
 
 inputs:
   PATH:

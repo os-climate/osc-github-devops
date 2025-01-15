@@ -1,8 +1,9 @@
 ---
 # SPDX-License-Identifier: Apache-2.0
-# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+# SPDX-FileCopyrightText: 2024 The Linux Foundation
 
-name: "♻️ Update Dependencies"
+# Updates Python dependencies and raises a pull request
+name: "🐍 Update Dependencies"
 
 # yamllint disable-line rule:truthy
 on:
