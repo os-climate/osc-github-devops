@@ -38,6 +38,7 @@ runs:
       id: process-commits
       shell: bash
       run: |
+        # Process last two commits
         LATEST_COMMIT_SHA=$(git rev-parse @~0)
         PREVIOUS_COMMIT_SHA=$(git rev-parse @~1)
         FILES_CHANGED=$(git diff --name-only "$LATEST_COMMIT_SHA" "$PREVIOUS_COMMIT_SHA")
@@ -47,4 +48,7 @@ runs:
           echo "📁 Files changed:"
           echo "$FILES_CHANGED"
         fi
-        echo "files_changed=$FILES_CHANGED" >> "$GITHUB_ENV"
+        { echo 'files_changed<<EOF'
+          echo "$FILES_CHANGED"
+          echo EOF
+        } >> "$GITHUB_ENV"
