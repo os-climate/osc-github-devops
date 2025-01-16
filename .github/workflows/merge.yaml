@@ -1,0 +1,31 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation
+
+name: "🤖 DevOps Automation [Merge/Pull Request]"
+
+# yamllint disable-line rule:truthy
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - "**"
+      #- "!.github/**"
+      #- "!.*"
+      #- "!pdm.lock"
+      #- "!tox.ini"
+
+permissions: {}
+
+jobs:
+  pull-request-merged:
+    name: "Pull Request Merged"
+    runs-on: "ubuntu-24.04"
+    permissions:
+      contents: read
+    steps:
+      # yamllint disable-line rule:line-length
+      - uses: os-climate/osc-github-devops/.github/actions/git-last-commit@main

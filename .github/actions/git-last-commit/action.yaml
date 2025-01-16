@@ -1,0 +1,48 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation
+
+name: "🗞️ Merge/Change Report"
+description: "Sets parameters and reports metadata for the last two commits"
+
+inputs:
+  FILENAME:
+    description: "Returns true if filename was modified"
+
+  FILE_PATH:
+    description: "Returns true if file path was modified"
+
+outputs:
+  LATEST_COMMIT_SHA:
+    description: "SHA value for latest commit"
+    value: ${{ steps.parse-commits.outputs.latest_commit_sha }}
+  PREVIOUS_COMMIT_SHA:
+    description: "SHA value for previous commit"
+    value: ${{ steps.parse-commits.outputs.previous_commit_sha }}
+  FILES_CHANGED:
+    description: "SHA value for latest commit"
+    value: ${{ steps.parse-commits.outputs.files_changed }}
+  MODIFIED:
+    description: "Returns true if supplied filename or path was modified"
+    value: ${{ steps.parse-commits.outputs.files_changed }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+    - name: Process last two commits
+      id: process-commits
+      shell: bash
+      run: |
+        LATEST_COMMIT_SHA=$(git rev-parse @~0)
+        PREVIOUS_COMMIT_SHA=$(git rev-parse @~1)
+        FILES_CHANGED=$(git diff --name-only "$LATEST_COMMIT_SHA" "$PREVIOUS_COMMIT_SHA")
+        echo "⏱️ Latest commit: $LATEST_COMMIT_SHA"
+        echo "⏪ Previous commit: $PREVIOUS_COMMIT_SHA"
+        if [ -n "$FILES_CHANGED" ]; then
+          echo "📁 Files changed:"
+          echo "$FILES_CHANGED"
+        fi
+        echo "files_changed=$FILES_CHANGED" >> "$GITHUB_ENV"
