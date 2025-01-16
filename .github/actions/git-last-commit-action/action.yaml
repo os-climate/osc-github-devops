@@ -42,20 +42,22 @@ runs:
         LATEST_COMMIT_SHA=$(git rev-parse @~0)
         PREVIOUS_COMMIT_SHA=$(git rev-parse @~1)
         FILES_CHANGED=$(git diff --name-only "$LATEST_COMMIT_SHA" "$PREVIOUS_COMMIT_SHA")
+
         echo "⏱️ Latest commit: $LATEST_COMMIT_SHA"
+        echo "latest_commit_sha=$LATEST_COMMIT_SHA" >> "$GITHUB_ENV"
+        echo "latest_commit_sha=$LATEST_COMMIT_SHA" >> "$GITHUB_OUTPUT"
         echo "⏪ Previous commit: $PREVIOUS_COMMIT_SHA"
+        echo "previous_commit_sha=$PREVIOUS_COMMIT_SHA" >> "$GITHUB_ENV"
+        echo "previous_commit_sha=$PREVIOUS_COMMIT_SHA" >> "$GITHUB_OUTPUT"
         if [ -n "$FILES_CHANGED" ]; then
           echo "📁 Files changed:"
           echo "$FILES_CHANGED"
-        fi
-        { echo 'files_changed<<EOF'
-          echo "$FILES_CHANGED"
-          echo EOF
-        } >> "$GITHUB_ENV"
-        echo "# Summary: Pull Request Merged" >> "$GITHUB_STEP_SUMMARY"
-        echo "⏱️ Latest commit: $LATEST_COMMIT_SHA" >> "$GITHUB_STEP_SUMMARY"
-        echo "⏪ Previous commit: $PREVIOUS_COMMIT_SHA" >> "$GITHUB_STEP_SUMMARY"
-        if [ -n "$FILES_CHANGED" ]; then
-          echo "### 📁 Files changed"
-          echo "$FILES_CHANGED"
+          { echo 'files_changed<<EOF'
+            echo "$FILES_CHANGED"
+            echo EOF
+          } >> "$GITHUB_ENV"
+          { echo 'files_changed<<EOF'
+            echo "$FILES_CHANGED"
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
         fi
