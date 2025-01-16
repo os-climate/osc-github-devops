@@ -41,7 +41,8 @@ jobs:
           echo "⏱️ Latest commit: ${{ env.latest_commit_sha }}" >> "$GITHUB_STEP_SUMMARY"
           echo "⏪ Previous commit: ${{ env.previous_commit_sha }}" >> "$GITHUB_STEP_SUMMARY"
 
-          if [ -n ${{ env.files_changed }} ]; then
+          FILES_CHANGED="${{ env.files_changed }}"
+          if [ -n "$FILES_CHANGED" ]; then
             echo "## 📁 Files Changed" >> "$GITHUB_STEP_SUMMARY"
-            echo "${{ env.files_changed }}" >> "$GITHUB_STEP_SUMMARY"
+            echo "$FILES_CHANGED" >> "$GITHUB_STEP_SUMMARY"
           fi
