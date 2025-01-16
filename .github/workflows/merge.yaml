@@ -29,3 +29,19 @@ jobs:
     steps:
       # yamllint disable-line rule:line-length
       - uses: os-climate/osc-github-devops/.github/actions/git-last-commit-action@main
+
+      - name: Summary Output
+        shell: bash
+        run: |
+          # Report: Last Merged Pull Request
+
+          # shellcheck disable=SC2129
+
+          echo "# 🗞️ Report: Last Merged Pull Request" >> "$GITHUB_STEP_SUMMARY"
+          echo "⏱️ Latest commit: ${{ env.latest_commit_sha }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "⏪ Previous commit: ${{ env.previous_commit_sha }}" >> "$GITHUB_STEP_SUMMARY"
+
+          if [ -n ${{ env.files_changed }} ]; then
+            echo "## 📁 Files Changed" >> "$GITHUB_STEP_SUMMARY"
+            echo "${{ env.files_changed }}" >> "$GITHUB_STEP_SUMMARY"
+          fi
