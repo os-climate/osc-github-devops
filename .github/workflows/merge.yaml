@@ -49,7 +49,7 @@ jobs:
 
       - name: "Check: .github/workflows/merge.yaml"
         id: trap-version-bump
-        uses: os-climate/osc-github-devops/.github/actions/string-in-multiline-text@main
+        uses: os-climate/osc-github-devops/.github/actions/string-in-multiline-text-action@main
         with:
           string: ".github/workflows/merge.yaml"
           multiline-text: "${{ env.files_changed }}"
