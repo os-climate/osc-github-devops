@@ -28,4 +28,4 @@ jobs:
       contents: read
     steps:
       # yamllint disable-line rule:line-length
-      - uses: os-climate/osc-github-devops/.github/actions/git-last-commit@main
+      - uses: os-climate/osc-github-devops/.github/actions/git-last-commit-action@main

@@ -52,3 +52,10 @@ runs:
           echo "$FILES_CHANGED"
           echo EOF
         } >> "$GITHUB_ENV"
+        echo "# Summary: Pull Request Merged" >> "$GITHUB_STEP_SUMMARY"
+        echo "⏱️ Latest commit: $LATEST_COMMIT_SHA" >> "$GITHUB_STEP_SUMMARY"
+        echo "⏪ Previous commit: $PREVIOUS_COMMIT_SHA" >> "$GITHUB_STEP_SUMMARY"
+        if [ -n "$FILES_CHANGED" ]; then
+          echo "### 📁 Files changed"
+          echo "$FILES_CHANGED"
+        fi
