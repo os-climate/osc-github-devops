@@ -46,3 +46,16 @@ jobs:
             echo "## 📁 Files Changed" >> "$GITHUB_STEP_SUMMARY"
             echo "$FILES_CHANGED" >> "$GITHUB_STEP_SUMMARY"
           fi
+
+      - name: "Check: .github/workflows/merge.yaml"
+        id: trap-version-bump
+        uses: os-climate/osc-github-devops/.github/actions/string-in-multiline-text@main
+        with:
+          string: ".github/workflows/merge.yaml"
+          multiline-text: "${{ env.files_changed }}"
+
+      - name: "Report Match"
+        shell: bash
+        run: |
+          # Report: Match
+          echo "${{ steps.trap-version-bump.outputs.match }}"
