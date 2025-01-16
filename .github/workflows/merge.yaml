@@ -47,15 +47,34 @@ jobs:
             echo "$FILES_CHANGED" >> "$GITHUB_STEP_SUMMARY"
           fi
 
-      - name: "Check: .github/workflows/merge.yaml"
-        id: trap-version-bump
+      - name: "Check: pyproject.toml"
+        id: trap-version-bump-pyproject-toml
+        # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/string-in-multiline-text-action@main
         with:
-          string: ".github/workflows/merge.yaml"
+          string: "pyproject.toml"
           multiline_text: "${{ env.files_changed }}"
 
-      - name: "Report Match"
-        shell: bash
-        run: |
-          # Report: Match
-          echo "${{ steps.trap-version-bump.outputs.match }}"
+      - name: "Check: setup.py"
+        id: trap-version-bump-setup-py
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/string-in-multiline-text-action@main
+        with:
+          string: "setup.py"
+          multiline_text: "${{ env.files_changed }}"
+
+      # - name: "Intermediate step to check if version changed"
+      #   id: parse-version
+      #   uses: os-climate/osc-github-devops/.github/actions/python-project-version@main
+
+      - name: "Extract New Version"
+        id: parse-project
+        uses: os-climate/osc-github-devops/.github/actions/python-project-version@main
+
+      - name: "Push Tag, Trigger Release"
+        uses: actions-ecosystem/action-push-tag@v1
+        if: ${{ steps.trap-version-bump-pyproject-toml.outputs.match }}
+        with:
+          tag: ${{ steps.parse-project.outputs.python_project_version }}
+          # yamllint disable-line rule:line-length
+          message: "${{ steps.parse-project.outputs.python_project_version }}: PR #${{ github.event.pull_request.number }} ${{ github.event.pull_request.title }}"
