@@ -30,7 +30,7 @@ jobs:
       # yamllint disable-line rule:line-length
       - uses: os-climate/osc-github-devops/.github/actions/git-last-commit-action@main
 
-      - name: Summary Output
+      - name: "Summary Output"
         shell: bash
         run: |
           # Report: Last Merged Pull Request
@@ -67,13 +67,23 @@ jobs:
       #   id: parse-version
       #   uses: os-climate/osc-github-devops/.github/actions/python-project-version@main
 
-      - name: "Extract New Version"
+      # - name: "Intermediate step to check if tag already exists"
+      #   id: parse-version
+      #   uses: os-climate/osc-github-devops/.github/actions/python-project-version@main
+
+      - name: "Extract Version"
         id: parse-project
+        if: steps.trap-version-bump-pyproject-toml.outputs.match == 'true'
+        # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/python-project-version@main
+
+      - name: "Configure GIT"
+        # yamllint disable-line rule:line-length
+        uses: lfit/releng-reusable-workflows/.github/actions/git-configure@0b4c7e76b95e903c04c0044c558d142f5ceb8c35 # 2025-01-19
 
       - name: "Push Tag, Trigger Release"
         uses: actions-ecosystem/action-push-tag@v1
-        if: ${{ steps.trap-version-bump-pyproject-toml.outputs.match }}
+        if: steps.trap-version-bump-pyproject-toml.outputs.match == 'true'
         with:
           tag: ${{ steps.parse-project.outputs.python_project_version }}
           # yamllint disable-line rule:line-length

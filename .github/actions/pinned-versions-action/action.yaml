@@ -28,7 +28,7 @@ runs:
         files: |
           .github/**/*.{yml,yaml}
 
-    - name: Prune verification scope
+    - name: Set verification scope
       if: ${{ github.event_name != 'workflow_dispatch' }}
       env:
         ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
