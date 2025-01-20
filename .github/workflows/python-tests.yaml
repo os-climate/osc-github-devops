@@ -35,7 +35,7 @@ jobs:
       - name: "Test Python project"
         id: python-project-tests
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/python-test-project@main
+        uses: os-climate/osc-github-devops/.github/actions/python-test-project-action@main
         with:
           python_version: ${{ inputs.python_version }}
           never_fail: true

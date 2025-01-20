@@ -71,18 +71,18 @@ jobs:
       - name: "Repository metadata"
         id: repository
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/repository-metadata@main
+        uses: os-climate/osc-github-devops/.github/actions/repository-metadata-action@main
 
       - name: "Classify content"
         id: content
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/repository-content@main
+        uses: os-climate/osc-github-devops/.github/actions/repository-scan-content-action@main
 
       - name: "Verify pushed tag"
         id: tag-validate
         if: startsWith(github.ref, 'refs/tags/')
         # if: contains(github.event.head_commit.message, '[release]')
-        uses: os-climate/osc-github-devops/.github/actions/tag-validate-semantic@main
+        uses: os-climate/osc-github-devops/.github/actions/tag-validate-semantic-action@main
         with:
           tag: ${{ github.ref_name }}
 
@@ -106,7 +106,7 @@ jobs:
       - name: "Get current repository tag"
         id: current-tag
         if: startsWith(github.ref, 'refs/tags/') != true
-        uses: os-climate/osc-github-devops/.github/actions/repository-tag-current@main
+        uses: os-climate/osc-github-devops/.github/actions/repository-tag-current-action@main
 
       - name: "Generate build tag"
         id: development-tag

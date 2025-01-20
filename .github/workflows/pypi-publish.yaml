@@ -53,7 +53,7 @@ jobs:
       - name: "Extract project/repository naming"
         id: naming
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/python-project-name@main
+        uses: os-climate/osc-github-devops/.github/actions/python-get-project-name-action@main
 
       - name: "⬇ Download build artefacts"
         # yamllint disable-line rule:line-length

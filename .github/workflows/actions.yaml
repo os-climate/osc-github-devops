@@ -57,28 +57,28 @@ jobs:
           fetch-tags: true
           # The repository-tag-current action currently contains a workaround for this behaviour
 
-      - name: "Action: github-latest-release"
-        id: github-latest-release
+      - name: "Action: github-get-latest-release-action"
+        id: github-get-latest-release-action
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/github-latest-release@main
+        uses: os-climate/osc-github-devops/.github/actions/github-get-latest-release-action@main
 
-        # ToDo: Validate step for github-latest-release (above)
+        # ToDo: Validate step for github-get-latest-release-action (above)
 
       - name: "Action: git-commit-message"
         id: git-commit-message
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/git-commit-message@main
+        uses: os-climate/osc-github-devops/.github/actions/git-commit-message-action@main
 
-      - name: "Action: python-project-name"
-        id: python-project-name
+      - name: "Action: python-get-project-name-action"
+        id: python-get-project-name-action
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/python-project-name@main
+        uses: os-climate/osc-github-devops/.github/actions/python-get-project-name-action@main
 
-      - name: "Validate: python-project-name"
+      - name: "Validate: python-get-project-name-action"
         shell: bash
         run: |
-          # Check output from: python-project-name
-          PYTHON_PROJECT_NAME="${{ steps.python-project-name.outputs.python_project_name }}"
+          # Check output from: python-get-project-name-action
+          PYTHON_PROJECT_NAME="${{ steps.python-get-project-name-action.outputs.python_project_name }}"
           if [ "$PYTHON_PROJECT_NAME" != "osc-github-devops" ]; then
             echo "ERROR: Python project name was not as expected"
             echo "python_project_name: $PYTHON_PROJECT_NAME"; exit 1
@@ -86,16 +86,16 @@ jobs:
             echo "Returned project name is correct: $PYTHON_PROJECT_NAME"
           fi
 
-      - name: "Action: python-project-version"
-        id: python-project-version
+      - name: "Action: python-project-version-action"
+        id: python-project-version-action
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/python-project-version@main
 
-      - name: "Validate: python-project-version"
+      - name: "Validate: python-project-version-action"
         shell: bash
         run: |
-          # Check output from: python-project-version
-          PYTHON_PROJECT_VERSION="${{ steps.python-project-version.outputs.python_project_version }}"
+          # Check output from: python-project-version-action
+          PYTHON_PROJECT_VERSION="${{ steps.python-project-version-action.outputs.python_project_version }}"
           if [ "$PYTHON_PROJECT_VERSION" != "v0.1.15" ]; then
             echo "ERROR: Python project version was not as expected"
             echo "python_project_version: $PYTHON_PROJECT_VERSION"; exit 1
@@ -103,16 +103,16 @@ jobs:
             echo "Returned project version is correct: $PYTHON_PROJECT_NAME"
           fi
 
-      - name: "Action: python-project-name-match-repo-name"
-        id: python-project-name-match-repo-name
+      - name: "Action: project-name-vs-repo-action"
+        id: project-name-vs-repo-action
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/python-project-name-match-repo-name@main
+        uses: os-climate/osc-github-devops/.github/actions/project-name-vs-repo-action@main
 
-      - name: "Validate: python-project-name-match-repo-name"
+      - name: "Validate: project-name-vs-repo-action"
         shell: bash
         run: |
-          # Check output from: python-project-name-match-repo-name
-          MATCHES_REPO_NAME="${{ steps.python-project-name-match-repo-name.outputs.MATCHES_REPO_NAME }}"
+          # Check output from: project-name-vs-repo-action
+          MATCHES_REPO_NAME="${{ steps.project-name-vs-repo-action.outputs.MATCHES_REPO_NAME }}"
           if [ "$MATCHES_REPO_NAME" != "true" ]; then
             echo "ERROR: Python project name did not match repository name, as expected"
             echo "MATCHES_REPO_NAME: $MATCHES_REPO_NAME"; exit 1
@@ -122,33 +122,33 @@ jobs:
           fi
 
       - name: "Extract TOX stanza"
-        id: tox-stanza
+        id: tox-parse-stanza-action
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/tox-parse-stanza@main
+        uses: os-climate/osc-github-devops/.github/actions/tox-parse-stanza-action@main
 
-      - name: "Action: python-versions-matrix"
-        id: python-versions-matrix
+      - name: "Action: python-versions-matrix-action"
+        id: python-versions-matrix-action
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/python-versions-matrix@main
+        uses: os-climate/osc-github-devops/.github/actions/python-versions-matrix-action@main
 
-      - name: "Action: tag-validate-semantic [semantic tag]"
+      - name: "Action: tag-validate-semantic-action [semantic tag]"
         id: tag-validate-semantic-good
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/tag-validate-semantic@main
+        uses: os-climate/osc-github-devops/.github/actions/tag-validate-semantic-action@main
         with:
           tag: "v1.2.3"
 
-      - name: "Action: tag-validate-semantic [junk tag]"
+      - name: "Action: tag-validate-semantic-action [junk tag]"
         id: tag-validate-semantic-junk
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/tag-validate-semantic@main
+        uses: os-climate/osc-github-devops/.github/actions/tag-validate-semantic-action@main
         with:
           tag: "v1.not-valid.3.garbage"
 
-      - name: "Validate: tag-validate-semantic"
+      - name: "Validate: tag-validate-semantic-action"
         shell: bash
         run: |
-          # Check output from: tag-validate-semantic [semantic/junk]
+          # Check output from: tag-validate-semantic-action [semantic/junk]
           ERRORS="false"
           if [ "${{ steps.tag-validate-semantic-good.outputs.semantic }}" != "true" ]; then
             echo "Errors with: tag-validate-semantic v1.2.3"
@@ -164,31 +164,31 @@ jobs:
             echo "All tag validation tests passed, no errors found"
           fi
 
-      - name: "Action: repository-tag-current"
-        id: repository-tag-current
+      - name: "Action: repository-tag-current-action"
+        id: repository-tag-current-action
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/repository-tag-current@main
+        uses: os-climate/osc-github-devops/.github/actions/repository-tag-current-action@main
 
-      - name: "Action: semantic-tag-production [patch]"
+      - name: "Action: semantic-tag-production-action [patch]"
         id: semantic-tag-production-patch
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/semantic-tag-production@main
+        uses: os-climate/osc-github-devops/.github/actions/semantic-tag-production-action@main
         with:
           tag: "v2.9.6"
           type: "patch"
 
-      - name: "Action: semantic-tag-production [minor]"
+      - name: "Action: semantic-tag-production-action [minor]"
         id: semantic-tag-production-minor
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/semantic-tag-production@main
+        uses: os-climate/osc-github-devops/.github/actions/semantic-tag-production-action@main
         with:
           tag: "v0.1.2"
           type: "minor"
 
-      - name: "Action: semantic-tag-production [major]"
+      - name: "Action: semantic-tag-production-action [major]"
         id: semantic-tag-production-major
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/semantic-tag-production@main
+        uses: os-climate/osc-github-devops/.github/actions/semantic-tag-production-action@main
         with:
           tag: "v1.2.3"
           type: "major"
@@ -196,7 +196,7 @@ jobs:
       - name: "Validate Incremented PROD Tags"
         shell: bash
         run: |
-          # Check output from: semantic-tag-production
+          # Check output from: semantic-tag-production-action
           ERRORS="false"
           if [ "${{ steps.semantic-tag-production-patch.outputs.tag }}" != "2.9.7" ]; then
             echo "Errors with: semantic-tag-production [patch]"
@@ -269,32 +269,32 @@ jobs:
             echo 'All tag check tests passed, no errors found'
           fi
 
-      - name: "Action: url-validity-check"
-        id: url-validity-check
+      - name: "Action: url-validity-check-action"
+        id: url-validity-check-action
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/url-validity-check@main
+        uses: os-climate/osc-github-devops/.github/actions/url-validity-check-action@main
         with:
           prefix: "https://test.pypi.org/project"
           string: "/ITR"
           suffix: "/"
 
-      - name: "Action: github-labels"
-        id: github-labels
+      - name: "Action: github-labels-action"
+        id: github-labels-action
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/github-labels@main
+        uses: os-climate/osc-github-devops/.github/actions/github-labels-action@main
         env:
           GH_TOKEN: ${{ github.token }}
 
-      - name: "Validate: github-labels"
+      - name: "Validate: github-labels-action"
         shell: bash
         run: |
-          # Check output from: github-labels
-          if [ "${{ steps.github-labels.outputs.present }}" = 'true' ]; then
+          # Check output from: github-labels-action
+          if [ "${{ steps.github-labels-action.outputs.present }}" = 'true' ]; then
             echo "Labels are reported present:"
             if (gh label list | grep release); then
               exit 0
             fi
-          elif [ "${{ steps.github-labels.outputs.created }}" = 'true' ]; then
+          elif [ "${{ steps.github-labels-action.outputs.created }}" = 'true' ]; then
             echo "Labels are reported present:"
             if (gh label list | grep release); then
               exit 0
@@ -305,8 +305,8 @@ jobs:
             exit 1
           fi
 
-      - name: "Action: github-secrets"
-        uses: os-climate/osc-github-devops/.github/actions/github-secrets@main
+      - name: "Action: test-github-secrets-action"
+        uses: os-climate/osc-github-devops/.github/actions/test-github-secrets-action@main
         # Do NOT run until change is merged; secrets will NOT be available and workflow WILL fail
         if: github.event_name != 'pull_request'
         # continue-on-error: true
@@ -316,42 +316,42 @@ jobs:
           pypi_production: ${{ secrets.PYPI_PRODUCTION }}
           one_password_development: ${{ secrets.ONE_PASSWORD_DEVELOPMENT }}
 
-      - name: "Action: string-comparison [match]"
+      - name: "Action: string-comparison-action [match]"
         id: string-comparison-matching
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/string-comparison@main
+        uses: os-climate/osc-github-devops/.github/actions/string-comparison-action@main
         with:
           string_a: "Mary had a little lamb"
           string_b: "Mary had a little lamb"
 
-      - name: "Action: string-comparison [different]"
+      - name: "Action: string-comparison-action [different]"
         id: string-comparison-different
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/string-comparison@main
+        uses: os-climate/osc-github-devops/.github/actions/string-comparison-action@main
         with:
           string_a: "Mary had a little lamb"
           string_b: "I do not like eating lamb"
 
-      - name: "Action: string-comparison [sub-string match]"
+      - name: "Action: string-comparison-action [sub-string match]"
         id: string-comparison-substring
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/string-comparison@main
+        uses: os-climate/osc-github-devops/.github/actions/string-comparison-action@main
         with:
           string_a: "Mary had a little lamb"
           string_b: "a little lamb"
           substring_match: "true"
 
-      - name: "Action: string-comparison [sub-string match, case-insensitive]"
+      - name: "Action: string-comparison-action [sub-string match, case-insensitive]"
         id: string-comparison-substring-nocase
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/string-comparison@main
+        uses: os-climate/osc-github-devops/.github/actions/string-comparison-action@main
         with:
           string_a: "Mary had a little lamb"
           string_b: "A little lamb"
           substring_match: "true"
           case_insensitive: "true"
 
-      - name: "Report Errors: string-comparison"
+      - name: "Report Errors: string-comparison-action"
         # yamllint disable-line rule:line-length
         if: steps.string-comparison-matching.outputs.match == 'false'
           || steps.string-comparison-different.outputs.match == 'true'
@@ -408,13 +408,13 @@ jobs:
           # Report errors with path tests
           echo "One or more path checks failed validation"; exit 1
 
-      - name: "Action: python-project-version-patch"
-        id: python-project-version-patch
-        uses: os-climate/osc-github-devops/.github/actions/python-project-version-patch@main
+      - name: "Action: python-project-version-patch-action"
+        id: python-project-version-patch-action
+        uses: os-climate/osc-github-devops/.github/actions/python-project-version-patch-action@main
         with:
           replacement_version: "v1.0.0"
 
-      - name: "Validate: python-project-version-patch"
+      - name: "Validate: python-project-version-patch-action"
         shell: bash
         run: |
           # Check version string was patched correctly
@@ -426,5 +426,5 @@ jobs:
             fi
           fi
 
-      - name: "Action: python-project-setup"
-        uses: os-climate/osc-github-devops/.github/actions/python-project-setup@main
+      - name: "Action: python-project-setup-action"
+        uses: os-climate/osc-github-devops/.github/actions/python-project-setup-action@main

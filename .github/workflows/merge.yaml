@@ -65,24 +65,23 @@ jobs:
 
       # - name: "Intermediate step to check if version changed"
       #   id: parse-version
-      #   uses: os-climate/osc-github-devops/.github/actions/python-project-version@main
+      #   uses: os-climate/osc-github-devops/.github/actions/python-project-version-action@main
 
       # - name: "Intermediate step to check if tag already exists"
       #   id: parse-version
-      #   uses: os-climate/osc-github-devops/.github/actions/python-project-version@main
+      #   uses: os-climate/osc-github-devops/.github/actions/python-project-version-action@main
 
       - name: "Extract Version"
         id: parse-project
         if: steps.trap-version-bump-pyproject-toml.outputs.match == 'true'
-        # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/python-project-version@main
+        uses: os-climate/osc-github-devops/.github/actions/python-project-version-action@main
 
       - name: "Configure GIT"
         # yamllint disable-line rule:line-length
-        uses: lfit/releng-reusable-workflows/.github/actions/git-configure@0b4c7e76b95e903c04c0044c558d142f5ceb8c35 # 2025-01-19
+        uses: lfit/releng-reusable-workflows/.github/actions/git-configure-action@0b4c7e76b95e903c04c0044c558d142f5ceb8c35 # 2025-01-20
 
       - name: "Push Tag, Trigger Release"
-        uses: actions-ecosystem/action-push-tag@v1
+        uses: actions-ecosystem/action-push-tag@6e82caefe706f5a729e354df7443dc82f98a414f # v1.0.0
         if: steps.trap-version-bump-pyproject-toml.outputs.match == 'true'
         with:
           tag: ${{ steps.parse-project.outputs.python_project_version }}
