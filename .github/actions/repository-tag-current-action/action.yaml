@@ -93,7 +93,7 @@ runs:
 
     - name: "Check semantic/validity"
       id: validate
-      uses: os-climate/osc-github-devops/.github/actions/tag-validate-semantic@main
+      uses: os-climate/osc-github-devops/.github/actions/tag-validate-semantic-action@main
       with:
         tag: ${{ env.tag }}
 
