@@ -3,18 +3,17 @@
 
 [project]
 name = "osc-github-devops"
-# Also bump the version string in file .github/workflows/actions.yaml
-version = "v0.1.15"
+version = "0.1.15"
 # Uncomment to enable dynamic versioning
 # dynamic = [ "version" ]
-description = "Python project metadata to permit workflow testing."
+description = "Python project template"
 authors = [
   { name = "Matthew Watkins", email = "93649628+ModeSevenIndustrialSolutions@users.noreply.github.com" },
 ]
 requires-python = "<3.13,>=3.10"
 readme = "README.md"
 license = { text = "Apache-2.0" }
-keywords = ["Climate", "ITR", "Finance"]
+keywords = ["Climate", "Finance"]
 classifiers = [
   "Intended Audience :: Developers",
   "Intended Audience :: Science/Research",
@@ -25,7 +24,7 @@ classifiers = [
   "Programming Language :: Python",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3 :: Only",
-#  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.10",
   "Topic :: Office/Business :: Financial",
@@ -54,7 +53,7 @@ requires = ["pdm-backend"]
 build-backend = "pdm.backend"
 
 [project.optional-dependencies]
-  dev = [
+dev = [
   "ruff",
   "toml",
   "pdm",
@@ -67,13 +66,13 @@ test = [
     "pytest-cov",
 ]
 
-[tool.pdm.version]
+# [tool.pdm.version]
 # This stanza is documented here:
 # https://backend.pdm-project.org/metadata/#read-from-scm-tag-supporting-git-and-hg
 # Get versioning directly from GIT
-source = "scm"
-fallback_version = "0.0.0"
-write_to = "version.txt"
+# source = "scm"
+# fallback_version = "0.0.0"
+# write_to = "version.txt"
 
 [tool.pdm.scripts]
 test = "pytest"
@@ -101,7 +100,7 @@ omit = ["test/*"]
 [tool.coverage.report]
 fail_under = 30
 skip_empty = true
-#format = "html"
+format = ["term", "term-missing", "html", "text"]
 ignore_errors = true
 
 [tool.coverage.html]
@@ -171,7 +170,7 @@ ignore = [
 "!src/**.py" = ["D"]
 
 [tool.ruff.lint.pycodestyle]
-max-line-length = 160
+max-line-length = 120
 
 [tool.ruff.format]
 quote-style = "double"
