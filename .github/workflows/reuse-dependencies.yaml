@@ -18,7 +18,7 @@ jobs:
     name: "Repository Checks"
     if: startsWith(github.ref, 'dep/update-pdm-lock') != true
     # yamllint disable-line rule:line-length
-    uses: os-climate/osc-github-devops/.github/workflows/repository.yaml@main
+    uses: os-climate/osc-github-devops/.github/workflows/reuse-inspect-repository.yaml@main
     permissions:
       contents: read
 

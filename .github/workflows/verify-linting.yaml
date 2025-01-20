@@ -10,12 +10,17 @@ on:
   pull_request:
     types: [opened, reopened, edited, synchronize]
     paths:
-      - "!.github/"
-    branches:
-      - "*"
-      - "!update-devops-tooling"
+      - "**"
+      - "!.github/**"
+      - "!.*"
+      - "!pdm.lock"
+      - "!tox.ini"
 
 permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   linting:
@@ -23,4 +28,4 @@ jobs:
     permissions:
       contents: read
     # yamllint disable-line rule:line-length
-    uses: os-climate/osc-github-devops/.github/workflows/reuse-linting.yaml@ead07107d37425766864b6a3b1da459136dd9952 # 2024-12-31
+    uses: os-climate/osc-github-devops/.github/workflows/reuse-linting.yaml@405f3ed761eb3aec868739c7d4751415d3eb21e9 # 2024-01-20
