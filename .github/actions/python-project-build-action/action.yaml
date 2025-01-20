@@ -71,7 +71,7 @@ runs:
     - name: "Patch project versioning metadata"
       if: env.python_project_version != inputs.build_tag
       # yamllint disable-line rule:line-length
-      uses: os-climate/osc-github-devops/.github/actions/python-project-version-vs-tag-action@main
+      uses: os-climate/osc-github-devops/.github/actions/python-project-version-patch-action@main
       with:
         replacement_version: ${{ env.build_tag }}
 
