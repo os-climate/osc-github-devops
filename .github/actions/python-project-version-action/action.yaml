@@ -36,7 +36,7 @@ runs:
     - name: "Use project version from pyproject.toml"
       id: pyproject-toml-version
       if: steps.pyproject-toml.outputs.type == 'file'
-      uses: os-climate/osc-github-devops/.github/actions/file-grep-regex@main
+      uses: os-climate/osc-github-devops/.github/actions/file-grep-regex-action@main
       with:
         flags: "-oP -m1"
         # https://regex101.com/r/MWmRge/1
