@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
-name: "🤖 DevOps Automation [Merged Pull Request]"
+name: "🤖 Automatic Release [Merge]"
 
 # yamllint disable-line rule:truthy
 on:
@@ -13,6 +13,7 @@ on:
       - master
     paths:
       - "**"
+      # Temporarily comment these during testing
       #- "!.github/**"
       #- "!.*"
       #- "!pdm.lock"
@@ -78,7 +79,7 @@ jobs:
 
       - name: "Configure GIT"
         # yamllint disable-line rule:line-length
-        uses: lfit/releng-reusable-workflows/.github/actions/git-configure-action@0b4c7e76b95e903c04c0044c558d142f5ceb8c35 # 2025-01-20
+        uses: lfit/releng-reusable-workflows/.github/actions/git-configure-action@fd9bc3881956c2645d4da312079580d331f562ed # v0.2.2
 
       - name: "Push Tag, Trigger Release"
         uses: actions-ecosystem/action-push-tag@6e82caefe706f5a729e354df7443dc82f98a414f # v1.0.0
