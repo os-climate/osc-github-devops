@@ -89,7 +89,7 @@ jobs:
       - name: "Action: python-project-version-action"
         id: python-project-version-action
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/python-project-version@main
+        uses: os-climate/osc-github-devops/.github/actions/python-project-version-action@main
 
       - name: "Validate: python-project-version-action"
         shell: bash
