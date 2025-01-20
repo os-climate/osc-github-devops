@@ -45,7 +45,7 @@ runs:
     # First action performs repository checkout
     - name: "Python project setup"
       id: project-setup
-      uses: os-climate/osc-github-devops/.github/actions/python-project-setup@main
+      uses: os-climate/osc-github-devops/.github/actions/python-project-setup-action@main
 
     - name: "Set up Python ${{ inputs.build_python_version }}"
       # yamllint disable-line rule:line-length
@@ -71,7 +71,7 @@ runs:
     - name: "Patch project versioning metadata"
       if: env.python_project_version != inputs.build_tag
       # yamllint disable-line rule:line-length
-      uses: os-climate/osc-github-devops/.github/actions/python-project-version-patch@c3c8c6ed8f61e21cef7bf2b4bfb08b8244c5dbc3 # 2025-01-14
+      uses: os-climate/osc-github-devops/.github/actions/python-project-version-vs-tag-action@main
       with:
         replacement_version: ${{ env.build_tag }}
 
@@ -142,7 +142,7 @@ runs:
     # These steps produce additional output files unsupported during package uploads
     - name: "Validate artefacts with Twine"
       # yamllint disable-line rule:line-length
-      uses: os-climate/osc-github-devops/.github/actions/python-twine-check@c3c8c6ed8f61e21cef7bf2b4bfb08b8244c5dbc3 # 2025-01-14
+      uses: os-climate/osc-github-devops/.github/actions/python-twine-check-action@main
 
     - name: "Artefact attestation for: ${{ inputs.ARTEFACT_PATH }}"
       uses: actions/attest-build-provenance@7668571508540a607bdfd90a87a560489fe372eb # v2.1.0
