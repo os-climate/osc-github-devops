@@ -19,7 +19,11 @@ on:
       - "master"
       - "!update-devops-tooling"
     paths:
-      - "!.github"
+      - "**"
+      - "!.github/**"
+      - "!.*"
+      - "!pdm.lock"
+      - "!tox.ini"
 
 permissions: {}
 
