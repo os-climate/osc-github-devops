@@ -3,7 +3,7 @@
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 # Test/validation suite for individual actions and workflows
-name: "🔨 Actions and Workflows"
+name: "🧪 Test GitHub Actions [Merge]"
 
 # yamllint disable-line rule:truthy
 on:
@@ -24,7 +24,7 @@ jobs:
 
   one-password:
     name: "1Password"
-    uses: os-climate/osc-github-devops/.github/workflows/one-password.yaml@main
+    uses: os-climate/osc-github-devops/.github/workflows/reuse-one-password.yaml@main
     # Do NOT run until change is merged; secrets will NOT be available and workflow WILL fail
     if: github.event_name != 'pull_request'
     with:
@@ -38,7 +38,7 @@ jobs:
 
   repository:
     name: "Repository Content"
-    uses: os-climate/osc-github-devops/.github/workflows/repository.yaml@main
+    uses: os-climate/osc-github-devops/.github/workflows/reuse-inspect-repository.yaml@main
     permissions:
       contents: read
 

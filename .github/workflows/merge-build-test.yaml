@@ -22,7 +22,7 @@ jobs:
   one-password:
     name: "1Password"
     # yamllint disable-line rule:line-length
-    uses: os-climate/osc-github-devops/.github/workflows/one-password.yaml@main
+    uses: os-climate/osc-github-devops/.github/workflows/reuse-one-password.yaml@main
     # Do NOT run until change is merged; secrets will NOT be available and workflow WILL fail
     if: github.event_name != 'pull_request'
     with:
@@ -52,7 +52,7 @@ jobs:
   repository:
     name: "Repository"
     # yamllint disable-line rule:line-length
-    uses: os-climate/osc-github-devops/.github/workflows/repository.yaml@main
+    uses: os-climate/osc-github-devops/.github/workflows/reuse-inspect-repository.yaml@main
     permissions:
       # Required for action that creates labels: github-labels
       contents: read
@@ -84,7 +84,7 @@ jobs:
   python-test:
     name: "Test"
     # yamllint disable-line rule:line-length
-    uses: os-climate/osc-github-devops/.github/workflows/python-tests.yaml@main
+    uses: os-climate/osc-github-devops/.github/workflows/reuse-python-tests.yaml@main
     needs:
       - python-project
     # Matrix job
@@ -99,7 +99,7 @@ jobs:
   python-security:
     name: "Security"
     # yamllint disable-line rule:line-length
-    uses: os-climate/osc-github-devops/.github/workflows/python-security.yaml@main
+    uses: os-climate/osc-github-devops/.github/workflows/reuse-python-audit.yaml@main
     needs:
       - python-project
     # Matrix job
@@ -115,7 +115,7 @@ jobs:
     name: "Jupyter notebooks"
     if: needs.repository.outputs.jupyter_notebooks  == 'true'
     # yamllint disable-line rule:line-length
-    uses: os-climate/osc-github-devops/.github/workflows/jupyter-notebooks.yaml@main
+    uses: os-climate/osc-github-devops/.github/workflows/reuse-notebook-tests.yaml@main
     needs:
       - repository
       - python-project
@@ -230,7 +230,7 @@ jobs:
   pypi-test:
     name: "Test"
     # yamllint disable-line rule:line-length
-    uses: os-climate/osc-github-devops/.github/workflows/pypi-publish.yaml@main
+    uses: os-climate/osc-github-devops/.github/workflows/reuse-publish-pypi.yaml@main
     needs:
       - repository
       - python-project
@@ -253,7 +253,7 @@ jobs:
     # yamllint disable-line rule:line-length
     if: startsWith(github.ref, 'refs/tags/') || contains(github.event.head_commit.message, '[release]')
     # yamllint disable-line rule:line-length
-    uses: os-climate/osc-github-devops/.github/workflows/pypi-publish.yaml@main
+    uses: os-climate/osc-github-devops/.github/workflows/reuse-publish-pypi.yaml@main
     needs:
       - repository
       - python-project
