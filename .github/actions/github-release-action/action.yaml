@@ -47,7 +47,7 @@ runs:
   steps:
     - name: "Verify release tag"
       id: tag-validate
-      uses: os-climate/osc-github-devops/.github/actions/tag-validate-semantic@main
+      uses: os-climate/osc-github-devops/.github/actions/tag-validate-semantic-action@main
       with:
         tag: ${{ inputs.build_tag }}
 
