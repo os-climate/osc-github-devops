@@ -27,23 +27,10 @@ env:
 permissions: {}
 
 jobs:
-  repository:
-    name: "Repository Checks"
-    if: startsWith(github.ref, 'dep/update-pdm-lock') != true
-    # yamllint disable-line rule:line-length
-    uses: os-climate/osc-github-devops/.github/workflows/reuse-inspect-repository.yaml@12ed9699544b8c37155cb2732184644640cfd845 # 2025-01-20
-    permissions:
-      contents: read
-
   python-dependencies:
     name: "Update Python Dependencies"
     # yamllint disable-line rule:line-length
     uses: os-climate/osc-github-devops/.github/workflows/reuse-dependencies.yaml@12ed9699544b8c37155cb2732184644640cfd845 # 2025-01-20
-    needs:
-      - repository
-    # Only run if Python code is present in repository
-    if: needs.repository.outputs.python_project  == 'true' ||
-      needs.repository.outputs.jupyter_notebooks  == 'true'
     permissions:
       # IMPORTANT: mandatory to raise the PR
       id-token: write
