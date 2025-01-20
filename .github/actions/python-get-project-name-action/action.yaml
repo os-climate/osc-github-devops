@@ -31,7 +31,7 @@ runs:
     - name: "Use project name from setup.py"
       id: setup-py-name
       if: steps.setup-py.outputs.type == 'file'
-      uses: os-climate/osc-github-devops/.github/actions/file-grep-regex@main
+      uses: os-climate/osc-github-devops/.github/actions/file-grep-regex-action@main
       with:
         flags: "-oP -m1"
         regex: '(?<=name=")([^"]*)'
@@ -40,7 +40,7 @@ runs:
     - name: "Use project name from pyproject.toml"
       id: pyproject-toml-name
       if: steps.pyproject-toml.outputs.type == 'file'
-      uses: os-climate/osc-github-devops/.github/actions/file-grep-regex@main
+      uses: os-climate/osc-github-devops/.github/actions/file-grep-regex-action@main
       with:
         flags: "-oP -m1"
         regex: '(?<=^name = ")([^"]*)'
