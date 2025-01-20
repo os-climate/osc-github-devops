@@ -38,7 +38,7 @@ runs:
     - name: "Determine versioning type [static|dynamic]"
       id: versioning-type
       # yamllint disable-line rule:line-length
-      uses: os-climate/osc-github-devops/.github/actions/python-versioning-type@main
+      uses: os-climate/osc-github-devops/.github/actions/python-versioning-type-action@main
 
     - name: "ToDo: Artefact/build Python version"
       id: artefact-build-python
@@ -53,7 +53,7 @@ runs:
     - name: "Extract Python supported versions (JSON)"
       id: versions-matrix
       # yamllint disable-line rule:line-length
-      uses: os-climate/osc-github-devops/.github/actions/python-versions-matrix@main
+      uses: os-climate/osc-github-devops/.github/actions/python-versions-matrix-action@main
 
     - name: "Display summary output"
       shell: bash
