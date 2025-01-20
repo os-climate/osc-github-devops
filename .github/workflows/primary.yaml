@@ -42,7 +42,7 @@ jobs:
     steps:
       - name: "Check for required secrets/API keys/tokens"
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/github-secrets@main
+        uses: os-climate/osc-github-devops/.github/actions/test-github-secrets-action@main
         with:
           # Mandatory secrets/variables to check
           pypi_development: ${{ secrets.PYPI_DEVELOPMENT }}
@@ -146,7 +146,7 @@ jobs:
       - name: "Extract project/repository naming"
         id: naming
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/python-project-name@main
+        uses: os-climate/osc-github-devops/.github/actions/project-name-vs-repo-action@main
 
       - name: "⬇ Download build artefacts"
         # yamllint disable-line rule:line-length
