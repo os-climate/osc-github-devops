@@ -39,12 +39,15 @@ runs:
 
         #SHELLCODESTART
 
+        set -o pipefail
+        set -vx
+
         # Allows for testing from a local shell
         if [ -z "$GITHUB_OUTPUT" ]; then
           echo "Running from a shell, NOT workflow"
           export GITHUB_OUTPUT="/dev/null"
           export GITHUB_ENV="/dev/null"
-          if [ $# -ne 3 ]; then
+          if [ $# -ne 4 ]; then
             echo "Error: invalid arguments specified"
             echo "Usage:  $0 [flags] [regex] [filename]"; exit 1
           else
@@ -52,6 +55,7 @@ runs:
             FLAGS="$1"
             REGEX="$2"
             FILENAME="$3"
+            NO_FAIL="$4"
             set +o noglob
           fi
         else
@@ -64,7 +68,7 @@ runs:
 
         if [ ! -f "$FILENAME" ]; then
           echo "Error: file not found [$FILENAME]"
-          if [ "${{ inputs.NO_FAIL }} = "true" ]; then
+          if [ "${{ inputs.NO_FAIL }}" = "true" ]; then
             exit 0
           else
             exit 1
@@ -82,7 +86,7 @@ runs:
 
         if [ -z "$STRING" ]; then
           echo "String extraction failed; no matching value found ❌"
-          if [ "${{ inputs.NO_FAIL }} = "true" ]; then
+          if [ "${{ inputs.NO_FAIL }}" = "true" ]; then
             exit 0
           else
             exit 1
