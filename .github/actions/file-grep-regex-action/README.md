@@ -16,14 +16,14 @@ Call as a step in a larger composite action or workflow.
 <!-- markdownlint-disable MD013 -->
 
 ```yaml
-    steps:
-      - uses: lfit/releng-reusable-workflows/.github/actions/file-grep-regex-action@main # v1.0.0
-        id: grep-file
-        with:
-          regex: '(?<=^\[testenv:docs\])*basepython = python\K(.*)'
-          filename: "docs/tox.ini"
-          flags: "-m1 -Po"
-          no_fail: "true"
+steps:
+  - uses: lfit/releng-reusable-workflows/.github/actions/file-grep-regex-action@main # v1.0.0
+    id: grep-file
+    with:
+      regex: '(?<=^\[testenv:docs\])*basepython = python\K(.*)'
+      filename: "docs/tox.ini"
+      flags: "-m1 -Po"
+      no_fail: "true"
 ```
 
 <!-- markdownlint-enable MD013 -->
