@@ -6,6 +6,7 @@ name: "Extract string from file using GREP"
 description: "Uses grep, flags, and a regular expression to extract text from a file"
 
 inputs:
+  # Mandatory
   FLAGS:
     description: "Flags to use with grep command"
     required: false
@@ -16,6 +17,11 @@ inputs:
   FILENAME:
     description: "File containing text to extract"
     required: true
+  # Optional
+  NO_FAIL:
+    description: "Override errors if file not found or no value returned"
+    required: false
+    default: "false"
 
 outputs:
   EXTRACTED_STRING:
@@ -57,7 +63,12 @@ runs:
         fi
 
         if [ ! -f "$FILENAME" ]; then
-          echo "Error: file not found [$FILENAME]"; exit 1
+          echo "Error: file not found [$FILENAME]"
+          if [ "${{ inputs.NO_FAIL }} = "true" ]; then
+            exit 0
+          else
+            exit 1
+          fi
         fi
 
         set -o noglob
@@ -70,11 +81,16 @@ runs:
         set +o noglob
 
         if [ -z "$STRING" ]; then
-          echo "String extraction failed; no matching value found ❌"; exit 1
+          echo "String extraction failed; no matching value found ❌"
+          if [ "${{ inputs.NO_FAIL }} = "true" ]; then
+            exit 0
+          else
+            exit 1
+          fi
         else
           # Make string available as action output
           echo "extracted_string=$STRING" >> "$GITHUB_OUTPUT"
-          echo "Extracted string: $STRING"
+          echo "Extracted string: $STRING ✅"
         fi
 
         #SHELLCODEEND
