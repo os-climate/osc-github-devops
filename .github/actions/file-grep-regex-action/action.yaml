@@ -40,7 +40,6 @@ runs:
         #SHELLCODESTART
 
         set -o pipefail
-        set -vx
 
         # Allows for testing from a local shell
         if [ -z "$GITHUB_OUTPUT" ]; then
