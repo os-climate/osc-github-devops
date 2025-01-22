@@ -26,7 +26,8 @@ runs:
     - name: "Use project version from setup.py"
       id: setup-py-version
       if: steps.setup-py.outputs.type == 'file'
-      uses: os-climate/osc-github-devops/.github/actions/file-grep-regex-action@main
+      # yamllint disable-line rule:line-length
+      uses: lfit/releng-reusable-workflows/.github/actions/file-grep-regex-action@edbf8500dcbe4c63ea07b13f4077a7f29bbecb11 # 2025-01-22
       with:
         flags: "-oP -m1"
         # https://regex101.com/r/QKYHId/1
@@ -36,7 +37,8 @@ runs:
     - name: "Use project version from pyproject.toml"
       id: pyproject-toml-version
       if: steps.pyproject-toml.outputs.type == 'file'
-      uses: os-climate/osc-github-devops/.github/actions/file-grep-regex-action@main
+      # yamllint disable-line rule:line-length
+      uses: lfit/releng-reusable-workflows/.github/actions/file-grep-regex-action@edbf8500dcbe4c63ea07b13f4077a7f29bbecb11 # 2025-01-22
       with:
         flags: "-oP -m1"
         # https://regex101.com/r/MWmRge/1
