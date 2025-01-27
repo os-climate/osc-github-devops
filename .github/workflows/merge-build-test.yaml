@@ -184,6 +184,7 @@ jobs:
       contents: read
       # Needed for trusted publishing; must also be passed from parent workflows
       id-token: write
+      packages: write
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -212,6 +213,7 @@ jobs:
       contents: read
       # Needed for trusted publishing; must also be passed from parent workflows
       id-token: write
+      packages: write
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
