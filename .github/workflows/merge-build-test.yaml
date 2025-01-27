@@ -171,103 +171,102 @@ jobs:
 
   ### Action code
 
-  #  pypi-test:
-  #    name: "Test PyPI Package Publishing"
-  #    needs:
-  #      - repository
-  #      - python-project
-  #      - python-security
-  #      - python-test
-  #    runs-on: "ubuntu-24.04"
-  #    # environment: development
-  #    permissions:
-  #      contents: read
-  #      # Needed for trusted publishing; must also be passed from parent workflows
-  #      id-token: write
-  #    env:
-  #      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #    steps:
-  #      # Need repository content to extract project name
-  #      - name: "Publish to Test PyPI"
-  #        uses: os-climate/osc-github-devops/.github/actions/python-pypi-publish-action@main
-  #        with:
-  #          # environment: development
-  #          build_tag: ${{ needs.repository.outputs.build_tag }}
-  #          one_password_item: "op://hdiyadcjno2knqgvcy4wj5ulya/tm2ffuusrynfivtcsnamginhm4/password"
-  #          op_service_account_token: ${{ secrets.ONE_PASSWORD_PRODUCTION }}
-  #          pypi_credential: ${{ secrets.PYPI_PRODUCTION }}
-
-  #  pypi:
-  #    name: "Release to PyPI"
-  #    if: startsWith(github.ref, 'refs/tags/') || contains(github.event.head_commit.message, '[release]')
-  #    needs:
-  #      - repository
-  #      - python-project
-  #      - python-test
-  #      - python-security
-  #      - pypi-test
-  #    runs-on: "ubuntu-24.04"
-  #    # environment: production
-  #    permissions:
-  #      contents: read
-  #      # Needed for trusted publishing; must also be passed from parent workflows
-  #      id-token: write
-  #    env:
-  #      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #    steps:
-  #      # Need repository content to extract project name
-  #      - name: "Publish to PyPI"
-  #        uses: os-climate/osc-github-devops/.github/actions/python-pypi-publish-action@main
-  #        with:
-  #          # environment: production
-  #          build_tag: ${{ needs.repository.outputs.build_tag }}
-  #          one_password_item: "op://hdiyadcjno2knqgvcy4wj5ulya/vds5rebqxeqfrjqwpszxxicmzq/password"
-  #          op_service_account_token: ${{ secrets.ONE_PASSWORD_PRODUCTION }}
-  #          pypi_credential: ${{ secrets.PYPI_PRODUCTION }}
-
-  ### Reusable code
-
   pypi-test:
-    name: "Test"
-    # yamllint disable-line rule:line-length
-    uses: os-climate/osc-github-devops/.github/workflows/reuse-publish-pypi.yaml@main
+    name: "Test PyPI Package Publishing"
     needs:
       - repository
       - python-project
-      - python-test
       - python-security
-    with:
-      environment: "development"
-      build_tag: ${{ needs.repository.outputs.build_tag }}
-      one_password_item: "op://hdiyadcjno2knqgvcy4wj5ulya/tm2ffuusrynfivtcsnamginhm4/password"
+      - python-test
+    runs-on: "ubuntu-24.04"
+    # environment: development
     permissions:
       contents: read
       # Needed for trusted publishing; must also be passed from parent workflows
       id-token: write
-    secrets:
-      OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.ONE_PASSWORD_PRODUCTION }}
-      PYPI_CREDENTIAL: ${{ secrets.PYPI_DEVELOPMENT }}
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      # Need repository content to extract project name
+      - name: "Publish to Test PyPI"
+        uses: os-climate/osc-github-devops/.github/actions/python-pypi-publish-action@main
+        with:
+          # environment: development
+          build_tag: ${{ needs.repository.outputs.build_tag }}
+          one_password_item: "op://hdiyadcjno2knqgvcy4wj5ulya/tm2ffuusrynfivtcsnamginhm4/password"
+          op_service_account_token: ${{ secrets.ONE_PASSWORD_PRODUCTION }}
+          pypi_credential: ${{ secrets.PYPI_PRODUCTION }}
 
   pypi:
-    name: "Release"
-    # yamllint disable-line rule:line-length
+    name: "Release to PyPI"
     if: startsWith(github.ref, 'refs/tags/') || contains(github.event.head_commit.message, '[release]')
-    # yamllint disable-line rule:line-length
-    uses: os-climate/osc-github-devops/.github/workflows/reuse-publish-pypi.yaml@main
     needs:
       - repository
       - python-project
       - python-test
       - python-security
       - pypi-test
-    with:
-      environment: "production"
-      build_tag: ${{ needs.repository.outputs.build_tag }}
-      one_password_item: "op://hdiyadcjno2knqgvcy4wj5ulya/vds5rebqxeqfrjqwpszxxicmzq/password"
+    runs-on: "ubuntu-24.04"
+    # environment: production
     permissions:
       contents: read
       # Needed for trusted publishing; must also be passed from parent workflows
       id-token: write
-    secrets:
-      OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.ONE_PASSWORD_PRODUCTION }}
-      PYPI_CREDENTIAL: ${{ secrets.PYPI_PRODUCTION }}
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      # Need repository content to extract project name
+      - name: "Publish to PyPI"
+        uses: os-climate/osc-github-devops/.github/actions/python-pypi-publish-action@main
+        with:
+          # environment: production
+          build_tag: ${{ needs.repository.outputs.build_tag }}
+          one_password_item: "op://hdiyadcjno2knqgvcy4wj5ulya/vds5rebqxeqfrjqwpszxxicmzq/password"
+          op_service_account_token: ${{ secrets.ONE_PASSWORD_PRODUCTION }}
+          pypi_credential: ${{ secrets.PYPI_PRODUCTION }}
+
+  ### Reusable code
+#  pypi-test:
+#    name: "Test"
+#    # yamllint disable-line rule:line-length
+#    uses: os-climate/osc-github-devops/.github/workflows/reuse-publish-pypi.yaml@main
+#    needs:
+#      - repository
+#      - python-project
+#      - python-test
+#      - python-security
+#    with:
+#      environment: "development"
+#      build_tag: ${{ needs.repository.outputs.build_tag }}
+#      one_password_item: "op://hdiyadcjno2knqgvcy4wj5ulya/tm2ffuusrynfivtcsnamginhm4/password"
+#    permissions:
+#      contents: read
+#      # Needed for trusted publishing; must also be passed from parent workflows
+#      id-token: write
+#    secrets:
+#      OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.ONE_PASSWORD_PRODUCTION }}
+#      PYPI_CREDENTIAL: ${{ secrets.PYPI_DEVELOPMENT }}
+
+#  pypi:
+#    name: "Release"
+#    # yamllint disable-line rule:line-length
+#    if: startsWith(github.ref, 'refs/tags/') || contains(github.event.head_commit.message, '[release]')
+#    # yamllint disable-line rule:line-length
+#    uses: os-climate/osc-github-devops/.github/workflows/reuse-publish-pypi.yaml@main
+#    needs:
+#      - repository
+#      - python-project
+#      - python-test
+#      - python-security
+#      - pypi-test
+#    with:
+#      environment: "production"
+#      build_tag: ${{ needs.repository.outputs.build_tag }}
+#      one_password_item: "op://hdiyadcjno2knqgvcy4wj5ulya/vds5rebqxeqfrjqwpszxxicmzq/password"
+#    permissions:
+#      contents: read
+#      # Needed for trusted publishing; must also be passed from parent workflows
+#      id-token: write
+#    secrets:
+#      OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.ONE_PASSWORD_PRODUCTION }}
+#      PYPI_CREDENTIAL: ${{ secrets.PYPI_PRODUCTION }}
