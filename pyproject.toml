@@ -90,10 +90,6 @@ lint = ["pre-commit"]
 testpaths = [
   "tests/",
 ]
-#addopts = """
-#  --cov
-#  --cov-report=html
-#"""
 addopts = ["--cov", "--cov-report=html"]
 
 [tool.coverage.run]
