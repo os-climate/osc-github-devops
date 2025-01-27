@@ -36,7 +36,7 @@ runs:
   using: "composite"
   steps:
     # Need repository content to extract project name
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
     - name: "Extract project/repository naming"
       id: naming
@@ -88,25 +88,15 @@ runs:
           echo "No SigStore signing artefacts to purge"
         fi
 
-    - name: "Checking Destination for Project"
-      id: project-url-check
+    - name: "Checking package index for build/release"
+      id: check-package-index
       # yamllint disable-line rule:line-length
-      uses: os-climate/osc-github-devops/.github/actions/url-validity-check@main
+      uses: os-climate/osc-github-devops/.github/actions/pypi-version-check-action@main
       with:
-        # e.g. "https://test.pypi.org/project/ITR/"
-        prefix: "${{ env.base_url }}/project"
-        string: "/${{ steps.naming.outputs.python_project_name }}"
-        suffix: "/"
-
-    - name: "Checking Destination for Build/Release"
-      id: build-url-check
-      # yamllint disable-line rule:line-length
-      uses: os-climate/osc-github-devops/.github/actions/url-validity-check@main
-      with:
-        prefix: "${{ env.base_url }}/project"
-        # e.g. "https://test.pypi.org/project/ITR/v1.0.0/"
-        string: "/${{ steps.naming.outputs.python_project_name }}"
-        suffix: "/${{ inputs.build_tag }}/"
+        index_url: "${{ env.base_url }}/simple"
+        package_name: "${{ steps.naming.outputs.python_project_name }}"
+        package_version: "${{ inputs.build_tag }}"
+        environment: ${{ inputs.ENVIRONMENT }}
 
     - name: "Determine publishing method"
       id: conditions
@@ -114,29 +104,29 @@ runs:
       run: |
         # Determine publishing method
 
-        if [ "${{ steps.project-url-check.outputs.valid }}" = "true" ]; then
+        if [ "${{ steps.check-package-index.outputs.package_match }}" = "true" ]; then
           echo "Project has previously been published ✅"
           publish_method="Trusted Publishing"
         fi
 
-        if [ "${{ steps.build-url-check.outputs.valid }}" == 'false' ]; then
+        if [ "${{ steps.check-package-index.outputs.version_match }}" != 'true' ]; then
           echo "This build/release has NOT previously been published ✅"
         fi
 
         # ToDo: remove line below when supporting reusable workflows
-        #if [ "$publish_method" = "Trusted Publishing" ]; then
+        if [ "$publish_method" = "Trusted Publishing" ]; then
         #  echo "⚠️ Trusting published is temporarily disabled"
         #  publish_method="Trusted Publishing Bypassed"
         #else
-        #  echo "Publishing will use Trusted Publishing ✅"
-        #fi
+          echo "Publishing will use Trusted Publishing ✅"
+        fi
 
-        if [ "${{ env.base_url }}" = "https://pypi.org/" ] && \
-        [ "${{ steps.build-url-check.outputs.valid }}" == 'true' ]; then
+        if [ "${{ env.base_url }}" != "https://pypi.org" ] && \
+        [ "${{ steps.check-package-index.outputs.version_match }}" == 'true' ]; then
           echo "This build/release has already been published ❌"
           echo "This build/release has already been published ❌" >> "$GITHUB_STEP_SUMMARY"
           exit 1
-        elif [ "${{ steps.build-url-check.outputs.valid }}" == 'true' ]; then
+        elif [ "${{ steps.check-package-index.outputs.version_match }}" == 'true' ]; then
           echo "This build/release has already been published ❌"
           publish_method="Skipped"
           # Skip the rest of the logic in this step for test/development builds
@@ -178,11 +168,6 @@ runs:
           echo "publish_method=$publish_method" >> "$GITHUB_OUTPUT"
         fi
 
-    # Temporarily disabled due to OIDC (and token/claim complications)
-    # This is all about job_workflow_ref vs ref
-    # e.g. https://github.com/pypi/warehouse/issues/11096
-    # https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/using-openid-connect-with-reusable-workflows
-
     - name: "Publish PyPI [Trusted Publishing]"
       uses: pypa/gh-action-pypi-publish@76f52bc884231f62b9a034ebfe128415bbaabdfc # v1.12.4
       # yamllint disable-line rule:line-length
@@ -196,8 +181,7 @@ runs:
         verify-metadata: false
         # Optional debugging, pretty much essential for information on failures
         verbose: true
-        attestations: false # Currently too buggy to enable
-        # attestations: true
+        attestations: true # Currently too buggy to enable?
 
     - name: "Retrieve Credential [1Password]"
       id: one-password-pypi-test
