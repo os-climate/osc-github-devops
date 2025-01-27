@@ -135,7 +135,7 @@ runs:
 
         echo '# 🔍 Repository Content Inspection' >> "$TMPFILE"
         echo "Supported content types are listed in the table below" >> "$TMPFILE"
-        echo "| Status | Support Content Type |" >> "$TMPFILE"
+        echo "| Status | Content Type Found |" >> "$TMPFILE"
         echo "| -------- | ------- |" >> "$TMPFILE"
         echo "| $PYTHON_PROJECT | Python Project |" >> "$TMPFILE"
         echo "| $GO_PROJECT | Go Project |" >> "$TMPFILE"
