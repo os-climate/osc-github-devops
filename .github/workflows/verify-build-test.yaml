@@ -22,36 +22,6 @@ on:
 permissions: {}
 
 jobs:
-  one-password:
-    name: "1Password"
-    # yamllint disable-line rule:line-length
-    uses: os-climate/osc-github-devops/.github/workflows/reuse-one-password.yaml@main
-    # Do NOT run until change is merged; secrets will NOT be available and workflow WILL fail
-    if: github.event_name != 'pull_request'
-    with:
-      ACCESS_TYPE: "production"
-      VAULT_ITEM: "op://hdiyadcjno2knqgvcy4wj5ulya/Test Secure Note/notesPlain"
-      EXPORT: false
-    secrets:
-      # Test development credentials
-      ONE_PASSWORD_DEVELOPMENT: ${{ secrets.ONE_PASSWORD_DEVELOPMENT }}
-      ONE_PASSWORD_PRODUCTION: ${{ secrets.ONE_PASSWORD_PRODUCTION }}
-    permissions: {}
-
-  check-secrets:
-    name: "Required credentials"
-    runs-on: ubuntu-24.04
-    permissions: {}
-    steps:
-      - name: "Check for required secrets/API keys/tokens"
-        # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/test-github-secrets-action@main
-        with:
-          # Mandatory secrets/variables to check
-          pypi_development: ${{ secrets.PYPI_DEVELOPMENT }}
-          pypi_production: ${{ secrets.PYPI_PRODUCTION }}
-          one_password_development: ${{ secrets.ONE_PASSWORD_DEVELOPMENT }}
-
   repository:
     name: "Repository"
     # yamllint disable-line rule:line-length
