@@ -184,7 +184,7 @@ runs:
     # https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/using-openid-connect-with-reusable-workflows
 
     - name: "Publish PyPI [Trusted Publishing]"
-      uses: pypa/gh-action-pypi-publish@15c56dba361d8335944d31a2ecd17d700fc7bcbc # v1.12.2
+      uses: pypa/gh-action-pypi-publish@76f52bc884231f62b9a034ebfe128415bbaabdfc # v1.12.4
       # yamllint disable-line rule:line-length
       if: steps.conditions.outputs.publish_method == 'Trusted Publishing'
       with:
@@ -212,7 +212,7 @@ runs:
 
     # Used only once prior to trusted publishing being configured
     - name: "Publish PyPI [1Password Credential]"
-      uses: pypa/gh-action-pypi-publish@15c56dba361d8335944d31a2ecd17d700fc7bcbc # v1.12.2
+      uses: pypa/gh-action-pypi-publish@76f52bc884231f62b9a034ebfe128415bbaabdfc # v1.12.4
       if: steps.conditions.outputs.publish_method == '1Password Vault'
       with:
         repository-url: "${{ env.publish_url }}"
@@ -226,7 +226,7 @@ runs:
 
     # Fallback method using credential stored as GitHub secret
     - name: "Publish PyPI [GitHub Secret]"
-      uses: pypa/gh-action-pypi-publish@15c56dba361d8335944d31a2ecd17d700fc7bcbc # v1.12.2
+      uses: pypa/gh-action-pypi-publish@76f52bc884231f62b9a034ebfe128415bbaabdfc # v1.12.4
       if: steps.conditions.outputs.publish_method == 'GitHub Secret'
       with:
         repository-url: "${{ env.publish_url }}"
