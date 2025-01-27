@@ -9,6 +9,9 @@ outputs:
   PYTHON_PROJECT:
     description: "Repository contains a Python project with file: pyproject.toml"
     value: ${{ steps.content.outputs.python_project }}
+  GO_PROJECT:
+    description: "Repository contains a Go project with file: go.mod"
+    value: ${{ steps.content.outputs.go_project }}
   NODE_JS_PROJECT:
     description: "Repository contains a Node.js project with file: package.json"
     value: ${{ steps.content.outputs.node_js_project }}
@@ -18,12 +21,21 @@ outputs:
   GRADLE_CONFIG:
     description: "Repository contains Gradle project with file(s): settings.gradle*"
     value: ${{ steps.content.outputs.gradle_config }}
-  JUPYTER_NOTEBOOKS:
-    description: "Repository contains Jupyter Notebooks with file(s): *.ipynb"
-    value: ${{ steps.content.outputs.jupyter_notebooks }}
   TOX_CONFIG:
     description: "Repository contains a TOX configuration file: tox.ini"
     value: ${{ steps.content.outputs.tox_config }}
+  JUPYTER_NOTEBOOKS:
+    description: "Repository contains Jupyter Notebooks with file(s): *.ipynb"
+    value: ${{ steps.content.outputs.jupyter_notebooks }}
+  MAKEFILE:
+    description: "Repository contains Jupyter Notebooks with file(s): *.ipynb"
+    value: ${{ steps.content.outputs.makefile }}
+  CMAKE_CONFIG:
+    description: "Repository contains: CMakeLists.txt"
+    value: ${{ steps.content.outputs.cmake_config }}
+  DOCKERFILE:
+    description: "Repository contains: Dockerfile"
+    value: ${{ steps.content.outputs.dockerfile }}
 
 runs:
   using: "composite"
@@ -32,26 +44,23 @@ runs:
       id: content
       shell: bash
       run: |
-        #/usr/bin/env bash
         # Inpect repository content
-
-        #SHELLCODESTART
 
         # Always create a local text file containing the summary output
         TMPFILE=$(mktemp -p /tmp --suffix "github-summary-output.txt")
-
-        # Allows for testing from a local shell
-        if [ -z "$GITHUB_OUTPUT" ]; then
-          echo "Running from a shell, NOT workflow"
-          export GITHUB_OUTPUT="/dev/null"
-          export GITHUB_ENV="/dev/null"
-        fi
 
         # Check for Python project metadata files
         if [ -f pyproject.toml ] || [ -f setup.py ]; then
           PYTHON_PROJECT="true"
         else
           PYTHON_PROJECT="false"
+        fi
+
+        # Check for Python project metadata files
+        if [ -f go.mod ]; then
+          GO_PROJECT="true"
+        else
+          GO_PROJECT="false"
         fi
 
         # Check for Node.JS package description
@@ -91,14 +100,36 @@ runs:
           JUPYTER_NOTEBOOKS="false"
         fi
 
+        if [ -f Makefile ]; then
+          MAKEFILE="true"
+        else
+          MAKEFILE="false"
+        fi
+
+        if [ -f CMakeLists.txt ]; then
+          CMAKE_CONFIG="true"
+        else
+          CMAKE_CONFIG="false"
+        fi
+
+        if [ -f Dockerfile ]; then
+          DOCKERFILE="true"
+        else
+          DOCKERFILE="false"
+        fi
+
         ### Set Outputs ###
 
         echo "python_project=$PYTHON_PROJECT" >> "$GITHUB_OUTPUT"
+        echo "go_project=$GO_PROJECT" >> "$GITHUB_OUTPUT"
         echo "node_js_project=$NODE_JS_PROJECT" >> "$GITHUB_OUTPUT"
         echo "maven_config=$MAVEN_CONFIG" >> "$GITHUB_OUTPUT"
         echo "gradle_config=$GRADLE_CONFIG" >> "$GITHUB_OUTPUT"
         echo "tox_config=$TOX_CONFIG" >> "$GITHUB_OUTPUT"
         echo "jupyter_notebooks=$JUPYTER_NOTEBOOKS" >> "$GITHUB_OUTPUT"
+        echo "makefile=$MAKEFILE" >> "$GITHUB_OUTPUT"
+        echo "cmake_config=$CMAKE_CONFIG" >> "$GITHUB_OUTPUT"
+        echo "dockerfile=$DOCKERFILE" >> "$GITHUB_OUTPUT"
 
         ### GitHub Summary ###
 
@@ -107,11 +138,15 @@ runs:
         echo "| Status | Support Content Type |" >> "$TMPFILE"
         echo "| -------- | ------- |" >> "$TMPFILE"
         echo "| $PYTHON_PROJECT | Python Project |" >> "$TMPFILE"
+        echo "| $GO_PROJECT | Go Project |" >> "$TMPFILE"
         echo "| $NODE_JS_PROJECT | Node.js Project |" >> "$TMPFILE"
         echo "| $MAVEN_CONFIG | Maven Configuration |" >> "$TMPFILE"
         echo "| $GRADLE_CONFIG | Gradle Configuration |" >> "$TMPFILE"
         echo "| $TOX_CONFIG | Tox Configuration |" >> "$TMPFILE"
         echo "| $JUPYTER_NOTEBOOKS | Jupyter Notebooks |" >> "$TMPFILE"
+        echo "| $MAKEFILE | Makefile |" >> "$TMPFILE"
+        echo "| $CMAKE_CONFIG | CMake Configuration |" >> "$TMPFILE"
+        echo "| $DOCKERFILE | Dockerfile |" >> "$TMPFILE"
 
         # The hack below helps make the displayed output summary pretty
         sed -i "s/true/✅/g" "$TMPFILE"
@@ -123,5 +158,3 @@ runs:
           cat "$TMPFILE"
         fi
         rm "$TMPFILE"
-
-        #SHELLCODEEND
