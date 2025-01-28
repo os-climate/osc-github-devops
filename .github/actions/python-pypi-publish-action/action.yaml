@@ -171,7 +171,7 @@ runs:
     - name: "Publish PyPI [Trusted Publishing]"
       # Do NOT pin to SHA just yet
       # See: https://github.com/pypa/gh-action-pypi-publish/discussions/287
-      uses: pypa/gh-action-pypi-publish@v1.12.4
+      uses: pypa/gh-action-pypi-publish@fb13cb306901256ace3dab689990e13a5550ffaa # v1.11.0
       # yamllint disable-line rule:line-length
       if: steps.conditions.outputs.publish_method == 'Trusted Publishing'
       with:
@@ -198,7 +198,7 @@ runs:
 
     # Used only once prior to trusted publishing being configured
     - name: "Publish PyPI [1Password Credential]"
-      uses: pypa/gh-action-pypi-publish@v1.12.4
+      uses: pypa/gh-action-pypi-publish@fb13cb306901256ace3dab689990e13a5550ffaa # v1.11.0
       if: steps.conditions.outputs.publish_method == '1Password Vault'
       with:
         repository-url: "${{ env.publish_url }}"
@@ -212,7 +212,7 @@ runs:
 
     # Fallback method using credential stored as GitHub secret
     - name: "Publish PyPI [GitHub Secret]"
-      uses: pypa/gh-action-pypi-publish@v1.12.4
+      uses: pypa/gh-action-pypi-publish@fb13cb306901256ace3dab689990e13a5550ffaa # v1.11.0
       if: steps.conditions.outputs.publish_method == 'GitHub Secret'
       with:
         repository-url: "${{ env.publish_url }}"
