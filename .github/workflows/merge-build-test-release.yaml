@@ -36,7 +36,7 @@ jobs:
     permissions: {}
 
   check-secrets:
-    name: "Required credentials"
+    name: "Check credentials"
     runs-on: ubuntu-24.04
     permissions: {}
     steps:
@@ -131,7 +131,7 @@ jobs:
       contents: read
 
   pypi-test:
-    name: "Test Release: PyPI"
+    name: "Test release: PyPI"
     needs:
       - repository
       - python-build
