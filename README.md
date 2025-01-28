@@ -54,7 +54,7 @@ In the meantime, here is some general documentation covering the relevant topics
 [comment]: # Section below is sourced by the badges displayed under the project heading
 -->
 
-[🧪 GitHub Actions CI/CD workflow tests badge]: https://github.com/os-climate/osc-github-devops/actions/workflows/merge-build-test.yaml/badge.svg?branch=main&event=push
-[GHA workflow runs list]: https://github.com/os-climate/osc-github-devops/actions/workflows/merge-build-test.yaml?query=branch%3Amain
+[🧪 GitHub Actions CI/CD workflow tests badge]: https://github.com/os-climate/osc-github-devops/actions/workflows/merge-build-test-release.yaml/badge.svg?branch=main&event=push
+[GHA workflow runs list]: https://github.com/os-climate/osc-github-devops/actions/workflows/merge-build-test-release.yaml?query=branch%3Amain
 [pre-commit.ci results page]: https://results.pre-commit.ci/latest/github/os-climate/osc-github-devops/main
 [pre-commit.ci status badge]: https://results.pre-commit.ci/badge/github/os-climate/osc-github-devops/main.svg
