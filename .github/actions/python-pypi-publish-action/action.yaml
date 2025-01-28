@@ -233,10 +233,10 @@ runs:
           echo "### Publishing skipped due to existing content ⛔️" >> "$GITHUB_STEP_SUMMARY"
           exit 0
         elif [ ${{ env.base_url }} != "https://pypi.org" ]; then
-          echo "# Tested Publishing to PyPI" >> "$GITHUB_STEP_SUMMARY"
+          echo "# Test Released: PyPI" >> "$GITHUB_STEP_SUMMARY"
         else
-          echo "# 🚀 Release Python Package: PyPI" >> "$GITHUB_STEP_SUMMARY"
+          echo "# 🚀 Released: PyPI" >> "$GITHUB_STEP_SUMMARY"
         fi
-        echo "Publishing method: ${{ steps.conditions.outputs.publish_method }}"
-        echo "Publishing method: ${{ steps.conditions.outputs.publish_method }}" >> "$GITHUB_STEP_SUMMARY"
-        echo "${{ env.BASE_URL }}/project/${{ steps.naming.outputs.python_project_name }}/${{ inputs.build_tag }}/" >> "$GITHUB_STEP_SUMMARY"
+        echo "Method: ${{ steps.conditions.outputs.publish_method }}"
+        echo "Method: ${{ steps.conditions.outputs.publish_method }}" >> "$GITHUB_STEP_SUMMARY"
+        echo "🔗 ${{ env.base_url }}/project/${{ steps.naming.outputs.python_project_name }}/${{ inputs.build_tag }}/" >> "$GITHUB_STEP_SUMMARY"
