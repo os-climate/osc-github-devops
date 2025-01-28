@@ -11,7 +11,7 @@ inputs:
     description: "Mandatory environment, e.g. development, production"
     type: string
     required: false
-    default: "test"
+    default: "production"
   BUILD_TAG:
     description: "Semantic tag for this release/build"
     type: string
