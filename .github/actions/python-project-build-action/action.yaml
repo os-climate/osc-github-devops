@@ -151,6 +151,7 @@ runs:
         subject-path: ${{ inputs.ARTEFACT_PATH }}/*
 
     - name: "Add heading to separate signing from attestations"
+      if: ${{ inputs.sigstore_sign == 'true' }}
       shell: bash
       run: |
         # Add heading to separate signing from attestations

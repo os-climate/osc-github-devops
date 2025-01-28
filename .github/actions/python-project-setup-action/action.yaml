@@ -71,7 +71,5 @@ runs:
         echo "| Build Python | ${{ steps.artefact-build-python.outputs.build_python_version }} |" \
           >> "$GITHUB_STEP_SUMMARY"
 
-        echo "## JSON Output" >> "$GITHUB_STEP_SUMMARY"
-
-        echo "### Versions JSON for Matrix jobs:" >> "$GITHUB_STEP_SUMMARY"
+        echo "### Python versions JSON for matrix jobs" >> "$GITHUB_STEP_SUMMARY"
         echo "${{ steps.versions-matrix.outputs.matrix_json }}" >> "$GITHUB_STEP_SUMMARY"
