@@ -3,6 +3,7 @@
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 name: "📦 GitHub Release"
+description: "Creates a new GitHub release"
 
 inputs:
   # Mandatory
@@ -47,6 +48,7 @@ runs:
   steps:
     - name: "Verify release tag"
       id: tag-validate
+      # yamllint disable-line rule:line-length
       uses: os-climate/osc-github-devops/.github/actions/tag-validate-semantic-action@main
       with:
         tag: ${{ inputs.build_tag }}
@@ -57,8 +59,6 @@ runs:
         # Build tag values
         if [ ${{ steps.tag-validate.outputs.semantic }} == 'true' ]; then
           pushed_tag="${{ inputs.build_tag }}"
-          echo "Release tag: ${{ inputs.build_tag }} ✅"
-          echo "Release tag: ${{ inputs.build_tag }} ✅" >> "$GITHUB_STEP_SUMMARY"
         else
           echo "Release tag NOT semantic: ${{ inputs.build_tag }} ❌"
           echo "Release tag NOT semantic: ${{ inputs.build_tag }} ❌" >> "$GITHUB_STEP_SUMMARY"
@@ -109,13 +109,18 @@ runs:
 
     - name: "Print summary/job output"
       shell: bash
+      # yamllint disable rule:line-length
       run: |
         # Print summary/job output
         echo "# 🚀 GitHub Release" >> "$GITHUB_STEP_SUMMARY"
-        echo "${{ env.RELEASE_TITLE }}" >> "$GITHUB_STEP_SUMMARY"
+        echo "Title: ${{ env.RELEASE_TITLE }} 💬" >> "$GITHUB_STEP_SUMMARY"
+        echo "Tag: ${{ inputs.build_tag }} 🏷️" >> "$GITHUB_STEP_SUMMARY"
+        echo "Link: https://github.com/${GITHUB_REPOSITORY}/releases/tag/${{ inputs.build_tag }} 🔗" >> "$GITHUB_STEP_SUMMARY"
         # ToDo: Add release notes here
         if [ "${{ inputs.prerelease }}" = "true" ]; then
-          echo "Pre-release/Development Build: ✅"
+          echo "Test/Development Build ✅"
+          echo "Test/Development Build" >> "$GITHUB_STEP_SUMMARY"
         else
-          echo "Production/Release Build: ✅"
+          echo "Production Release Build ✅"
+          echo "Production Release Build ✅" >> "$GITHUB_STEP_SUMMARY"
         fi
