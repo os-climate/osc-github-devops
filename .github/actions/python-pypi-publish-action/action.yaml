@@ -3,7 +3,7 @@
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 name: "📦 PyPI Publish Package"
-# Publishes a Python package to PyPI"
+description: "Publishes a Python package to PyPI"
 
 inputs:
   ENVIRONMENT:
