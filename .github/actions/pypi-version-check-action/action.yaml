@@ -60,17 +60,22 @@ runs:
         INDEX_URL="${{ inputs.INDEX_URL }}"
         PACKAGE_NAME="${{ inputs.PACKAGE_NAME }}"
         PACKAGE_VERSION="${{ inputs.PACKAGE_VERSION }}"
+        ENVIRONMENT="${{ inputs.ENVIRONMENT }}"
 
-        # If present, strip the leading "v" character
+        # Strip the leading "v" character if present
         if [[ "$PACKAGE_VERSION" == v* ]]; then
           PACKAGE_VERSION="${PACKAGE_VERSION:1}"
         fi
 
-        echo "Searching index: $INDEX_URL"
-        echo "For package:     $PACKAGE_NAME $PACKAGE_VERSION"
+        # Package names substitute dashes for full stops
+        PACKAGE_VERSION=$(echo $PACKAGE_VERSION | tr '-' '.')
+
+        echo "Searching index:   $INDEX_URL"
+        echo "For package:       $PACKAGE_NAME $PACKAGE_VERSION"
+        echo "CI/CD environment: $ENVIRONMENT"
 
         # Note: pip index is experimental and NOT fully supported
-        if [ "${{ inputs.ENVIRONMENT }}" == "production" ]; then
+        if [ "$ENVIRONMENT" == "production" ]; then
           OUTPUT=$(pip index --disable-pip-version-check \
               "--index-url=$INDEX_URL" versions \
               "$PACKAGE_NAME" 2>/dev/null)

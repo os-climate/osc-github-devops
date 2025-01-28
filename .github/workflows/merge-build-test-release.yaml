@@ -86,6 +86,7 @@ jobs:
     # yamllint disable-line rule:line-length
     uses: os-climate/osc-github-devops/.github/workflows/reuse-python-tests.yaml@main
     needs:
+      - repository
       - python-build
     # Matrix job
     strategy:
@@ -101,6 +102,7 @@ jobs:
     # yamllint disable-line rule:line-length
     uses: os-climate/osc-github-devops/.github/workflows/reuse-python-audit.yaml@main
     needs:
+      - repository
       - python-build
     # Matrix job
     strategy:
@@ -161,9 +163,6 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/') || contains(github.event.head_commit.message, '[release]')
     needs:
       - repository
-      - python-build
-      - python-test
-      - python-audit
       - pypi-test
     runs-on: "ubuntu-24.04"
     permissions:
@@ -203,9 +202,6 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/') || contains(github.event.head_commit.message, '[release]')
     needs:
       - repository
-      - python-build
-      - python-test
-      - python-audit
       - pypi-test
     runs-on: "ubuntu-24.04"
     environment: production
