@@ -96,8 +96,8 @@ jobs:
     permissions:
       contents: read
 
-  python-security:
-    name: "Security"
+  python-audit:
+    name: "Audit"
     # yamllint disable-line rule:line-length
     uses: os-climate/osc-github-devops/.github/workflows/reuse-python-audit.yaml@main
     needs:
@@ -135,7 +135,7 @@ jobs:
       - repository
       - python-build
       - python-test
-      - python-security
+      - python-audit
     runs-on: "ubuntu-24.04"
     permissions:
       contents: write
@@ -174,7 +174,7 @@ jobs:
     needs:
       - repository
       - python-build
-      - python-security
+      - python-audit
       - python-test
     runs-on: "ubuntu-24.04"
     # environment: development
@@ -203,7 +203,7 @@ jobs:
       - repository
       - python-build
       - python-test
-      - python-security
+      - python-audit
       - pypi-test
     runs-on: "ubuntu-24.04"
     # environment: production
