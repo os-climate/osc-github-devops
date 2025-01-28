@@ -30,14 +30,14 @@ jobs:
       # Required for action that creates labels: github-labels
       contents: read
 
-  python-project:
-    name: "Python project"
+  python-build:
+    name: "Python build"
     needs: repository
     if: needs.repository.outputs.python_project  == 'true'
     runs-on: ubuntu-24.04
     outputs:
-      matrix_json: ${{ steps.python-project.outputs.matrix_json }}
-      artefact_path: ${{ steps.python-project.outputs.artefact_path }}
+      matrix_json: ${{ steps.python-build.outputs.matrix_json }}
+      artefact_path: ${{ steps.python-build.outputs.artefact_path }}
     permissions:
       contents: write
       # Required by SigStore signing action
@@ -48,7 +48,7 @@ jobs:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: "Build Python project"
-        id: python-project
+        id: python-build
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/python-project-build-action@main
         with:
@@ -59,11 +59,11 @@ jobs:
     # yamllint disable-line rule:line-length
     uses: os-climate/osc-github-devops/.github/workflows/reuse-python-tests.yaml@main
     needs:
-      - python-project
+      - python-build
     # Matrix job
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(needs.python-project.outputs.matrix_json) }}
+      matrix: ${{ fromJson(needs.python-build.outputs.matrix_json) }}
     with:
       python_version: ${{ matrix.python-version }}
     permissions:
@@ -74,11 +74,11 @@ jobs:
     # yamllint disable-line rule:line-length
     uses: os-climate/osc-github-devops/.github/workflows/reuse-python-audit.yaml@main
     needs:
-      - python-project
+      - python-build
     # Matrix job
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(needs.python-project.outputs.matrix_json) }}
+      matrix: ${{ fromJson(needs.python-build.outputs.matrix_json) }}
     with:
       python_version: ${{ matrix.python-version }}
     permissions:
@@ -91,11 +91,11 @@ jobs:
     uses: os-climate/osc-github-devops/.github/workflows/reuse-notebook-tests.yaml@main
     needs:
       - repository
-      - python-project
+      - python-build
     # Matrix job
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(needs.python-project.outputs.matrix_json) }}
+      matrix: ${{ fromJson(needs.python-build.outputs.matrix_json) }}
     with:
       python_version: ${{ matrix.python-version }}
     permissions:

@@ -58,7 +58,7 @@ jobs:
       contents: read
 
   python-build:
-    name: "Python project"
+    name: "Python build"
     needs: repository
     if: needs.repository.outputs.python_project  == 'true'
     runs-on: ubuntu-24.04
@@ -128,6 +128,35 @@ jobs:
     permissions:
       contents: read
 
+  pypi-test:
+    name: "Test Package Publishing"
+    needs:
+      - repository
+      - python-build
+      - python-audit
+      - python-test
+    runs-on: "ubuntu-24.04"
+    # environment: development
+    permissions:
+      contents: read
+      # Needed for trusted publishing; must also be passed from parent workflows
+      id-token: write
+      packages: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      # Need repository content to extract project name
+      - name: "Test Package Publishing"
+        uses: os-climate/osc-github-devops/.github/actions/python-pypi-publish-action@main
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # environment: development
+          build_tag: ${{ needs.repository.outputs.build_tag }}
+          one_password_item: "op://hdiyadcjno2knqgvcy4wj5ulya/tm2ffuusrynfivtcsnamginhm4/password"
+          op_service_account_token: ${{ secrets.ONE_PASSWORD_PRODUCTION }}
+          pypi_credential: ${{ secrets.PYPI_PRODUCTION }}
+
   github-release:
     name: "Release to GitHub"
     if: startsWith(github.ref, 'refs/tags/') || contains(github.event.head_commit.message, '[release]')
@@ -136,6 +165,7 @@ jobs:
       - python-build
       - python-test
       - python-audit
+      - pypi-test
     runs-on: "ubuntu-24.04"
     permissions:
       contents: write
@@ -169,33 +199,6 @@ jobs:
           build_tag: ${{ needs.repository.outputs.build_tag }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
-  pypi-test:
-    name: "Test Package Publishing"
-    needs:
-      - repository
-      - python-build
-      - python-audit
-      - python-test
-    runs-on: "ubuntu-24.04"
-    # environment: development
-    permissions:
-      contents: read
-      # Needed for trusted publishing; must also be passed from parent workflows
-      id-token: write
-      packages: write
-    env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      # Need repository content to extract project name
-      - name: "Test Package Publishing"
-        uses: os-climate/osc-github-devops/.github/actions/python-pypi-publish-action@main
-        with:
-          # environment: development
-          build_tag: ${{ needs.repository.outputs.build_tag }}
-          one_password_item: "op://hdiyadcjno2knqgvcy4wj5ulya/tm2ffuusrynfivtcsnamginhm4/password"
-          op_service_account_token: ${{ secrets.ONE_PASSWORD_PRODUCTION }}
-          pypi_credential: ${{ secrets.PYPI_PRODUCTION }}
-
   pypi-release:
     name: "Release to PyPI"
     if: startsWith(github.ref, 'refs/tags/') || contains(github.event.head_commit.message, '[release]')
@@ -218,6 +221,8 @@ jobs:
       # Need repository content to extract project name
       - name: "Release to PyPI"
         uses: os-climate/osc-github-devops/.github/actions/python-pypi-publish-action@main
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           # environment: production
           build_tag: ${{ needs.repository.outputs.build_tag }}
