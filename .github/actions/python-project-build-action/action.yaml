@@ -150,6 +150,12 @@ runs:
       with:
         subject-path: ${{ inputs.ARTEFACT_PATH }}/*
 
+    - name: "Add heading to separate signing from attestations"
+      shell: bash
+      run: |
+        # Add heading to separate signing from attestations
+        echo "### Sigstore Signing ✍🏼" >> "$GITHUB_STEP_SUMMARY"
+
     # This step optional and must be explicitly requested (passed the relevant input)
     - name: "Sign packages with SigStore"
       # yamllint disable-line rule:line-length
