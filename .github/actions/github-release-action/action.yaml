@@ -112,8 +112,8 @@ runs:
       # yamllint disable rule:line-length
       run: |
         # Print summary/job output
-        echo "# 🚀 Released: GitHub" >> "$GITHUB_STEP_SUMMARY"
-        echo "💬 ${{ env.RELEASE_TITLE }}" >> "$GITHUB_STEP_SUMMARY"
+        echo "# 🚀 Release: GitHub" >> "$GITHUB_STEP_SUMMARY"
+        echo "${{ env.RELEASE_TITLE }}" >> "$GITHUB_STEP_SUMMARY"
         echo "🔗 https://github.com/${GITHUB_REPOSITORY}/releases/tag/${{ inputs.build_tag }}" >> "$GITHUB_STEP_SUMMARY"
         # ToDo: Add release notes here
         if [ "${{ inputs.prerelease }}" = "true" ]; then
