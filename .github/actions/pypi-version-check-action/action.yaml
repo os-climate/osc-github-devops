@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
-# Checks the PyPI index for a given package name (and optional build/release)
 name: "📦 PyPI Package Check"
+description: "Checks PyPI servers for a given package (and optional build/release)"
 
 inputs:
   # Mandatory

@@ -3,6 +3,7 @@
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 name: "🌍 Check URL for Validity with WGET"
+description: "Tests a give URL for a valid server response"
 
 inputs:
   PREFIX:

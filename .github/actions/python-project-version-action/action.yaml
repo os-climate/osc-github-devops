@@ -4,6 +4,7 @@
 
 name: "🐍 Get Python Project Version"
 description: "Returns the version of the Python Project"
+# Supports both pyproject.toml and setup.py project configuration files
 
 outputs:
   PYTHON_PROJECT_VERSION:
@@ -18,11 +19,6 @@ runs:
       with:
         path: "setup-py"
 
-    - uses: os-climate/osc-github-devops/.github/actions/path-check-action@main
-      id: pyproject-toml
-      with:
-        path: "pyproject.toml"
-
     - name: "Use project version from setup.py"
       id: setup-py-version
       if: steps.setup-py.outputs.type == 'file'
@@ -33,6 +29,11 @@ runs:
         # https://regex101.com/r/QKYHId/1
         regex: '(?<=version=")([^"]*)'
         filename: "setup.py"
+
+    - uses: os-climate/osc-github-devops/.github/actions/path-check-action@main
+      id: pyproject-toml
+      with:
+        path: "pyproject.toml"
 
     - name: "Use project version from pyproject.toml"
       id: pyproject-toml-version

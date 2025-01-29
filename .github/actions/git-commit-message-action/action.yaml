@@ -3,6 +3,7 @@
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 name: "💬 GIT Commit Message"
+description: "Returns the most recent GIT commit message body"
 
 inputs:
   REF:
