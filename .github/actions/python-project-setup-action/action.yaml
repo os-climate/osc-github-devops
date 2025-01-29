@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
+# python-project-setup-action
 name: "🛠️ Python Project Metadata"
 description: "Extracts Python project metadata from repository content"
 
@@ -19,10 +20,10 @@ outputs:
     value: ${{ steps.versioning-type.outputs.versioning_type }}
   MATRIX_JSON:
     description: "Project supported Python versions as JSON"
-    value: ${{ steps.versions-matrix.outputs.matrix_json }}
+    value: ${{ steps.supported-python-versions.outputs.matrix_json }}
   BUILD_PYTHON_VERSION:
     description: "Python version to use for build (creates artefacts)"
-    value: "${{ steps.artefact-build-python.outputs.build_python_version }}"
+    value: "${{ steps.supported-python-versions.outputs.base_python }}"
 
 runs:
   using: "composite"
@@ -40,18 +41,8 @@ runs:
       # yamllint disable-line rule:line-length
       uses: os-climate/osc-github-devops/.github/actions/python-versioning-type-action@main
 
-    - name: "ToDo: Artefact/build Python version"
-      id: artefact-build-python
-      shell: bash
-      run: |
-        # ToDo: Artefact/build Python version enumerated from pyproject.toml
-        build_python_version='3.11'
-        echo "Using artefact/build Python version: $build_python_version"
-        echo "build_python_version=$build_python_version" >> "$GITHUB_ENV"
-        echo "build_python_version=$build_python_version" >> "$GITHUB_OUTPUT"
-
     - name: "Extract Python supported versions (JSON)"
-      id: versions-matrix
+      id: supported-python-versions
       # yamllint disable-line rule:line-length
       uses: os-climate/osc-github-devops/.github/actions/python-project-supported-versions-action@main
 
@@ -68,8 +59,8 @@ runs:
         echo "| Project name | ${{ steps.project-naming.outputs.python_project_name }} |" >> "$GITHUB_STEP_SUMMARY"
         echo "| Package name | ${{ steps.project-naming.outputs.python_build_name }} |" >> "$GITHUB_STEP_SUMMARY"
         echo "| Versioning type | ${{ steps.versioning-type.outputs.versioning_type }} |" >> "$GITHUB_STEP_SUMMARY"
-        echo "| Build Python | ${{ steps.artefact-build-python.outputs.build_python_version }} |" \
+        echo "| Build Python | ${{ steps.supported-python-versions.outputs.build_python_version }} |" \
           >> "$GITHUB_STEP_SUMMARY"
 
         echo "### Python versions JSON for matrix jobs" >> "$GITHUB_STEP_SUMMARY"
-        echo "${{ steps.versions-matrix.outputs.matrix_json }}" >> "$GITHUB_STEP_SUMMARY"
+        echo "${{ steps.supported-python-versions.outputs.matrix_json }}" >> "$GITHUB_STEP_SUMMARY"
