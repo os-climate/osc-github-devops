@@ -4,7 +4,6 @@
 
 name: "🛠️ Check/Verify GitHub Secrets"
 description: "Checks/verifies access to required secrets"
-
 # These need to be setup at either the ORG or REPO level
 # (i.e. available to workflows in this repository)
 # e.g. PyPI API Keys required for package publishing

@@ -3,6 +3,7 @@
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 name: "🏷️ Repository Tag Create"
+description: "Creates a new tag in the repository"
 
 inputs:
   TAG:
