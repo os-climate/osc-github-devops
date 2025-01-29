@@ -6,7 +6,7 @@
 # by a third-party and are governed by separate terms of service, privacy
 # policy, and support documentation.
 
-name: 🔐 OSSF Scorecard Audit
+name: 🔐 Security Audit [Merge]
 on:
   workflow_dispatch:
   # For Branch-Protection check. Only the default branch is supported. See
@@ -26,6 +26,12 @@ on:
 permissions: read-all
 
 jobs:
+  call-sonatype-lifecycle:
+    # yamllint disable-line rule:line-length
+    uses: lfit/releng-reusable-workflows/.github/workflows/reuse-sonatype-lifecycle.yaml@36ff4d15c9c86771dc5d7073b5df323970f74b95 # 2025-01-29
+    secrets:
+      NEXUS_IQ_PASSWORD: ${{ secrets.NEXUS_IQ_PASSWORD }}
+
   analysis:
     name: Analysis
     runs-on: ubuntu-24.04
