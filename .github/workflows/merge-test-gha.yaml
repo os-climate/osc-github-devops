@@ -126,10 +126,10 @@ jobs:
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/tox-parse-stanza-action@main
 
-      - name: "Action: python-versions-matrix-action"
-        id: python-versions-matrix-action
+      - name: "Action: python-project-supported-versions-action"
+        id: python-project-supported-versions-action
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/python-versions-matrix-action@main
+        uses: os-climate/osc-github-devops/.github/actions/python-project-supported-versions-action@main
 
       - name: "Action: tag-validate-semantic-action [semantic tag]"
         id: tag-validate-semantic-good
