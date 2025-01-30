@@ -41,7 +41,7 @@ runs:
       # yamllint disable-line rule:line-length
       uses: os-climate/osc-github-devops/.github/actions/python-versioning-type-action@main
 
-    - name: "Extract Python supported versions (JSON)"
+    - name: "Get supported Python versions (Base/build and JSON)"
       id: supported-python-versions
       # yamllint disable-line rule:line-length
       uses: os-climate/osc-github-devops/.github/actions/python-supported-versions-action@main
@@ -55,11 +55,11 @@ runs:
         echo "Gathered Python project metadata"
 
         echo "| Key | Value |" >> "$GITHUB_STEP_SUMMARY"
-        echo "| -------- | ------- |" >> "$GITHUB_STEP_SUMMARY"
+        echo "| ----------------- | ------- |" >> "$GITHUB_STEP_SUMMARY"
         echo "| Project name | ${{ steps.project-naming.outputs.python_project_name }} |" >> "$GITHUB_STEP_SUMMARY"
         echo "| Package name | ${{ steps.project-naming.outputs.python_build_name }} |" >> "$GITHUB_STEP_SUMMARY"
         echo "| Versioning type | ${{ steps.versioning-type.outputs.versioning_type }} |" >> "$GITHUB_STEP_SUMMARY"
-        echo "| Build Python | ${{ steps.supported-python-versions.outputs.build_python_version }} |" \
+        echo "| Base/Build Python | ${{ steps.supported-python-versions.outputs.base_python }} |" \
           >> "$GITHUB_STEP_SUMMARY"
 
         echo "### Python versions JSON for matrix jobs" >> "$GITHUB_STEP_SUMMARY"
