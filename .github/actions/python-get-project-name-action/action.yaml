@@ -32,7 +32,7 @@ runs:
       id: setup-py-name
       if: steps.setup-py.outputs.type == 'file'
       # yamllint disable-line rule:line-length
-      uses: lfit/releng-reusable-workflows/.github/actions/file-grep-regex-action@edbf8500dcbe4c63ea07b13f4077a7f29bbecb11 # 2025-01-22
+      uses: lfit/releng-reusable-workflows/.github/actions/file-grep-regex-action@0b3caf21542fc99480016a2c3759264807880bff # 2025-01-30
       with:
         flags: "-oP -m1"
         regex: '(?<=name=")([^"]*)'
@@ -42,7 +42,7 @@ runs:
       id: pyproject-toml-name
       if: steps.pyproject-toml.outputs.type == 'file'
       # yamllint disable-line rule:line-length
-      uses: lfit/releng-reusable-workflows/.github/actions/file-grep-regex-action@edbf8500dcbe4c63ea07b13f4077a7f29bbecb11 # 2025-01-22
+      uses: lfit/releng-reusable-workflows/.github/actions/file-grep-regex-action@0b3caf21542fc99480016a2c3759264807880bff # 2025-01-30
       with:
         flags: "-oP -m1"
         regex: '(?<=^name = ")([^"]*)'
