@@ -47,8 +47,6 @@ runs:
     - name: "Python project setup"
       id: project-setup
       uses: os-climate/osc-github-devops/.github/actions/python-project-setup-action@main
-      # The above step is informational only and providfes summary output
-      # Python versions for setup-python/setup-pdm come directly from pyproject.toml
 
     - name: "Set up Python ${{ inputs.build_python_version }}"
       # yamllint disable-line rule:line-length
