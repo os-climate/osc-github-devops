@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
+# github-labels-action
 name: "🛠️ Check/Verify GitHub Labels"
 description: "Checks/creates mandatory labels"
 

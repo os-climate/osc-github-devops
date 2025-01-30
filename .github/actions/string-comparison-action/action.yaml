@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
+# string-comparison-action
 name: "🔤 String Comparison Check"
 description: erforms various string comparison checks, based on configurable parameters"
 

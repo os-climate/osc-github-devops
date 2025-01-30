@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
+# tag-validate-semantic-action
 name: "🏷️ Check Tag/String is Semantic"
 description: "Validates a given string for conformity to semantic value"
 

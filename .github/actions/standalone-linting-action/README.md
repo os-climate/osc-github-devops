@@ -9,7 +9,7 @@ This action is designed to run as a standalone linting step. This is helpful
 for tools that do not run well (or cannot run) under the GitHub marketplace
 pre-commit.ci application.
 
-## linting-action
+## standalone-linting-action
 
 ## Usage Example
 
@@ -19,7 +19,7 @@ Can be called as a workflow step with:
 steps:
   - name: Linting action
     # yamllint disable-line rule:line-length
-    uses: os-climate/osc-github-devops/.github/actions/linting-action@main
+    uses: os-climate/osc-github-devops/.github/actions/standalone-linting-action@main
 ```
 
 An example reusable workflow implementation:
@@ -46,16 +46,16 @@ jobs:
     steps:
       - name: Linting action
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/linting-action@main
+        uses: os-climate/osc-github-devops/.github/actions/standalone-linting-action@main
 ```
 
 ## Inputs
 
 <!-- markdownlint-disable MD013 -->
 
-| Variable Name    | Required | Default                                                                                                                                                        |
-| ---------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| CONFIG_URL       | False    | [pre-commit-config.yaml](https://raw.githubusercontent.com/os-climate/osc-github-devops/refs/heads/main/.github/actions/linting-action/pre-commit-config.yaml) |
-| DEPENDENCIES_URL | False    | [requirements.txt](https://raw.githubusercontent.com/os-climate/osc-github-devops/refs/heads/main/linting/requirements.txt)                                    |
+| Variable Name    | Required | Default                                                                                                                                                                   |
+| ---------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CONFIG_URL       | False    | [pre-commit-config.yaml](https://raw.githubusercontent.com/os-climate/osc-github-devops/refs/heads/main/.github/actions/standalone-linting-action/pre-commit-config.yaml) |
+| DEPENDENCIES_URL | False    | [requirements.txt](https://raw.githubusercontent.com/os-climate/osc-github-devops/refs/heads/main/linting/requirements.txt)                                               |
 
 <!-- markdownlint-enable MD013 -->

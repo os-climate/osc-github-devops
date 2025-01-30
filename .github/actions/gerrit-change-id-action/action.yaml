@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
+# gerrit-change-id-action
 name: "🏷️ Gerrit Change-Id"
 description: "Generates a Gerrit change-Id string"
 # Note: Based on shell code from the gerrit project

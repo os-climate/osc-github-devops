@@ -2,7 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
-name: "↗️ Project versioning type"
+# python-versioning-type-action
+name: "🐍 Project versioning type"
 description: "Checks if dynamic versioning is enabled in pyproject.toml"
 
 outputs:
