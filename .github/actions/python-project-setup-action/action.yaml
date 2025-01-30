@@ -107,7 +107,7 @@ runs:
         if [ "${{ steps.project-toml.outputs.type }}" = "file" ]; then
           echo "| Versioning type | ${{ steps.versioning-type.outputs.versioning_type }} |" >> "$GITHUB_STEP_SUMMARY"
         fi
-        echo "| Base/Build Python | ${{ steps.supported-python-versions.outputs.base_python }} |" \
+        echo "| Build Python | ${{ steps.supported-python-versions.outputs.base_python }} |" \
           >> "$GITHUB_STEP_SUMMARY"
 
         echo "### Python versions JSON for matrix jobs" >> "$GITHUB_STEP_SUMMARY"
