@@ -82,22 +82,6 @@ runs:
       with:
         path: ${{ inputs.artefact_location }}
 
-    - name: "Check if this tag already released"
-      id: release-validate
-      # yamllint disable-line rule:line-length
-      uses: os-climate/osc-github-devops/.github/actions/github-list-releases-action@main
-      with:
-        tag: ${{ inputs.build_tag }}
-
-    - name: "Abort with error when tag already released"
-      shell: bash
-      # yamllint disable-line rule:line-length
-      run: |
-        # Abort with error when tag already released
-        echo "⛔️ ## Aborting: tag ${{ inputs.build_tag }} already released" >> "$GITHUB_STEP_SUMMARY"
-        echo "🔗 https://github.com/${GITHUB_REPOSITORY}/releases/tag/${{ inputs.build_tag }}" >> "$GITHUB_STEP_SUMMARY"
-        exit 1
-
     - name: "GitHub release [with artefacts]"
       if: inputs.artefact_location != ''
       # Note: a bug in release v2.2.0 causes upload failures
