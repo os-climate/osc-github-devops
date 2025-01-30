@@ -51,14 +51,14 @@ runs:
       shell: bash
       run: |
         # Set preferred metadata file
-        if [ "${{ steps.project-toml.outputs.type }} = "file" ]; then
+        if [ "${{ steps.project-toml.outputs.type }}" = "file" ]; then
 
           # Project supports modern PEP standards
           echo "Using pyproject.toml for project metadata ✅"
           echo "metadata_file=pyproject.toml" >> "$GITHUB_ENV"
           echo "metadata_file=pyproject.toml" >> "$GITHUB_OUTPUTS"
 
-        elif [ "${{ steps.setup-py.outputs.type }} = "file" ]; then
+        elif [ "${{ steps.setup-py.outputs.type }}" = "file" ]; then
 
           # Project is defined using legacy standards
           echo "Using setup.py for project metadata ⚠️"
