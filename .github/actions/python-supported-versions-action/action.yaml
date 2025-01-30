@@ -25,14 +25,14 @@ runs:
     - name: "Check for: pyproject.toml"
       id: pyproject-toml
       # yamllint disable-line rule:line-length
-      uses: lfit/releng-reusable-workflows/.github/actions/file-grep-regex-action@0b3caf21542fc99480016a2c3759264807880bff # 2025-01-30
+      uses: os-climate/osc-github-devops/.github/actions/path-check-action@edf4c90472c8443832e4ecdf6cd3b6200da258fc # 2025-01-30
       with:
         path: "pyproject.toml"
 
     - name: "Check for: setup.py"
       id: setup-py
       # yamllint disable-line rule:line-length
-      uses: os-climate/osc-github-devops/.github/actions/path-check-action@edfd2709ced51496d7de1825c0f7ccdb52b1e485 # 2025-01-29
+      uses: os-climate/osc-github-devops/.github/actions/path-check-action@edf4c90472c8443832e4ecdf6cd3b6200da258fc # 2025-01-30
       with:
         path: "setup.py"
 
@@ -47,7 +47,7 @@ runs:
     - name: "Parse supported Python versions from pyproject.toml"
       id: capture-versions
       # yamllint disable-line rule:line-length
-      uses: ./.github/actions/file-grep-regex-action # Test fix to upstream action locally
+      uses: lfit/releng-reusable-workflows/.github/actions/file-grep-regex-action@0b3caf21542fc99480016a2c3759264807880bff # 2025-01-30
       with:
         flags: "-oP"
         # https://regex101.com/r/0mhOlr/1
