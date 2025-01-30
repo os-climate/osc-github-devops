@@ -3,7 +3,7 @@
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 # Test/validation suite for individual actions and workflows
-name: "🧪 Test GitHub Actions [Merge]"
+name: "🧪 Test GitHub Actions"
 
 # yamllint disable-line rule:truthy
 on:
@@ -96,7 +96,7 @@ jobs:
         run: |
           # Check output from: python-project-version-action
           PYTHON_PROJECT_VERSION="${{ steps.python-project-version-action.outputs.python_project_version }}"
-          if [ "$PYTHON_PROJECT_VERSION" != "0.1.21" ]; then
+          if [ "$PYTHON_PROJECT_VERSION" != "0.1.22" ]; then
             echo "ERROR: Python project version was not as expected"
             echo "python_project_version: $PYTHON_PROJECT_VERSION"; exit 1
           else
