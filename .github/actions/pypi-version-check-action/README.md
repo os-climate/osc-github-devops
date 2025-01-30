@@ -24,7 +24,7 @@ steps:
     with:
       index_url: "${{ env.base_url }}/simple"
       package_name: "/${{ steps.naming.outputs.python_project_name }}"
-      package_version: "/${{ inputs.build_tag }}/"
+      package_version: "/${{ inputs.tag }}/"
 ```
 
 Query URL examples:
