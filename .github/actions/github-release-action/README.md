@@ -19,7 +19,7 @@ steps:
   - name: "GitHub Release"
     uses: os-climate/osc-github-devops/.github/actions/github-release-action@main
     with:
-      build_tag: ${{ github.ref_name }}
+      tag: ${{ github.ref_name }}
       github_token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
@@ -29,7 +29,7 @@ steps:
 
 | Variable Name     | Required | Default   | Description                                 |
 | ----------------- | -------- | --------- | ------------------------------------------- |
-| BUILD_TAG         | True     | N/A       | Fixed preamble/string to embed/inject       |
+| TAG               | True     | N/A       | Fixed preamble/string to embed/inject       |
 | GITHUB_TOKEN      | True     | N/A       | Mandatory token for content write access    |
 | PROJECT_NAME      | False    | See Below | Project/product name                        |
 | RELEASE_TITLE     | False    | See Below | Title for the release                       |
@@ -49,13 +49,13 @@ When not provided, the project/product title will default to the repository name
 
 When not explicitly provided, the release title will be set to the compound value:
 
-`[Project Name] [Build Tag]`
+`[Project Name] [Tag]`
 
 So, when the following values are enumerated by the release action:
 
 ```console
 repository = osc-github-devops
-build_tag  = v1.0.1
+tag        = v1.0.1
 ```
 
 The GitHub release title would be presented as:

@@ -13,7 +13,7 @@ inputs:
     type: string
     required: false
     default: "production"
-  BUILD_TAG:
+  TAG:
     description: "Semantic tag for this release/build"
     type: string
     required: true
@@ -96,7 +96,7 @@ runs:
       with:
         index_url: "${{ env.base_url }}/simple"
         package_name: "${{ steps.naming.outputs.python_project_name }}"
-        package_version: "${{ inputs.build_tag }}"
+        package_version: "${{ inputs.tag }}"
         environment: ${{ inputs.ENVIRONMENT }}
 
     - name: "Determine publishing method"
@@ -250,4 +250,4 @@ runs:
         fi
         echo "Method: ${{ steps.conditions.outputs.publish_method }}"
         echo "Method: ${{ steps.conditions.outputs.publish_method }}" >> "$GITHUB_STEP_SUMMARY"
-        echo "🔗 ${{ env.base_url }}/project/${{ steps.naming.outputs.python_project_name }}/${{ inputs.build_tag }}/" >> "$GITHUB_STEP_SUMMARY"
+        echo "🔗 ${{ env.base_url }}/project/${{ steps.naming.outputs.python_project_name }}/${{ inputs.tag }}/" >> "$GITHUB_STEP_SUMMARY"

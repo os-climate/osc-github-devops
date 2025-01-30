@@ -8,7 +8,7 @@ description: "Creates a new GitHub release"
 
 inputs:
   # Mandatory
-  BUILD_TAG:
+  TAG:
     description: "Semantic tag for this release/build"
     type: string
     required: true
@@ -52,17 +52,17 @@ runs:
       # yamllint disable-line rule:line-length
       uses: os-climate/osc-github-devops/.github/actions/tag-validate-semantic-action@main
       with:
-        tag: ${{ inputs.build_tag }}
+        tag: ${{ inputs.tag }}
 
     - name: "Report build tag, setup ENV"
       shell: bash
       run: |
         # Build tag values
         if [ ${{ steps.tag-validate.outputs.semantic }} == 'true' ]; then
-          pushed_tag="${{ inputs.build_tag }}"
+          pushed_tag="${{ inputs.tag }}"
         else
-          echo "Release tag NOT semantic: ${{ inputs.build_tag }} ❌"
-          echo "Release tag NOT semantic: ${{ inputs.build_tag }} ❌" >> "$GITHUB_STEP_SUMMARY"
+          echo "Release tag NOT semantic: ${{ inputs.tag }} ❌"
+          echo "Release tag NOT semantic: ${{ inputs.tag }} ❌" >> "$GITHUB_STEP_SUMMARY"
           exit 1
         fi
         if [ -z "${{ inputs.PROJECT_NAME }}" ]; then
@@ -71,7 +71,7 @@ runs:
           echo "PROJECT_NAME=${{ inputs.PROJECT_NAME }}" >> $GITHUB_ENV
         fi
         if [ -z "${{ inputs.RELEASE_TITLE }}" ]; then
-          echo "RELEASE_TITLE="${{ inputs.PROJECT_NAME }}" ${{ inputs.build_tag }}" >> "$GITHUB_ENV"
+          echo "RELEASE_TITLE="${{ inputs.PROJECT_NAME }}" ${{ inputs.tag }}" >> "$GITHUB_ENV"
         else
           echo "RELEASE_TITLE=${{ inputs.RELEASE_TITLE }}" >> "$GITHUB_ENV"
         fi
@@ -87,15 +87,15 @@ runs:
       # yamllint disable-line rule:line-length
       uses: os-climate/osc-github-devops/.github/actions/github-list-releases-action@main
       with:
-        tag: ${{ inputs.build_tag }}
+        tag: ${{ inputs.tag }}
 
     - name: "Abort with error when tag already released"
       shell: bash
       # yamllint disable-line rule:line-length
       run: |
         # Abort with error when tag already released
-        echo "⛔️ ## Aborting: tag ${{ inputs.build_tag }} already released" >> "$GITHUB_STEP_SUMMARY"
-        echo "🔗 https://github.com/${GITHUB_REPOSITORY}/releases/tag/${{ inputs.build_tag }}" >> "$GITHUB_STEP_SUMMARY"
+        echo "⛔️ ## Aborting: tag ${{ inputs.tag }} already released" >> "$GITHUB_STEP_SUMMARY"
+        echo "🔗 https://github.com/${GITHUB_REPOSITORY}/releases/tag/${{ inputs.tag }}" >> "$GITHUB_STEP_SUMMARY"
         exit 1
 
     - name: "GitHub release [with artefacts]"
@@ -106,7 +106,7 @@ runs:
         token: ${{ inputs.GITHUB_TOKEN }}
         prerelease: ${{ inputs.prerelease }}
         make_latest: ${{ inputs.MAKE_LATEST }}
-        tag_name: ${{ inputs.build_tag }}
+        tag_name: ${{ inputs.tag }}
         name: ${{ env.RELEASE_TITLE }}
         # ToDo: Incorporate release notes, etc.
         # body_path: ${{ github.workspace }}/CHANGELOG.rst
@@ -121,7 +121,7 @@ runs:
         token: ${{ inputs.GITHUB_TOKEN }}
         prerelease: ${{ inputs.prerelease }}
         make_latest: ${{ inputs.MAKE_LATEST }}
-        tag_name: ${{ inputs.build_tag }}
+        tag_name: ${{ inputs.tag }}
         name: ${{ env.RELEASE_TITLE }}
 
     - name: "Print summary/job output"
@@ -131,7 +131,7 @@ runs:
         # Print summary/job output
         echo "# 🚀 Release: GitHub" >> "$GITHUB_STEP_SUMMARY"
         echo "${{ env.RELEASE_TITLE }}" >> "$GITHUB_STEP_SUMMARY"
-        echo "🔗 https://github.com/${GITHUB_REPOSITORY}/releases/tag/${{ inputs.build_tag }}" >> "$GITHUB_STEP_SUMMARY"
+        echo "🔗 https://github.com/${GITHUB_REPOSITORY}/releases/tag/${{ inputs.tag }}" >> "$GITHUB_STEP_SUMMARY"
         # ToDo: Add release notes here
         if [ "${{ inputs.prerelease }}" = "true" ]; then
           echo "Test/Development Build ✅"
