@@ -8,9 +8,6 @@ name: "🐍 [R] Update Dependencies"
 on:
   workflow_call:
 
-env:
-  python-version: 3.11
-
 permissions: {}
 
 jobs:
@@ -47,7 +44,7 @@ jobs:
         # yamllint disable-line rule:line-length
         uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
         with:
-          python-version: ${{ env.python-version }}
+          python-version-file: "pyproject.toml"
 
       - name: "Update Python dependencies"
         # yamllint disable-line rule:line-length
