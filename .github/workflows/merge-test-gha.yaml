@@ -69,16 +69,16 @@ jobs:
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/git-commit-message-action@main
 
-      - name: "Action: python-get-project-name-action"
-        id: python-get-project-name-action
+      - name: "Action: python-project-name-action"
+        id: python-project-name-action
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/python-get-project-name-action@main
+        uses: os-climate/osc-github-devops/.github/actions/python-project-name-action@main
 
-      - name: "Validate: python-get-project-name-action"
+      - name: "Validate: python-project-name-action"
         shell: bash
         run: |
-          # Check output from: python-get-project-name-action
-          PYTHON_PROJECT_NAME="${{ steps.python-get-project-name-action.outputs.python_project_name }}"
+          # Check output from: python-project-name-action
+          PYTHON_PROJECT_NAME="${{ steps.python-project-name-action.outputs.python_project_name }}"
           if [ "$PYTHON_PROJECT_NAME" != "osc-github-devops" ]; then
             echo "ERROR: Python project name was not as expected"
             echo "python_project_name: $PYTHON_PROJECT_NAME"; exit 1
@@ -103,16 +103,16 @@ jobs:
             echo "Returned project version is correct: $PYTHON_PROJECT_NAME"
           fi
 
-      - name: "Action: project-name-vs-repo-action"
-        id: project-name-vs-repo-action
+      - name: "Action: project-name-compare-action"
+        id: project-name-compare-action
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/project-name-vs-repo-action@main
+        uses: os-climate/osc-github-devops/.github/actions/project-name-compare-action@main
 
-      - name: "Validate: project-name-vs-repo-action"
+      - name: "Validate: project-name-compare-action"
         shell: bash
         run: |
-          # Check output from: project-name-vs-repo-action
-          MATCHES_REPO_NAME="${{ steps.project-name-vs-repo-action.outputs.MATCHES_REPO_NAME }}"
+          # Check output from: project-name-compare-action
+          MATCHES_REPO_NAME="${{ steps.project-name-compare-action.outputs.MATCHES_REPO_NAME }}"
           if [ "$MATCHES_REPO_NAME" != "true" ]; then
             echo "ERROR: Python project name did not match repository name, as expected"
             echo "MATCHES_REPO_NAME: $MATCHES_REPO_NAME"; exit 1
@@ -126,10 +126,10 @@ jobs:
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/tox-parse-stanza-action@main
 
-      - name: "Action: python-project-supported-versions-action"
-        id: python-project-supported-versions-action
+      - name: "Action: python-supported-versions-action"
+        id: python-supported-versions-action
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/python-project-supported-versions-action@main
+        uses: os-climate/osc-github-devops/.github/actions/python-supported-versions-action@main
 
       - name: "Action: tag-validate-semantic-action [semantic tag]"
         id: tag-validate-semantic-good
@@ -408,13 +408,13 @@ jobs:
           # Report errors with path tests
           echo "One or more path checks failed validation"; exit 1
 
-      - name: "Action: python-project-version-patch-action"
-        id: python-project-version-patch-action
-        uses: os-climate/osc-github-devops/.github/actions/python-project-version-patch-action@main
+      - name: "Action: python-project-version-update-action"
+        id: python-project-version-update-action
+        uses: os-climate/osc-github-devops/.github/actions/python-project-version-update-action@main
         with:
           replacement_version: "v1.0.0"
 
-      - name: "Validate: python-project-version-patch-action"
+      - name: "Validate: python-project-version-update-action"
         shell: bash
         run: |
           # Check version string was patched correctly

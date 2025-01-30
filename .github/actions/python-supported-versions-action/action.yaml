@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
-# python-project-supported-versions-action
-name: "↗️ Extract Python supported versions from pyproject.toml"
+# python-supported-versions-action
+name: "🐍 Extract Python supported versions from pyproject.toml"
 description: "Returns base version for builds and JSON for use in matrix jobs"
 # Base version is the lowest supported Python version specified
 

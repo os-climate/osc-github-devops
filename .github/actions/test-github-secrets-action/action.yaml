@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
+# test-github-secrets-action
 name: "🛠️ Check/Verify GitHub Secrets"
 description: "Checks/verifies access to required secrets"
 # These need to be setup at either the ORG or REPO level

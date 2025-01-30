@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
+# python-pypi-publish-action
 name: "📦 PyPI Publish Package"
 description: "Publishes a Python package to PyPI"
 
@@ -41,7 +42,7 @@ runs:
     - name: "Extract project/repository naming"
       id: naming
       # yamllint disable-line rule:line-length
-      uses: os-climate/osc-github-devops/.github/actions/python-get-project-name-action@main
+      uses: os-climate/osc-github-devops/.github/actions/python-project-name-action@main
 
     - name: "⬇ Download build artefacts"
       uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8

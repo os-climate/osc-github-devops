@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
+# standalone-standalone-linting-action
 name: "Linting action"
 description: "Runs linting tools that do NOT work under pre-commit.ci"
 
@@ -11,13 +12,13 @@ inputs:
     type: string
     required: false
     # yamllint disable-line rule:line-length
-    default: "https://raw.githubusercontent.com/os-climate/osc-github-devops/refs/heads/main/.github/actions/linting-action/pre-commit-config.yaml"
+    default: "https://raw.githubusercontent.com/os-climate/osc-github-devops/refs/heads/main/.github/actions/standalone-linting-action/pre-commit-config.yaml"
   DEPENDENCIES_URL:
     description: "Download location for Python dependencies"
     type: string
     required: false
     # yamllint disable-line rule:line-length
-    default: "https://raw.githubusercontent.com/os-climate/osc-github-devops/refs/heads/main/.github/actions/linting-action/requirements.txt"
+    default: "https://raw.githubusercontent.com/os-climate/osc-github-devops/refs/heads/main/.github/actions/standalone-linting-action/requirements.txt"
 
 runs:
   using: "composite"

@@ -3,8 +3,8 @@
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 # python-project-setup-action
-name: "🛠️ Python Project Metadata"
-description: "Extracts Python project metadata from repository content"
+name: "🛠️ Python Project Setup"
+description: "Extracts Python project metadata from repository"
 
 outputs:
   # Enumerated values
@@ -34,7 +34,7 @@ runs:
     - name: "Extract Python project naming"
       id: project-naming
       # yamllint disable-line rule:line-length
-      uses: os-climate/osc-github-devops/.github/actions/python-get-project-name-action@main
+      uses: os-climate/osc-github-devops/.github/actions/python-project-name-action@main
 
     - name: "Determine versioning type [static|dynamic]"
       id: versioning-type
@@ -44,7 +44,7 @@ runs:
     - name: "Extract Python supported versions (JSON)"
       id: supported-python-versions
       # yamllint disable-line rule:line-length
-      uses: os-climate/osc-github-devops/.github/actions/python-project-supported-versions-action@main
+      uses: os-climate/osc-github-devops/.github/actions/python-supported-versions-action@main
 
     - name: "Display summary output"
       shell: bash

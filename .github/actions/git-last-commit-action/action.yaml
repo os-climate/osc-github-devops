@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
+# git-last-commit-action
 name: "🗞️ Merge/Change Report"
 description: "Sets parameters and reports metadata for the last two commits"
 

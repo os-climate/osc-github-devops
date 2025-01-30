@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
+# tox-parse-stanza-action
 name: "🗒️ Tox: Parse Stanza"
 description: "Extracts all the defined tox stanza from inside square brackets"
 

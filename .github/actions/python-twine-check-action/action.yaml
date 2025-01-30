@@ -2,9 +2,10 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
+# python-twine-check-action
 name: "📦 Twine Check Artefacts"
 description: "Verifies Python build artefacts can be uploaded to PyPI"
-# Performs checks on filenames and file types
+# Checks supported filenames and file types prior to publishing
 
 inputs:
   PATH:

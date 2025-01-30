@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
+# github-get-latest-release-action
 name: "✳️ GitHub Latest Release"
 description: "Returns the Github release marked as latest"
 

@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
+# repository-tag-next-action
 name: "🏷️ Development Semantic Tag"
 description: "Generates a development/test tag based on the current/input tag"
 # Accepts an increment type of [major|minor|patch]
