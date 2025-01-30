@@ -56,7 +56,7 @@ runs:
           # Project supports modern PEP standards
           echo "Using pyproject.toml for project metadata ✅"
           echo "metadata_file=pyproject.toml" >> "$GITHUB_ENV"
-          echo "metadata_file=pyproject.toml" >> "$GITHUB_OUTPUTS"
+          echo "metadata_file=pyproject.toml" >> "$GITHUB_OUTPUT"
 
         elif [ "${{ steps.setup-py.outputs.type }}" = "file" ]; then
 
