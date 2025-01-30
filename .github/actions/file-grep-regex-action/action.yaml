@@ -70,8 +70,7 @@ runs:
             exit 1
           fi
         else
-          # Make string available as action output
-          echo "extracted_string=$STRING" >> "$GITHUB_OUTPUT"
+          # Make multi-line string available as action output
           { echo 'extracted_string<<EOF'
             echo "$STRING"
             echo EOF
