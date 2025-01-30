@@ -36,13 +36,13 @@ runs:
 
     - name: "Check for pyproject.toml"
       id: project-toml
-      uses: os-climate/osc-github-devops/.github/actions/path-check-action @main
+      uses: os-climate/osc-github-devops/.github/actions/path-check-action@main
       with:
         path: "pyproject.toml"
 
     - name: "Check for setup.py"
       id: setup-py
-      uses: os-climate/osc-github-devops/.github/actions/path-check-action @main
+      uses: os-climate/osc-github-devops/.github/actions/path-check-action@main
       with:
         path: "setup.py"
 
@@ -64,6 +64,11 @@ runs:
           echo "Using setup.py for project metadata ⚠️"
           echo "This project format is deprecated"
           echo "The repository content needs updating"
+
+          echo "# Using setup.py for project metadata ⚠️" >> "$GITHUB_STEP_SUMMARY"
+          echo "This project format is deprecated" >> "$GITHUB_STEP_SUMMARY"
+          echo "The repository content needs updating" >> "$GITHUB_STEP_SUMMARY"
+
           echo "metadata_file=setup.py" >> "$GITHUB_ENV"
           echo "metadata_file=setup.py" >> "$GITHUB_OUTPUTS"
         else
