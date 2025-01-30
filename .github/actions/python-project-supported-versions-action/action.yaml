@@ -73,13 +73,13 @@ runs:
         STRING=$(echo "$PYTHON_VERSIONS" | awk '{print "\""$1"\""}' | paste -s -d, -)
         STRING="[$STRING]"
 
-        matrix_json="{\"python-version\": $STRING}"
-        if ! (echo "$matrix_json" | jq); then
+        MATRIX_JSON="{\"python-version\": $STRING}"
+        if ! (echo "$MATRIX_JSON" | jq); then
           echo "❌ Parsing error; output is NOT valid JSON"; exit 1
         fi
-        echo "base_python=$base_python" >> "$GITHUB_ENV"
-        echo "base_python=$base_python" >> "$GITHUB_OUTPUT"
+        echo "base_python=$BASE_PYTHON" >> "$GITHUB_ENV"
+        echo "base_python=$BASE_PYTHON" >> "$GITHUB_OUTPUT"
         echo "base_python = $BASE_PYTHON"
-        echo "matrix_json=$matrix_json" >> "$GITHUB_ENV"
-        echo "matrix_json=$matrix_json" >> "$GITHUB_OUTPUT"
-        echo "matrix_json = $matrix_json"
+        echo "matrix_json=$MATRIX_JSON" >> "$GITHUB_ENV"
+        echo "matrix_json=$MATRIX_JSON" >> "$GITHUB_OUTPUT"
+        echo "matrix_json = $MATRIX_JSON"
