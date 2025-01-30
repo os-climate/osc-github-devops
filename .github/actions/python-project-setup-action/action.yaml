@@ -24,6 +24,9 @@ outputs:
   BUILD_PYTHON_VERSION:
     description: "Python version to use for build (creates artefacts)"
     value: "${{ steps.supported-python-versions.outputs.base_python }}"
+  METADATA_FILE:
+    description: "File user to enumerate project metadata"
+    value: "${{ steps.metadata-file.outputs.metadata_file }}"
 
 runs:
   using: "composite"
@@ -31,12 +34,49 @@ runs:
     # yamllint disable-line rule:line-length
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
+    - name: "Check for pyproject.toml"
+      id: project-toml
+      uses: os-climate/osc-github-devops/.github/actions/path-check-action @main
+      with:
+        path: "pyproject.toml"
+
+    - name: "Check for setup.py"
+      id: project-toml
+      uses: os-climate/osc-github-devops/.github/actions/path-check-action @main
+      with:
+        path: "setup.py"
+
+    - name: "Set preferred metadata file"
+      id: metadata-file
+      shell: bash
+      run: |
+        # Set preferred metadata file
+        if [ "${{ steps.project-toml.outputs.type }} = "file" ]; then
+
+          # Project supports modern PEP standards
+          echo "Using pyproject.toml for project metadata ✅"
+          echo "metadata_file=pyproject.toml" >> "$GITHUB_ENV"
+          echo "metadata_file=pyproject.toml" >> "$GITHUB_OUTPUTS"
+
+        elif [ "${{ steps.setup-py.outputs.type }} = "file" ]; then
+
+          # Project is defined using legacy standards
+          echo "Using setup.py for project metadata ⚠️"
+          echo "This project format is deprecated"
+          echo "The repository content needs updating"
+          echo "metadata_file=setup.py" >> "$GITHUB_ENV"
+          echo "metadata_file=setup.py" >> "$GITHUB_OUTPUTS"
+        else
+          echo "Unsupported or missing project metadata ❌"; exit 1
+        fi
+
     - name: "Extract Python project naming"
       id: project-naming
       # yamllint disable-line rule:line-length
       uses: os-climate/osc-github-devops/.github/actions/python-project-name-action@main
 
     - name: "Determine versioning type [static|dynamic]"
+      if: steps.project-toml.outputs.type == 'file'
       id: versioning-type
       # yamllint disable-line rule:line-length
       uses: os-climate/osc-github-devops/.github/actions/python-versioning-type-action@main
@@ -58,7 +98,10 @@ runs:
         echo "| ----------------- | ------- |" >> "$GITHUB_STEP_SUMMARY"
         echo "| Project name | ${{ steps.project-naming.outputs.python_project_name }} |" >> "$GITHUB_STEP_SUMMARY"
         echo "| Package name | ${{ steps.project-naming.outputs.python_build_name }} |" >> "$GITHUB_STEP_SUMMARY"
-        echo "| Versioning type | ${{ steps.versioning-type.outputs.versioning_type }} |" >> "$GITHUB_STEP_SUMMARY"
+        echo "| Metadata file | ${{ steps.metadata-file.outputs.metadata_file }} |" >> "$GITHUB_STEP_SUMMARY"
+        if [ ${{ steps.project-toml.outputs.type = "file" ]; then
+          echo "| Versioning type | ${{ steps.versioning-type.outputs.versioning_type }} |" >> "$GITHUB_STEP_SUMMARY"
+        fi
         echo "| Base/Build Python | ${{ steps.supported-python-versions.outputs.base_python }} |" \
           >> "$GITHUB_STEP_SUMMARY"
 
