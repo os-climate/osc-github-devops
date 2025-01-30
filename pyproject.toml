@@ -3,7 +3,7 @@
 
 [project]
 name = "osc-github-devops"
-version = "0.1.21"
+version = "0.1.22"
 # Uncomment to enable dynamic versioning
 # dynamic = [ "version" ]
 description = "Python project template"
@@ -24,6 +24,7 @@ classifiers = [
   "Programming Language :: Python",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.10",
   "Topic :: Office/Business :: Financial",
@@ -32,8 +33,8 @@ classifiers = [
 ]
 
 dependencies = [
-    "typer==0.13.1",
-    "jupyterlab==4.3.1"
+    "typer",
+    "jupyterlab"
 ]
 
 [project.urls]
