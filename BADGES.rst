@@ -45,9 +45,9 @@ Badge Template for README.rst
   :alt: TestPyPI Package
   :target: https://test.pypi.org/project/osc-github-devops
 
-.. |devops| image:: https://github.com/os-climate/osc-github-devops/actions/workflows/primary.yaml/badge.svg?branch=main&event=push
+.. |devops| image:: https://github.com/os-climate/osc-github-devops/actions/workflows/merge-build-test-release.yaml/badge.svg?branch=main&event=push
   :alt: DevOps Automation
-  :target: https://github.com/os-climate/osc-github-devops/actions/workflows/primary.yaml?query=branch%3Amain
+  :target: https://github.com/os-climate/osc-github-devops/actions/workflows/merge-build-test-release.yaml?query=branch%3Amain
 
 .. |codeql| image:: https://github.com/os-climate/osc-github-devops/actions/workflows/codeql.yml/badge.svg
   :target: https://github.com/os-climate/osc-github-devops/actions/workflows/codeql.yml
