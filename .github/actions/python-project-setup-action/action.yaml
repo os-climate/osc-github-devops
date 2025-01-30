@@ -41,7 +41,7 @@ runs:
         path: "pyproject.toml"
 
     - name: "Check for setup.py"
-      id: project-toml
+      id: setup-py
       uses: os-climate/osc-github-devops/.github/actions/path-check-action @main
       with:
         path: "setup.py"
@@ -98,8 +98,8 @@ runs:
         echo "| ----------------- | ------- |" >> "$GITHUB_STEP_SUMMARY"
         echo "| Project name | ${{ steps.project-naming.outputs.python_project_name }} |" >> "$GITHUB_STEP_SUMMARY"
         echo "| Package name | ${{ steps.project-naming.outputs.python_build_name }} |" >> "$GITHUB_STEP_SUMMARY"
-        echo "| Metadata file | ${{ steps.metadata-file.outputs.metadata_file }} |" >> "$GITHUB_STEP_SUMMARY"
-        if [ ${{ steps.project-toml.outputs.type = "file" ]; then
+        echo "| Package file | ${{ steps.metadata-file.outputs.metadata_file }} |" >> "$GITHUB_STEP_SUMMARY"
+        if [ "${{ steps.project-toml.outputs.type }}" = "file" ]; then
           echo "| Versioning type | ${{ steps.versioning-type.outputs.versioning_type }} |" >> "$GITHUB_STEP_SUMMARY"
         fi
         echo "| Base/Build Python | ${{ steps.supported-python-versions.outputs.base_python }} |" \
