@@ -32,6 +32,11 @@ inputs:
   PYPI_CREDENTIAL:
     description: "PyPI API credential from GitHub secrets"
     required: false
+  PUBLISH_DISABLE:
+    description: "Disables the final publishing step that uploads packages"
+    type: string
+    required: false
+    default: "false"
 
 runs:
   using: "composite"
@@ -176,7 +181,7 @@ runs:
       # https://github.com/pypa/gh-action-pypi-publish/discussions/287
       uses: pypa/gh-action-pypi-publish@fb13cb306901256ace3dab689990e13a5550ffaa # v1.11.0
       # yamllint disable-line rule:line-length
-      if: steps.conditions.outputs.publish_method == 'Trusted Publishing'
+      if: steps.conditions.outputs.publish_method == 'Trusted Publishing' && inputs.publish_disable == 'false'
       with:
         repository-url: "${{ env.publish_url }}"
         # Show checksum values
@@ -206,7 +211,7 @@ runs:
       # Also, be cautious pinning v1.12.x to a SHA commit value:
       # https://github.com/pypa/gh-action-pypi-publish/discussions/287
       uses: pypa/gh-action-pypi-publish@fb13cb306901256ace3dab689990e13a5550ffaa # v1.11.0
-      if: steps.conditions.outputs.publish_method == '1Password Vault'
+      if: steps.conditions.outputs.publish_method == '1Password Vault' && inputs.publish_disable == 'false'
       with:
         repository-url: "${{ env.publish_url }}"
         print-hash: true
@@ -224,7 +229,7 @@ runs:
       # Also, be cautious pinning v1.12.x to a SHA commit value:
       # https://github.com/pypa/gh-action-pypi-publish/discussions/287
       uses: pypa/gh-action-pypi-publish@fb13cb306901256ace3dab689990e13a5550ffaa # v1.11.0
-      if: steps.conditions.outputs.publish_method == 'GitHub Secret'
+      if: steps.conditions.outputs.publish_method == 'GitHub Secret' && inputs.publish_disable == 'false'
       with:
         repository-url: "${{ env.publish_url }}"
         print-hash: true
