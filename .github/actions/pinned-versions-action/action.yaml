@@ -34,6 +34,7 @@ runs:
 
     # Get files changed in the pull request from upstream action
     - name: Get changed files from action
+      id: changed-files
       if: github.event_name != 'workflow_dispatch'
       # yamllint disable-line rule:line-length
       uses: tj-actions/changed-files@d6e91a2266cdb9d62096cebf1e8546899c6aa18f # v45.0.6
@@ -44,6 +45,8 @@ runs:
 
     - name: Prune unmodified workflows/actions from scope
       if: github.event_name != 'workflow_dispatch'
+      env:
+        ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
       shell: bash
       run: |
         # ✂️ Prune unmodified workflows/actions from scope
