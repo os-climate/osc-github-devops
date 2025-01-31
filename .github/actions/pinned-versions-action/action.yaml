@@ -12,12 +12,20 @@ runs:
     # Checkout repository on manual invocation
     - name: Checkout repository
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      if: ${{ github.event_name == 'workflow_dispatch' }}
+      if: github.event_name == 'workflow_dispatch'
+
+    # Scan all GitHub actions/workflows on manual invocation
+    - name: Scan all GitHub actions/workflows
+      if: github.event_name == 'workflow_dispatch'
+      shell: bash
+      run: |
+        echo "workflow_changes=true" >> "$GITHUB_ENV"
+        echo "Auditing all actions/workflows ✅"
 
     # Checkout change when invoked on a pull request
     - name: Checkout pull request
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      if: ${{ github.event_name != 'workflow_dispatch' }}
+      if: github.event_name != 'workflow_dispatch'
       with:
         ref: ${{ github.event.pull_request.head.sha }}
 
@@ -32,38 +40,19 @@ runs:
         files: |
           .github/**/*.{yml,yaml}
 
-    # Create a list of files changed in the pull request
-    - name: Create a list of changed files
+    - name: Prune unmodified workflows/actions from scope
       if: github.event_name != 'workflow_dispatch'
       id: changed-files-list
       shell: bash
       run: |
-        # 📄 Create a list of changed files
+        # ✂️ Prune unmodified workflows/actions from scope
         for YAMLFILE in ${ALL_CHANGED_FILES}; do
           echo "$YAMLFILE" >> changed.txt
         done
-
-    - name: Set verification scope
-      env:
-        ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
-      shell: bash
-      run: |
-        # ✂️ Prune unmodified workflows/actions from scope
-
-        # When no action/workflow files were changed in the pull request
-        # There is nothing to do, so exit early without an error
         if [ ! -f changed.txt ]; then
           echo "workflow_changes=false" >> "$GITHUB_ENV"
           echo "No changes in scope for check ⏩"; exit 0
         fi
-
-        # Manual invocation, all files considered changed and will be checked
-        if [ "${{ github.event_name }}" = 'workflow_dispatch' ]; then
-          cp repository.txt changed.txt
-          echo "workflow_changes=true" >> "$GITHUB_ENV"
-          echo "All GitHub actions/workflows will be checked ✅"; exit 0
-        fi
-
         # Selective checks; prune unmodified actions/workflows from scope
         grep -Fvf changed.txt repository.txt > unmodified.txt
         while IFS= read -r YAMLFILE
