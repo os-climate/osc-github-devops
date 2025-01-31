@@ -245,14 +245,19 @@ runs:
       # yamllint disable rule:line-length
       run: |
         # Print summary/job output
-        if [ "${{ steps.conditions.outputs.publish_method }}" = "Skipped" ]; then
+        if [ "${{ inputs.publish_disable }}" = "true" ]; then
+          echo "# Publishing Disabled: Dry Run 🛑" >> "$GITHUB_STEP_SUMMARY"
+        elif [ "${{ steps.conditions.outputs.publish_method }}" = "Skipped" ]; then
           echo "### Publishing skipped due to existing content ⛔️" >> "$GITHUB_STEP_SUMMARY"
           exit 0
         elif [ ${{ env.base_url }} != "https://pypi.org" ]; then
-          echo "# Test Release: PyPI" >> "$GITHUB_STEP_SUMMARY"
+          echo "# 🧪 Test Release: PyPI" >> "$GITHUB_STEP_SUMMARY"
         else
           echo "# 🚀 Release: PyPI" >> "$GITHUB_STEP_SUMMARY"
         fi
         echo "Method: ${{ steps.conditions.outputs.publish_method }}"
         echo "Method: ${{ steps.conditions.outputs.publish_method }}" >> "$GITHUB_STEP_SUMMARY"
-        echo "🔗 ${{ env.base_url }}/project/${{ steps.naming.outputs.python_project_name }}/${{ inputs.tag }}/" >> "$GITHUB_STEP_SUMMARY"
+
+        if [ "${{ inputs.publish_disable }}" != "true" ]; then
+          echo "🔗 ${{ env.base_url }}/project/${{ steps.naming.outputs.python_project_name }}/${{ inputs.tag }}/" >> "$GITHUB_STEP_SUMMARY"
+        fi
