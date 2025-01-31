@@ -47,6 +47,9 @@ runs:
       shell: bash
       run: |
         # ✂️ Prune unmodified workflows/actions from scope
+        set -vx
+        echo "Changed files in pull request:"
+        echo "${ALL_CHANGED_FILES}"
         for YAMLFILE in ${ALL_CHANGED_FILES}; do
           echo "$YAMLFILE" >> changed.txt
         done
@@ -55,6 +58,7 @@ runs:
           echo "No changes in scope for check ⏩"; exit 0
         fi
         # Selective checks; prune unmodified actions/workflows from scope
+        find .github -type f -name '*.yaml' -o -name '*.yml' > repository.txt
         grep -Fvf changed.txt repository.txt > unmodified.txt
         while IFS= read -r YAMLFILE
         do
