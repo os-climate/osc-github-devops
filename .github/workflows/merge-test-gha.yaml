@@ -274,7 +274,7 @@ jobs:
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/url-validity-check-action@main
         with:
-          prefix: "https://test.pypi.org/project"
+          url: "https://test.pypi.org/project"
           string: "/ITR"
           suffix: "/"
 
