@@ -16,11 +16,11 @@ on:
       - "!pdm.lock"
       - "!tox.ini"
 
-env:
-  # Uncomment the variable below to disable PyPI publishing
-  pypi_publish_disable: "true"
-  # Uncomment the variable below to disable GitHub releasing
-  gh_release_disable: "true"
+# env:
+# Uncomment the variable below to disable PyPI publishing
+# pypi_publish_disable: "true"
+# Uncomment the variable below to disable GitHub releasing
+# gh_release_disable: "true"
 
 permissions: {}
 
