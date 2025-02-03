@@ -50,23 +50,23 @@ runs:
       shell: bash
       run: |
         # ✂️ Prune unmodified workflows/actions from scope
-
-        if [ -z  "${ALL_CHANGED_FILES}" ]; then
-          echo "No changes in scope for verification ⏩"; exit 0
-        else
-          echo "workflow_changes=true" >> "$GITHUB_ENV"
-          echo "Selectively checking actions/workflows ✅"
-        fi
-
-        find .github -type f -name '*.yaml' -o -name '*.yml' > repository.txt
-        mapfile -t repository_array < repository.txt
-        for YAMLFILE in "${repository_array[@]}"; do
-          if [[ ${ALL_CHANGED_FILES} =~ "$YAMLFILE" ]]; then
-            rm "$YAMLFILE"
-          else
-            echo "Pull request/modified: "$YAMLFILE""
-          fi
+        find .github -type f -name '*.yaml' -o -name '*.yml' > github.txt
+        for YAMLFILE in ${ALL_CHANGED_FILES}; do
+          echo "$YAMLFILE" >> changed.txt
         done
+        if [ ! -f changed.txt ]; then
+          echo "No changes in scope for check ⏩"
+          echo "workflow_changes=false" >> "$GITHUB_ENV"
+        else
+          grep -Fvf changed.txt github.txt > unmodified.txt
+          while IFS= read -r YAMLFILE
+          do
+            rm "$YAMLFILE"
+          done < unmodified.txt
+          echo "workflow_changes=true" >> "$GITHUB_ENV"
+          echo "Files found to check ✅"
+          cat changed.txt
+        fi
 
     - name: "Ensure SHA pinned actions"
       # yamllint disable-line rule:line-length
