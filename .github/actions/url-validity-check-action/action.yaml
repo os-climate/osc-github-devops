@@ -7,7 +7,7 @@ name: "🌍 Check URL for Validity with WGET"
 description: "Tests a give URL for a valid server response"
 
 inputs:
-  PREFIX:
+  URL:
     description: "URL prefix to check"
     # e.g. "https://pypi.org/project/"
     required: true
@@ -16,7 +16,7 @@ inputs:
     # e.g. "ITR"
     required: false
   SUFFIX:
-    description: "URL prefix to check"
+    description: "URL suffix to append"
     # e.g. "/"
     required: false
 
