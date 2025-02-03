@@ -252,7 +252,7 @@ runs:
       run: |
         # Print summary/job output
         if [ "${{ inputs.publish_disable }}" = "true" ]; then
-          echo "# Publishing Disabled: Dry Run 🛑" >> "$GITHUB_STEP_SUMMARY"
+          echo "## PyPI Publishing Disabled: Dry Run 🛑" >> "$GITHUB_STEP_SUMMARY"
         elif [ "${{ steps.conditions.outputs.publish_method }}" = "Skipped" ]; then
           echo "### Publishing skipped due to existing content ⛔️" >> "$GITHUB_STEP_SUMMARY"
           exit 0

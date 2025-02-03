@@ -60,8 +60,9 @@ runs:
 
         find .github -type f -name '*.yaml' -o -name '*.yml' > repository.txt
         for YAMLFILE in repository.txt; do
-        if [[ "${ALL_CHANGED_FILES}" =~ "$YAMLFILE" ]]; do
-          rm "$YAMLFILE"
+          if [[ "${ALL_CHANGED_FILES}" =~ "$YAMLFILE" ]]; then
+            rm "$YAMLFILE"
+          fi
         done
         # Display remaining files to process/audit
         find .github -type f -name '*.yaml' -o -name '*.yml'
