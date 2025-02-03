@@ -59,15 +59,14 @@ runs:
         fi
 
         find .github -type f -name '*.yaml' -o -name '*.yml' > repository.txt
-        for YAMLFILE in repository.txt; do
+        mapfile -t repository_array < my_file
+        for YAMLFILE in "${repository_array[@]}"; do
           if [[ ${ALL_CHANGED_FILES} =~ "$YAMLFILE" ]]; then
             rm "$YAMLFILE"
           else
-            echo "In pull request/modified: "$YAMLFILE""
+            echo "Pull request/modified: "$YAMLFILE""
           fi
         done
-        # Display remaining files to process/audit
-        # find .github -type f -name '*.yaml' -o -name '*.yml'
 
     - name: "Ensure SHA pinned actions"
       # yamllint disable-line rule:line-length
