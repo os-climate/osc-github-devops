@@ -59,7 +59,7 @@ runs:
         fi
 
         find .github -type f -name '*.yaml' -o -name '*.yml' > repository.txt
-        mapfile -t repository_array < my_file
+        mapfile -t repository_array < repository.txt
         for YAMLFILE in "${repository_array[@]}"; do
           if [[ ${ALL_CHANGED_FILES} =~ "$YAMLFILE" ]]; then
             rm "$YAMLFILE"

@@ -16,9 +16,9 @@ on:
       - "!pdm.lock"
       - "!tox.ini"
 
-# env:
-# Uncomment the variable below to disable PyPI publishing
-# pypi_publish_disable: "true"
+env:
+  # Uncomment the variable below to disable PyPI publishing
+  pypi_publish_disable: "true"
 # Uncomment the variable below to disable GitHub releasing
 # gh_release_disable: "true"
 
@@ -218,4 +218,4 @@ jobs:
           project_name: ${{ env.python_project_name }}
           artefact_location: "dist"
           tag: ${{ needs.repository.outputs.build_tag }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # github_token: ${{ secrets.GITHUB_TOKEN }}
