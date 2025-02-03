@@ -55,11 +55,17 @@ runs:
         name: ${{ env.python_project_name }}
         path: ${{ inputs.artefact_location }}
 
-    - name: "Set publishing parameters"
+    - name: "Derive additional publishing parameters"
       id: parameters
       shell: bash
       run: |
-        # Set publishing parameters
+        # Derive additional publishing parameters
+
+        # ToDo: Check if environment can be directly enumerated (does output below return a value?)
+        if [ -z ${{ inputs.ENVIRONMENT }} ]; then
+          echo "Environment was NOT set explicitly ⛔️"
+          echo "$ENVIRONMENT [$ENVIRONMENT_URL]"
+        fi
         if [ ${{ inputs.ENVIRONMENT }} = "test" ] || \
         [ ${{ inputs.ENVIRONMENT }} = "testing" ] || \
         [ ${{ inputs.ENVIRONMENT }} = "staging" ] || \
