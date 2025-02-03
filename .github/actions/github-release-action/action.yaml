@@ -43,10 +43,28 @@ inputs:
     type: string
     required: false
     default: false
+  GH_RELEASE_DISABLE:
+    description: "Dry run, do NOT perform the release step"
+    type: string
+    required: false
+    default: false
 
 runs:
   using: "composite"
   steps:
+    # yamllint disable-line rule:line-length
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+    - name: "Extract project/repository naming"
+      id: naming
+      # yamllint disable-line rule:line-length
+      uses: os-climate/osc-github-devops/.github/actions/project-name-compare-action@main
+
+    - name: "Check project version matches pushed tags"
+      if: startsWith(github.ref, 'refs/tags/')
+      # yamllint disable-line rule:line-length
+      uses: os-climate/osc-github-devops/.github/actions/python-project-version-vs-tag-action@main
+
     - name: "Verify release tag"
       id: tag-validate
       # yamllint disable-line rule:line-length
@@ -80,6 +98,9 @@ runs:
       if: inputs.artefact_location != ''
       uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
       with:
+        # ToDo: check if this is used/needed and all setup/pre-requisites
+        # Such as environment variables are configured correctly
+        # name: ${{ env.python_project_name }}
         path: ${{ inputs.artefact_location }}
 
     - name: "Check if this tag already released"
@@ -99,9 +120,9 @@ runs:
         exit 1
 
     - name: "GitHub release [with artefacts]"
-      if: inputs.artefact_location != ''
+      if: inputs.artefact_location != '' && GH_RELEASE_DISABLE == 'false'
       # Note: a bug in release v2.2.0 causes upload failures
-      uses: softprops/action-gh-release@01570a1f39cb168c169c802c3bceb9e93fb10974 # v2.1.0
+      uses: softprops/action-gh-release@c95fe1489396fe8a9eb87c0abf8aa5b2ef267fda # v2.2.1
       with:
         token: ${{ inputs.GITHUB_TOKEN }}
         prerelease: ${{ inputs.prerelease }}
@@ -114,9 +135,9 @@ runs:
           ${{ inputs.artefact_location }}/*
 
     - name: "GitHub release [no artefacts]"
-      if: inputs.artefact_location == ''
+      if: inputs.artefact_location == '' && GH_RELEASE_DISABLE == 'false'
       # Note: a bug in release v2.2.0 causes upload failures
-      uses: softprops/action-gh-release@01570a1f39cb168c169c802c3bceb9e93fb10974 # v2.1.0
+      uses: softprops/action-gh-release@c95fe1489396fe8a9eb87c0abf8aa5b2ef267fda # v2.2.1
       with:
         token: ${{ inputs.GITHUB_TOKEN }}
         prerelease: ${{ inputs.prerelease }}
@@ -129,12 +150,16 @@ runs:
       # yamllint disable rule:line-length
       run: |
         # Print summary/job output
-        echo "# 🚀 Release: GitHub" >> "$GITHUB_STEP_SUMMARY"
-        echo "${{ env.RELEASE_TITLE }}" >> "$GITHUB_STEP_SUMMARY"
-        echo "🔗 https://github.com/${GITHUB_REPOSITORY}/releases/tag/${{ inputs.tag }}" >> "$GITHUB_STEP_SUMMARY"
-        # ToDo: Add release notes here
-        if [ "${{ inputs.prerelease }}" = "true" ]; then
-          echo "Test/Development Build ✅"
+        if [ "${{ inputs.GH_RELEASE_DISABLE }}" != 'false' ]; then
+          echo "## GitHub Releasing Disabled: Dry Run 🛑" >> "$GITHUB_STEP_SUMMARY"
         else
-          echo "Production Release Build ✅"
+          echo "# 🚀 Release: GitHub" >> "$GITHUB_STEP_SUMMARY"
+          echo "${{ env.RELEASE_TITLE }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "🔗 https://github.com/${GITHUB_REPOSITORY}/releases/tag/${{ inputs.tag }}" >> "$GITHUB_STEP_SUMMARY"
+          # ToDo: Add release notes here
+          if [ "${{ inputs.prerelease }}" = "true" ]; then
+            echo "Test/Development Build ✅"
+          else
+            echo "Production Release Build ✅"
+          fi
         fi
