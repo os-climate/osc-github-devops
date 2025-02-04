@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
-# openssf-scorecard-audit-action/
-name: "📦 OpenSSF Scorecard Audit"
+# openssf-scorecard-audit-action
+name: "🔐 OpenSSF Scorecard Audit"
 description: "Audits a repository for OpenSSF security best practices"
 
 inputs:
