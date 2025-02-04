@@ -5,6 +5,7 @@
 # repository-metadata-action
 name: "🛠️ Repository Metadata"
 description: "Gathers repository metadata"
+# Also prints a summary of various GitHub environment variables to the console
 
 outputs:
   REPOSITORY_OWNER:
