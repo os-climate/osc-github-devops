@@ -26,20 +26,3 @@ def goodbye(name: str, formal: bool = False):
         print(f"Goodbye Ms. {name}. Have a good day.")
     else:
         print(f"Bye {name}!")
-
-
-# def run():
-#     app()
-
-
-# if __name__ == "__main__":
-#     """Provide main entry point for the sample/test application.
-
-#     This function sets up the Typer application with subcommands.
-
-#     Usage:
-#             osc-github-devops hello
-#             osc-github-devops goodbye
-
-#     """
-#     app()
