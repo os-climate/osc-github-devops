@@ -14,7 +14,7 @@ permissions: {}
 
 jobs:
   openssf-scorecard:
-    name: "Audit"
+    name: "Scan"
     runs-on: ubuntu-24.04
     permissions:
       # Needed to upload the results to code-scanning dashboard.
@@ -53,7 +53,7 @@ jobs:
 
   # Summary output MUST be in a separate job, as per the ossf/scorecard-action documentation
   summary-output:
-    name: "Summary"
+    name: "Link"
     needs: openssf-scorecard
     runs-on: ubuntu-24.04
     steps:
