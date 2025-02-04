@@ -6,6 +6,12 @@
 name: "🔐 SonarCube Cloud Scan"
 description: "Performs a SonarQube Cloud scan and uploads the results"
 
+# See: https://docs.sonarsource.com/sonarqube-server/latest/project-administration/analysis-scope/
+# Create a file at the top of the repository called: sonar-project.properties
+# e.g. For Python projects, define separate root directories for sources and tests:
+# sonar.sources = src/
+# sonar.tests = test/
+
 inputs:
   # Mandatory
   SONAR_TOKEN:
@@ -102,8 +108,9 @@ runs:
 
     - name: "Print summary/job output"
       shell: bash
+      # yamllint disable rule:line-length
       run: |
         # Print summary/job output
         # ToDo: Update the link below
         echo "## 🔐 SonarQube Cloud Scan Results Updated" >> "$GITHUB_STEP_SUMMARY"
-        echo "🔗 ToDo: Placeholder content; substitute the appropriate URL here" >> "$GITHUB_STEP_SUMMARY"
+        echo "🔗 https://sonarcloud.io/project/overview?id=${{ steps.repository-metadata.outputs.repository_owner }}_${{ steps.repository-metadata.outputs.repository_name }}" >> "$GITHUB_STEP_SUMMARY"
