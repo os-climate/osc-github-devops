@@ -6,7 +6,7 @@
 # by a third-party and are governed by separate terms of service, privacy
 # policy, and support documentation.
 
-name: 🔐 Security Audit [Merge]
+name: 🔐 Security Audits
 on:
   workflow_dispatch:
   # For Branch-Protection check. Only the default branch is supported. See
@@ -65,5 +65,7 @@ jobs:
       # actions: read
     steps:
       - name: "OSSF Scorecard Audit"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/openssf-scorecard-audit-action@main # ToDo: temporary during testing
