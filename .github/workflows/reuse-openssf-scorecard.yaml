@@ -50,10 +50,3 @@ jobs:
         uses: github/codeql-action/upload-sarif@48ab28a6f5dbc2a99bf1e0131198dd8f1df78169 # 3.28.0
         with:
           sarif_file: results.sarif
-
-      - name: "Print summary/job output"
-        shell: bash
-        # yamllint disable rule:line-length
-        run: |
-          # Print summary/job output
-          echo "## 🔐 OpenSSF Scorecard Results Updated" >> "$GITHUB_STEP_SUMMARY"
