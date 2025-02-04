@@ -32,6 +32,13 @@ jobs:
     secrets:
       NEXUS_IQ_PASSWORD: ${{ secrets.NEXUS_IQ_PASSWORD }}
 
+  # Scan results are found at: https://sonarcloud.io/login
+  call-sonarqube-cloud:
+    # yamllint disable-line rule:line-length
+    uses: os-climate/osc-github-devops/.github/workflows/reuse-sonarqube-cloud.yaml@9996bdd7f2fdd2ae0a94c539b776be7265a74eea # 2025-02-04
+    secrets:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
   analysis:
     name: Analysis
     runs-on: ubuntu-24.04
