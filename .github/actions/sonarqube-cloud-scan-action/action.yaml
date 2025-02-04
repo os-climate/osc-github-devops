@@ -106,4 +106,4 @@ runs:
         # Print summary/job output
         # ToDo: Update the link below
         echo "## 🔐 SonarQube Cloud Scan Results Updated" >> "$GITHUB_STEP_SUMMARY"
-        echo "🔗 ToDo: Placeholder content; substitute the appropriate URL here >> "$GITHUB_STEP_SUMMARY"
+        echo "🔗 ToDo: Placeholder content; substitute the appropriate URL here" >> "$GITHUB_STEP_SUMMARY"
