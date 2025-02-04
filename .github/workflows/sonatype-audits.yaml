@@ -6,7 +6,7 @@
 # by a third-party and are governed by separate terms of service, privacy
 # policy, and support documentation.
 
-name: 🔐 SonaType Security Audits
+name: 🔐 SonaType Scans
 on:
   workflow_dispatch:
   # For Branch-Protection check. Only the default branch is supported. See
@@ -35,8 +35,9 @@ jobs:
 
   # Scan results are found at: https://sonarcloud.io/login
   sonarqube-cloud:
-    name: "SonarQube Cloud Scan"
-    runs-on: ubuntu-24.04
+    name: "SonarQube Cloud"
+    # yamllint disable-line rule:line-length
+    uses: os-climate/osc-github-devops/.github/workflows/reuse-sonarqube-cloud.yaml@main # ToDo: temporary during testing
     permissions:
       # Needed to upload the results to code-scanning dashboard.
       security-events: write
@@ -45,9 +46,5 @@ jobs:
       # Uncomment the permissions below if installing in a private repository.
       # contents: read
       # actions: read
-    steps:
-      - name: "SonarQube Cloud Scan"
-        # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/sonarqube-cloud-scan-action@main # ToDo: temporary during testing
-        with:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    secrets:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
