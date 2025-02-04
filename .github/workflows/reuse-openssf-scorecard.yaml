@@ -50,3 +50,8 @@ jobs:
         uses: github/codeql-action/upload-sarif@48ab28a6f5dbc2a99bf1e0131198dd8f1df78169 # 3.28.0
         with:
           sarif_file: results.sarif
+
+      - name: "Provide summary output"
+        # The upstream action does not provide any useful summary output
+        # the action below adds a hyperlink to the OpenSSF Scorecard/report
+        uses: os-climate/osc-github-devops/.github/actions/repository-metadata-action@main

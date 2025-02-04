@@ -27,7 +27,7 @@ permissions: {}
 
 jobs:
   openssf-scorecard:
-    name: "Audit"
+    name: "OpenSSF Scorecard"
     # yamllint disable-line rule:line-length
     uses: os-climate/osc-github-devops/.github/workflows/reuse-openssf-scorecard.yaml@main # ToDo: temporary during testing
     permissions:
