@@ -53,10 +53,11 @@ jobs:
 
   # Summary output MUST be in a separate job, as per the ossf/scorecard-action documentation
   summary-output:
-    name: "Summary"
+    name: "Summary output"
+    needs: openssf-scorecard
     runs-on: ubuntu-24.04
     steps:
-      - name: "Provide summary output"
+      - name: "Provide link to scorecard"
         # The upstream action does not provide any useful summary output
         # the action below adds a hyperlink to the OpenSSF Scorecard/report
-        uses: os-climate/osc-github-devops/.github/actions/repository-metadata-action@main
+        uses: os-climate/osc-github-devops/.github/actions/openssf-scorecard-summary-action@main
