@@ -2,8 +2,10 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
-# Runs a SonarQube Cloud scan
+# reuse-sonarqube-cloud.yaml
 name: "[R] sonarqube-cloud"
+# "Runs a SonarQube Cloud scan"
+# Scan results are uploaded to: https://sonarcloud.io/login
 
 # yamllint disable-line rule:truthy
 on:
@@ -20,10 +22,17 @@ on:
         description: "Filesystem location of build outputs"
         type: string
         required: false
-      LC_ALL:
-        description: "Use when character set not covered by locale range of en_US.UTF-8"
+      SONAR_HOST_URL:
+        description: "Uploads scans to the given host URL"
         type: string
         required: false
+        default: "https://sonarcloud.io"
+      LC_ALL:
+        # yamllint disable-line rule:line-length
+        description: "Change when code character set is outside the range of en_US.UTF-8"
+        type: string
+        required: false
+        default: "en_US.UTF-8"
     # Re-usable workflow requires secrets be explicitly passed
     secrets:
       SONAR_TOKEN:
