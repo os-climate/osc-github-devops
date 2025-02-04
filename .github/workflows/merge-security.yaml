@@ -27,6 +27,7 @@ permissions: read-all
 
 jobs:
   sonatype-lifecycle:
+    name: "Sonatype Lifecycle Scan"
     # yamllint disable-line rule:line-length
     uses: lfit/releng-reusable-workflows/.github/workflows/reuse-sonatype-lifecycle.yaml@36ff4d15c9c86771dc5d7073b5df323970f74b95 # 2025-01-29
     secrets:
@@ -65,4 +66,4 @@ jobs:
     steps:
       - name: "OSSF Scorecard Audit"
         # yamllint disable-line rule:line-length
-        uses: os-climate/os-climate/osc-github-devops/.github/actions/openssf-scorecard-audit-action@main # ToDo: temporary during testing
+        uses: os-climate/osc-github-devops/.github/actions/openssf-scorecard-audit-action@main # ToDo: temporary during testing
