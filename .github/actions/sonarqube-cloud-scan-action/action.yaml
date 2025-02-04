@@ -96,7 +96,7 @@ runs:
         SONAR_ROOT_CERT: ${{ inputs.sonar_root_cert }}
         LC_ALL: ${{ inputs.LC_ALL }}
       with:
-        args: |
+        args: >
           -Dsonar.organization="${{ steps.repository-metadata.outputs.repository_owner }}"
           -Dsonar.projectKey="${{ steps.repository-metadata.outputs.repository_name }}"
 
