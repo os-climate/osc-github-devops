@@ -6,7 +6,7 @@
 # by a third-party and are governed by separate terms of service, privacy
 # policy, and support documentation.
 
-name: 🔐 Security Audits
+name: 🔐 SonaType Security Audits
 on:
   workflow_dispatch:
   # For Branch-Protection check. Only the default branch is supported. See
@@ -22,8 +22,8 @@ on:
       - "**"
       - "!.github/**"
 
-# Declare default permissions as read only.
-permissions: read-all
+# Declare default permissions as none.
+permissions: {}
 
 jobs:
   sonatype-lifecycle:
@@ -51,21 +51,3 @@ jobs:
         uses: os-climate/osc-github-devops/.github/actions/sonarqube-cloud-scan-action@main # ToDo: temporary during testing
         with:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-  openssf-scorecard:
-    name: "OSSF Scorecard Audit"
-    runs-on: ubuntu-24.04
-    permissions:
-      # Needed to upload the results to code-scanning dashboard.
-      security-events: write
-      # Needed to publish results and get a badge (see publish_results below).
-      id-token: write
-      # Uncomment the permissions below if installing in a private repository.
-      # contents: read
-      # actions: read
-    steps:
-      - name: "OSSF Scorecard Audit"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/openssf-scorecard-audit-action@main # ToDo: temporary during testing
