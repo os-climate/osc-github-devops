@@ -53,7 +53,7 @@ jobs:
 
   # Summary output MUST be in a separate job, as per the ossf/scorecard-action documentation
   summary-output:
-    name: "Summary output"
+    name: "Summary"
     needs: openssf-scorecard
     runs-on: ubuntu-24.04
     steps:
