@@ -33,7 +33,7 @@ runs:
 
         if [ ! -z "$GITHUB_TRIGGERING_ACTOR" ]; then
           echo "### User Data ###"
-          echo "User responsible: $GITHUB_TRIGGERING_ACTOR [GITHUB_TRIGGERING_ACTOR]"
+          echo "User responsible: $GITHUB_TRIGGERING_ACTOR [$GITHUB_TRIGGERING_ACTOR]"
         fi
 
         echo "### Action/Workflow Environment ###"
