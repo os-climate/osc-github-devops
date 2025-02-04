@@ -1,0 +1,52 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation
+
+# openssf-scorecard-audit-action/
+name: "📦 OpenSSF Scorecard Audit"
+description: "Audits a repository for OpenSSF security best practices"
+
+inputs:
+  # Optional
+  PUBLISH_RESULTS:
+    description: "Publish OpenSSF Scorecard results to security dashboard"
+    type: string
+    required: false
+    default: "true"
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Checkout code"
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      with:
+        persist-credentials: false
+
+    - name: "Run analysis"
+      uses: ossf/scorecard-action@62b2cac7ed8198b15735ed49ab1e5cf35480ba46 # v2.4.0
+      with:
+        results_file: results.sarif
+        results_format: sarif
+        publish_results: ${{ inputs.publish_results }}
+
+    - name: "Upload artifact"
+      uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
+      with:
+        name: SARIF file
+        path: results.sarif
+        retention-days: 5
+
+    # Upload the results to GitHub's code scanning dashboard (optional).
+    # Commenting out will disable upload of results to your repo's Code Scanning dashboard
+    - name: "Upload to code-scanning"
+      uses: github/codeql-action/upload-sarif@48ab28a6f5dbc2a99bf1e0131198dd8f1df78169 # 3.28.0
+      with:
+        sarif_file: results.sarif
+
+    - name: "Print summary/job output"
+      shell: bash
+      # yamllint disable rule:line-length
+      run: |
+        # Print summary/job output
+        echo "## 🔐 OpenSSF Scorecard Results Updated" >> "$GITHUB_STEP_SUMMARY"
+        echo "🔗 ${{ env.base_url }}/project/${{ steps.naming.outputs.python_project_name }}/${{ inputs.tag }}/" >> "$GITHUB_STEP_SUMMARY"
