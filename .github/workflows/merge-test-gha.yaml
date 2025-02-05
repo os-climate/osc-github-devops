@@ -219,7 +219,7 @@ jobs:
       - name: "Action: repository-tag-next-action [patch]"
         id: repo-tag-nxt-patch
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/repo-tag-nxt@main
+        uses: os-climate/osc-github-devops/.github/actions/repository-tag-next-action@main
         with:
           tag: "v0.0.4"
           type: "patch"
@@ -227,7 +227,7 @@ jobs:
       - name: "Action: repository-tag-next-action [minor]"
         id: repo-tag-nxt-minor
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/repo-tag-nxt@main
+        uses: os-climate/osc-github-devops/.github/actions/repository-tag-next-action@main
         with:
           tag: "v1.8.3"
           type: "minor"
@@ -235,7 +235,7 @@ jobs:
       - name: "Action: repository-tag-next-action [major]"
         id: repo-tag-nxt-major
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/repo-tag-nxt@main
+        uses: os-climate/osc-github-devops/.github/actions/repository-tag-next-action@main
         with:
           tag: "v4.1.1"
           type: "major"
