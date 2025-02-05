@@ -14,7 +14,8 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - uses: os-climate/osc-github-devops/.github/actions/path-check-action@main
+    # yamllint disable-line rule:line-length
+    - uses: lfit/releng-reusable-workflows/.github/actions/path-check-action@11530dee75e77f063c6e01ac7f3a6cb0cdc95db7 # 2025-02-05
       id: setup-py
       with:
         path: "setup-py"
@@ -30,7 +31,8 @@ runs:
         regex: '(?<=version=")([^"]*)'
         filename: "setup.py"
 
-    - uses: os-climate/osc-github-devops/.github/actions/path-check-action@main
+    # yamllint disable-line rule:line-length
+    - uses: lfit/releng-reusable-workflows/.github/actions/path-check-action@11530dee75e77f063c6e01ac7f3a6cb0cdc95db7 # 2025-02-05
       id: pyproject-toml
       with:
         path: "pyproject.toml"

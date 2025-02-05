@@ -275,7 +275,7 @@ jobs:
       - name: "Action: url-validity-check-action"
         id: url-validity-check-action
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/url-validity-check-action@main
+        uses: lfit/releng-reusable-workflows/.github/actions/url-validity-check-action@11530dee75e77f063c6e01ac7f3a6cb0cdc95db7 # 2025-02-05
         with:
           url: "https://test.pypi.org/project"
           string: "/ITR"
@@ -370,28 +370,28 @@ jobs:
       - name: "Action: path test [valid file]"
         id: path-check-file
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/path-check-action@main
+        uses: lfit/releng-reusable-workflows/.github/actions/path-check-action@11530dee75e77f063c6e01ac7f3a6cb0cdc95db7 # 2025-02-05
         with:
           path: "tests/resources/test-folder/test-file"
 
       - name: "Action: path test [valid folder]"
         id: path-check-folder
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/path-check-action@main
+        uses: lfit/releng-reusable-workflows/.github/actions/path-check-action@11530dee75e77f063c6e01ac7f3a6cb0cdc95db7 # 2025-02-05
         with:
           path: "tests/resources/test-folder"
 
       - name: "Action: path test [valid symlink to file]"
         id: path-check-symlink-file
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/path-check-action@main
+        uses: lfit/releng-reusable-workflows/.github/actions/path-check-action@11530dee75e77f063c6e01ac7f3a6cb0cdc95db7 # 2025-02-05
         with:
           path: "tests/resources/test-valid-file-symlink"
 
       - name: "Action: path test [valid symlink to folder]"
         id: path-check-symlink-folder
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/path-check-action@main
+        uses: lfit/releng-reusable-workflows/.github/actions/path-check-action@11530dee75e77f063c6e01ac7f3a6cb0cdc95db7 # 2025-02-05
         with:
           path: "tests/resources/test-valid-folder-symlink"
 
