@@ -3,8 +3,8 @@
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 # git-last-commit-action
-name: "🗞️ Merge/Change Report"
-description: "Sets parameters and reports metadata for the last two commits"
+name: "🗞️ Report on last GIT commit"
+description: "Extracts information and changes from the last two commits"
 
 inputs:
   FILENAME:
