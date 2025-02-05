@@ -93,6 +93,7 @@ runs:
 
     - name: "Display summary output"
       shell: bash
+      # yamllint disable rule:line-length
       run: |
         # Display summary output
         echo "# 🐍 Python Project" >> "$GITHUB_STEP_SUMMARY"

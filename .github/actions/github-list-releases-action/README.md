@@ -11,13 +11,12 @@ Lists all the releases for the current repository.
 
 ## Usage Example
 
-This action has no inputs; it provides results for the current repository
-only, which is enumerated at the calling location.
+This action has no inputs; it provides results for the current repository.
 
 ```yaml
 steps:
-  - name: "GitHub List Releases"
-    uses: os-climate/osc-github-devops/.github/actions/github-list-releases-action@main
+    - name: "GitHub List Releases"
+      uses: os-climate/osc-github-devops/.github/actions/github-list-releases-action@main
 ```
 
 ## Inputs

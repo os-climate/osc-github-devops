@@ -5,13 +5,13 @@
 
 # 🏷️ Generates a synthetic Gerrit "Change-Id" string
 
-Returns a unique value/string to be inserted in GIT COMMIT messages.
+Generate a unique value/string for addition to GIT COMMIT messages.
 
 ## gerrit-change-id-action
 
 ## Usage Example
 
-Returns a unique value/string to be inserted in GIT COMMIT messages.
+Returns a unique value/string for use in Gerrit GIT COMMIT messages.
 
 For further details, check the Gerrit documentation:
 
@@ -23,8 +23,8 @@ An example line from a commit message would look like:
 
 ## Outputs
 
-This action generates two strings that can be used, exporting them to the
-environment and also outputting them to be used explicitly in other steps.
+This action generates two strings for the "Change-Id", exporting them to the
+environment and also outputting them for use in other action/workflow steps.
 
 | Variable        | Example Value                                        |
 | --------------- | ---------------------------------------------------- |

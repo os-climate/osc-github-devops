@@ -18,22 +18,22 @@ Uploads the results to either the cloud service or an on-premise/hosted server.
 ```yaml
 # Scan results are found at: https://sonarcloud.io/login
 sonarqube-cloud:
-  name: "SonarQube Cloud Scan"
-  runs-on: ubuntu-24.04
-  permissions:
-    # Needed to upload the results to code-scanning dashboard.
-    security-events: write
-    # Needed to publish results and get a badge (see publish_results below).
-    id-token: write
-    # Uncomment the permissions below if installing in a private repository.
-    # contents: read
-    # actions: read
-  steps:
-    - name: "SonarQube Cloud Scan"
-      # yamllint disable-line rule:line-length
-      uses: os-climate/osc-github-devops/.github/actions/sonarqube-cloud-scan-action@main # 2025-02-04
-      with:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    name: "SonarQube Cloud Scan"
+    runs-on: ubuntu-24.04
+    permissions:
+        # Needed to upload the results to code-scanning dashboard.
+        security-events: write
+        # Needed to publish results and get a badge (see publish_results below).
+        id-token: write
+        # Uncomment the permissions below if installing in a private repository.
+        # contents: read
+        # actions: read
+    steps:
+        - name: "SonarQube Cloud Scan"
+          # yamllint disable-line rule:line-length
+          uses: os-climate/osc-github-devops/.github/actions/sonarqube-cloud-scan-action@main # 2025-02-04
+          with:
+              SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 ```
 
 <!-- markdownlint-enable MD013 -->

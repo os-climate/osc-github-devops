@@ -17,14 +17,14 @@ package release/version to check.
 
 ```yaml
 steps:
-  - name: "Checking package index for build/release"
-    id: check-package-index
-    # yamllint disable-line rule:line-length
-    uses: os-climate/osc-github-devops/.github/actions/pypi-version-check-action@main
-    with:
-      index_url: "${{ env.base_url }}/simple"
-      package_name: "/${{ steps.naming.outputs.python_project_name }}"
-      package_version: "/${{ inputs.tag }}/"
+    - name: "Checking package index for build/release"
+      id: check-package-index
+      # yamllint disable-line rule:line-length
+      uses: os-climate/osc-github-devops/.github/actions/pypi-version-check-action@main
+      with:
+          index_url: "${{ env.base_url }}/simple"
+          package_name: "/${{ steps.naming.outputs.python_project_name }}"
+          package_version: "/${{ inputs.tag }}/"
 ```
 
 Query URL examples:
@@ -44,16 +44,16 @@ Query URL examples:
 
 <!-- markdownlint-enable MD013 -->
 
-Note: If the version has a leading "v" character it will automatically be
-stripped, as the Python package index uses purely numerical versioning.
+Note: Leading "v" characters are automatically stripped, as the Python package
+index uses purely numerical versioning.
 
 ## Outputs
 
 <!-- markdownlint-disable MD013 -->
 
-| Variable Name | Mandatory | Description                                   |
-| ------------- | --------- | --------------------------------------------- |
-| PACKAGE_MATCH | True      | Always reports the presence of the project    |
-| VERSION_MATCH | False     | Only reports a match when version is provided |
+| Variable Name | Mandatory | Description                                    |
+| ------------- | --------- | ---------------------------------------------- |
+| PACKAGE_MATCH | True      | Always reports the presence of the project     |
+| VERSION_MATCH | False     | Reports a match when specific version provided |
 
 <!-- markdownlint-enable MD013 -->

@@ -116,7 +116,8 @@ runs:
       run: |
         # Abort with error when tag already released
         echo "⛔️ ## Aborting: tag ${{ inputs.tag }} already released" >> "$GITHUB_STEP_SUMMARY"
-        echo "🔗 https://github.com/${GITHUB_REPOSITORY}/releases/tag/${{ inputs.tag }}" >> "$GITHUB_STEP_SUMMARY"
+        echo "🔗 https://github.com/${GITHUB_REPOSITORY}/releases/tag/${{ inputs.tag }}" \
+          >> "$GITHUB_STEP_SUMMARY"
         exit 1
 
     - name: "GitHub release [with artefacts]"

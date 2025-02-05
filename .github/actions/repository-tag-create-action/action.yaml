@@ -41,7 +41,8 @@ runs:
       run: |
         # Abort workflow when tag is NOT semantic
         echo "Abort workflow when tag is NOT semantic: ${{ inputs.TAG }} ❌"
-        echo "### Abort workflow when tag is NOT semantic: ${{ inputs.TAG }} ❌" >> "$GITHUB_STEP_SUMMARY"
+        echo "### Abort workflow when tag is NOT semantic: ${{ inputs.TAG }} ❌" \
+           >> "$GITHUB_STEP_SUMMARY"
         exit 1
 
     - name: "Add tag to repository: ${{ inputs.TAG }}"

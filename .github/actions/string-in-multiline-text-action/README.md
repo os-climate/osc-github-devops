@@ -19,13 +19,13 @@ Supports a number of optional matching parameters:
 
 ```yaml
 steps:
-  - name: "Check multiline text string for TODO"
-    id: check-todo
-    uses: os-climate/osc-github-devops/.github/actions/string-in-multiline-text@main
-    with:
-      string: "TODO"
-      multiline-text: "${{ env.multiline_text }}"
-      case_insensitive: "true"
+    - name: "Check multiline text string for TODO"
+      id: check-todo
+      uses: os-climate/osc-github-devops/.github/actions/string-in-multiline-text@main
+      with:
+          string: "TODO"
+          multiline-text: "${{ env.multiline_text }}"
+          case_insensitive: "true"
 ```
 
 <!-- markdownlint-enable MD013 -->

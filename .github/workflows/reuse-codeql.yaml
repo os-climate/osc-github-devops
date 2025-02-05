@@ -24,7 +24,8 @@ permissions: {}
 jobs:
   analyze:
     name: Analyze (${{ matrix.language }})
-    # Consider using larger runners or machines with greater resources for possible analysis time improvements.
+    # Consider using larger runners or machines with greater resources
+    # (if analysis time improvements are necessary)
     runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-24.04' }}
     timeout-minutes: ${{ (matrix.language == 'swift' && 120) || 360 }}
     permissions:
@@ -43,7 +44,8 @@ jobs:
           - language: python
             build-mode: none
         # CodeQL supports the following values keywords for 'language':
-        #  'c-cpp', 'csharp', 'go', 'java-kotlin', 'javascript-typescript', 'python', 'ruby', 'swift'
+        # 'c-cpp', 'csharp', 'go', 'java-kotlin',
+        # 'javascript-typescript', 'python', 'ruby', 'swift'
 
     steps:
       - name: Checkout Repository

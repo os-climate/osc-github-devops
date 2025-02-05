@@ -17,9 +17,9 @@ Can be called as a workflow step with:
 
 ```yaml
 steps:
-  - name: Linting action
-    # yamllint disable-line rule:line-length
-    uses: os-climate/osc-github-devops/.github/actions/standalone-linting-action@main
+    - name: Linting action
+      # yamllint disable-line rule:line-length
+      uses: os-climate/osc-github-devops/.github/actions/standalone-linting-action@main
 ```
 
 An example reusable workflow implementation:
@@ -33,20 +33,20 @@ name: "⛔️ [R] Standalone Linting"
 
 # yamllint disable-line rule:truthy
 on:
-  workflow_call:
+    workflow_call:
 
 permissions: {}
 
 jobs:
-  linting:
-    name: "Standalone linting check"
-    runs-on: "ubuntu-24.04"
-    permissions:
-      contents: read
-    steps:
-      - name: Linting action
-        # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/standalone-linting-action@main
+    linting:
+        name: "Standalone linting check"
+        runs-on: "ubuntu-24.04"
+        permissions:
+            contents: read
+        steps:
+            - name: Linting action
+              # yamllint disable-line rule:line-length
+              uses: os-climate/osc-github-devops/.github/actions/standalone-linting-action@main
 ```
 
 ## Inputs

@@ -36,7 +36,8 @@ runs:
         fi
 
         # Based on the existing shell code used by the Gerrit commit hook
-        # Documentation here: https://gerrit-review.googlesource.com/Documentation/user-changeid.html
+        # Documentation here:
+        # https://gerrit-review.googlesource.com/Documentation/user-changeid.html
         # Source code for their implementation:
         # https://gerrit.googlesource.com/gerrit/+/refs/heads/master/resources/com/google/gerrit/server/tools/root/hooks/commit-msg
 
