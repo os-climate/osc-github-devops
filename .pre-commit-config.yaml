@@ -1,6 +1,6 @@
 ---
 # SPDX-License-Identifier: Apache-2.0
-# SPDX-FileCopyrightText: 2024 The Linux Foundation <https://linuxfoundation.org>
+# SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 ci:
   autofix_commit_msg: "Chore: pre-commit autoupdate"
@@ -93,10 +93,11 @@ repos:
     rev: v1.35.1
     hooks:
       - id: yamllint
+        types: [yaml]
         args:
           [
             "-d",
-            "{rules: {line-length: {max: 120}}, ignore-from-file: [.gitignore],}",
+            "{rules: {line-length: {max: 100}}, ignore-from-file: [.gitignore],}",
           ]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
@@ -133,6 +134,12 @@ repos:
         verbose: true
         args: ["--show-error-codes", "--install-types", "--non-interactive"]
         additional_dependencies: ["pytest", "types-requests"]
+
+  - repo: https://github.com/btford/write-good
+    rev: ab66ce10136dfad5146e69e70f82a3efac8842c1 # frozen: v1.0.8
+    hooks:
+      - id: write-good
+        files: "\\.(rst|md|markdown|mdown|mkdn)$"
 
   # Check for misspellings in documentation files
   # - repo: https://github.com/codespell-project/codespell
