@@ -7,6 +7,7 @@ name: "🌍 Check URL for Validity with WGET"
 description: "Tests a give URL for a valid server response"
 
 inputs:
+  # Allows for compound URLs built from three separate components
   URL:
     description: "URL prefix to check"
     # e.g. "https://pypi.org/project/"
@@ -28,11 +29,11 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: "Check Tooling is Available"
+    - name: "Verify WGET is available"
       id: prerequisites
       shell: bash
       run: |
-        # Verify tooling is available
+        # Verify WGET is available
         WGET_CMD=$(which wget)
         if [ ! -x $WGET_CMD ]; then
           apt-get update
