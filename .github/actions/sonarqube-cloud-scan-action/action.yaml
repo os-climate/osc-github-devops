@@ -85,6 +85,15 @@ runs:
         echo "https://docs.sonarsource.com/sonarqube-cloud/advanced-setup/analysis-parameters/" \
           >> "$GITHUB_STEP_SUMMARY"
 
+    - name: "SonarQube configuration present"
+      if: steps.sonar-project-properties.outputs.type != 'file' || \
+        steps.sonarcloud-properties.outputs.type != 'file'
+      shell: bash
+      run: |
+        # SonarQube configuration present
+        echo "SonarQube configuration present ✅"
+        echo "### SonarQube configuration present ✅" >> "$GITHUB_STEP_SUMMARY"
+
     - name: "Check build wrapper URL"
       id: url-validity-check-action
       if: inputs.BUILD_WRAPPER_URL != ''
