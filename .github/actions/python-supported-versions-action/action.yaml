@@ -25,14 +25,14 @@ runs:
     - name: "Check for: pyproject.toml"
       id: pyproject-toml
       # yamllint disable-line rule:line-length
-      uses: os-climate/osc-github-devops/.github/actions/path-check-action@edf4c90472c8443832e4ecdf6cd3b6200da258fc # 2025-01-30
+      uses: lfit/releng-reusable-workflows/.github/actions/path-check-action@11530dee75e77f063c6e01ac7f3a6cb0cdc95db7 # 2025-02-05
       with:
         path: "pyproject.toml"
 
     - name: "Check for: setup.py"
       id: setup-py
       # yamllint disable-line rule:line-length
-      uses: os-climate/osc-github-devops/.github/actions/path-check-action@edf4c90472c8443832e4ecdf6cd3b6200da258fc # 2025-01-30
+      uses: lfit/releng-reusable-workflows/.github/actions/path-check-action@11530dee75e77f063c6e01ac7f3a6cb0cdc95db7 # 2025-02-05
       with:
         path: "setup.py"
 
