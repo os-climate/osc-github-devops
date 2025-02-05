@@ -72,8 +72,9 @@ runs:
         path: ".sonarcloud.properties"
 
     - name: "Warning: missing SonarQube configuration"
-      if: steps.sonar-project-properties.outputs.type != 'file' && \
-        steps.sonarcloud-properties.outputs.type != 'file'
+      if:
+        # yamllint disable-line rule:line-length
+        steps.sonar-project-properties.outputs.type != 'file' && steps.sonarcloud-properties.outputs.type != 'file'
       shell: bash
       run: |
         # SonarQube configuration warning
@@ -86,8 +87,9 @@ runs:
           >> "$GITHUB_STEP_SUMMARY"
 
     - name: "SonarQube configuration present"
-      if: steps.sonar-project-properties.outputs.type != 'file' || \
-        steps.sonarcloud-properties.outputs.type != 'file'
+      if:
+        # yamllint disable-line rule:line-length
+        steps.sonar-project-properties.outputs.type != 'file' || steps.sonarcloud-properties.outputs.type != 'file'
       shell: bash
       run: |
         # SonarQube configuration present
