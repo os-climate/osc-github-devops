@@ -87,7 +87,7 @@ jobs:
           fi
 
       - name: "Action: python-project-version-action"
-        id: python-project-version-action
+        id: python-project
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/python-project-version-action@main
 
@@ -95,7 +95,7 @@ jobs:
         shell: bash
         run: |
           # Check output from: python-project-version-action
-          PYTHON_PROJECT_VERSION="${{ steps.python-project-version-action.outputs.python_project_version }}"
+          PYTHON_PROJECT_VERSION="${{ steps.python-project.outputs.python_project_version }}"
           if [ "$PYTHON_PROJECT_VERSION" != "0.1.24" ]; then
             echo "ERROR: Python project version was not as expected"
             echo "python_project_version: $PYTHON_PROJECT_VERSION"; exit 1
@@ -217,25 +217,25 @@ jobs:
           fi
 
       - name: "Action: repository-tag-next-action [patch]"
-        id: repository-tag-next-action-patch
+        id: repo-tag-nxt-patch
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/repository-tag-next-action@main
+        uses: os-climate/osc-github-devops/.github/actions/repo-tag-nxt@main
         with:
           tag: "v0.0.4"
           type: "patch"
 
       - name: "Action: repository-tag-next-action [minor]"
-        id: repository-tag-next-action-minor
+        id: repo-tag-nxt-minor
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/repository-tag-next-action@main
+        uses: os-climate/osc-github-devops/.github/actions/repo-tag-nxt@main
         with:
           tag: "v1.8.3"
           type: "minor"
 
       - name: "Action: repository-tag-next-action [major]"
-        id: repository-tag-next-action-major
+        id: repo-tag-nxt-major
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/repository-tag-next-action@main
+        uses: os-climate/osc-github-devops/.github/actions/repo-tag-nxt@main
         with:
           tag: "v4.1.1"
           type: "major"
@@ -243,24 +243,27 @@ jobs:
       - name: "Validate Incremented DEV Tags"
         shell: bash
         run: |
-          # Check output from: repository-tag-next-action
+          # Check output from: repo-tag-nxt
           ERRORS='false'
           EXPECTED='v0.0.5-dev1'
-          if [ "${{ steps.repository-tag-next-action-patch.outputs.tag }}" != "$EXPECTED" ]; then
-            echo "Errors with: repository-tag-next-action [patch]"
-            echo "Received: ${{ steps.repository-tag-next-action-patch.outputs.tag }} Expected: $EXPECTED"
+          if [ "${{ steps.repo-tag-nxt-patch.outputs.tag }}" != "$EXPECTED" ]; then
+            echo "Errors with: repo-tag-nxt [patch]"
+            echo "Received: ${{ steps.repo-tag-nxt-patch.outputs.tag }}"
+            echo "Expected: $EXPECTED"
             ERRORS='true'
           fi
           EXPECTED='v1.9.0-dev1'
-          if [ "${{ steps.repository-tag-next-action-minor.outputs.tag }}" != "$EXPECTED" ]; then
-            echo "Errors with: repository-tag-next-action [minor]"
-            echo "Received: ${{ steps.repository-tag-next-action-patch.outputs.tag }} Expected: $EXPECTED"
+          if [ "${{ steps.repo-tag-nxt-minor.outputs.tag }}" != "$EXPECTED" ]; then
+            echo "Errors with: repo-tag-nxt [minor]"
+            echo "Received: ${{ steps.repo-tag-nxt-patch.outputs.tag }}"
+            echo "Expected: $EXPECTED"
             ERRORS='true'
           fi
           EXPECTED='v5.0.0-dev1'
-          if [ "${{ steps.repository-tag-next-action-major.outputs.tag }}" != "$EXPECTED" ]; then
-            echo "Errors with: repository-tag-next-action [major]"
-            echo "Received: ${{ steps.repository-tag-next-action-patch.outputs.tag }} Expected: $EXPECTED"
+          if [ "${{ steps.repo-tag-nxt-major.outputs.tag }}" != "$EXPECTED" ]; then
+            echo "Errors with: repo-tag-nxt [major]"
+            echo "Received: ${{ steps.repo-tag-nxt-patch.outputs.tag }}"
+            echo "Expected: $EXPECTED"
             ERRORS='true'
           fi
           if [ "$ERRORS" = 'true' ]; then

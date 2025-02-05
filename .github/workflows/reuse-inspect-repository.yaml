@@ -99,7 +99,8 @@ jobs:
             echo "pushed_tag=$pushed_tag" >> "$GITHUB_OUTPUT"
           else
             echo "The pushed tag was NOT semantic: ${{ github.ref_name }} ❌"
-            echo "The pushed tag was NOT semantic: ${{ github.ref_name }} ❌" >> "$GITHUB_STEP_SUMMARY"
+            echo "The pushed tag was NOT semantic: ${{ github.ref_name }} ❌" \
+              >> "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
 

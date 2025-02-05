@@ -57,6 +57,34 @@ runs:
       # yamllint disable-line rule:line-length
       uses: os-climate/osc-github-devops/.github/actions/repository-metadata-action@main
 
+    - name: "Check for SonarQube project configuration"
+      id: sonar-project-properties
+      # yamllint disable-line rule:line-length
+      uses: os-climate/osc-github-devops/.github/actions/path-check-action@main
+      with:
+        path: "sonar-project.properties"
+
+    - name: "Check for SonarQube project configuration"
+      id: sonarcloud-properties
+      # yamllint disable-line rule:line-length
+      uses: os-climate/osc-github-devops/.github/actions/path-check-action@main
+      with:
+        path: ".sonarcloud.properties"
+
+    - name: "Warning: missing SonarQube configuration"
+      if: steps.sonar-project-properties.outputs.type != 'file' && \
+        steps.sonarcloud-properties.outputs.type != 'file'
+      shell: bash
+      run: |
+        # SonarQube configuration warning
+        echo "⚠️ Missing SonarQube configuration"
+        echo "Check the documentation for further details:"
+        echo "https://docs.sonarsource.com/sonarqube-cloud/advanced-setup/analysis-parameters/"
+        echo "### ⚠️ Missing SonarQube configuration file" >> "$GITHUB_STEP_SUMMARY"
+        echo "Check the documentation for further details:" >> "$GITHUB_STEP_SUMMARY"
+        echo "https://docs.sonarsource.com/sonarqube-cloud/advanced-setup/analysis-parameters/" \
+          >> "$GITHUB_STEP_SUMMARY"
+
     - name: "Check build wrapper URL"
       id: url-validity-check-action
       if: inputs.BUILD_WRAPPER_URL != ''

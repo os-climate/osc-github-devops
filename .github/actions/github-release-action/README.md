@@ -16,11 +16,11 @@ Other inputs are discretionary and set to useful defaults.
 
 ```yaml
 steps:
-  - name: "GitHub Release"
-    uses: os-climate/osc-github-devops/.github/actions/github-release-action@main
-    with:
-      tag: ${{ github.ref_name }}
-      github_token: ${{ secrets.GITHUB_TOKEN }}
+    - name: "GitHub Release"
+      uses: os-climate/osc-github-devops/.github/actions/github-release-action@main
+      with:
+          tag: ${{ github.ref_name }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 ## Inputs

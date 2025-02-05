@@ -92,7 +92,8 @@ runs:
           echo "No buildvars.txt file to purge"
         fi
         # Remove outputs related to SigStore signing
-        if test -n "$(find ${{ inputs.artefact_location }} -maxdepth 1 -name '*.sigstore*' -print -quit)"
+        if test -n "$(find ${{ inputs.artefact_location }} \
+          -maxdepth 1 -name '*.sigstore*' -print -quit)"
         then
           echo "Found SigStore signing artefacts to purge"
           rm  ${{ inputs.artefact_location }}/*.sigstore*
@@ -101,7 +102,7 @@ runs:
         fi
 
     - name: "Checking package index for build/release"
-      id: check-package-index
+      id: check-remote
       # yamllint disable-line rule:line-length
       uses: os-climate/osc-github-devops/.github/actions/pypi-version-check-action@main
       with:
@@ -116,12 +117,12 @@ runs:
       run: |
         # Determine publishing method
 
-        if [ "${{ steps.check-package-index.outputs.package_match }}" = "true" ]; then
+        if [ "${{ steps.check-remote.outputs.package_match }}" = "true" ]; then
           echo "Project has previously been published ✅"
           publish_method="Trusted Publishing"
         fi
 
-        if [ "${{ steps.check-package-index.outputs.version_match }}" != 'true' ]; then
+        if [ "${{ steps.check-remote.outputs.version_match }}" != 'true' ]; then
           echo "This build/release has NOT previously been published ✅"
         fi
 
@@ -134,11 +135,11 @@ runs:
         fi
 
         if [ "${{ env.base_url }}" != "https://pypi.org" ] && \
-        [ "${{ steps.check-package-index.outputs.version_match }}" == 'true' ]; then
+        [ "${{ steps.check-remote.outputs.version_match }}" == 'true' ]; then
           echo "This build/release has already been published ❌"
           echo "This build/release has already been published ❌" >> "$GITHUB_STEP_SUMMARY"
           exit 1
-        elif [ "${{ steps.check-package-index.outputs.version_match }}" == 'true' ]; then
+        elif [ "${{ steps.check-remote.outputs.version_match }}" == 'true' ]; then
           echo "This build/release has already been published ❌"
           publish_method="Skipped"
           # Skip the rest of the logic in this step for test/development builds
@@ -150,7 +151,8 @@ runs:
 
           ### 1Password Vault Credential ###
 
-          if [ -z "${{ inputs.OP_SERVICE_ACCOUNT_TOKEN }}" ] || [ -z "${{ inputs.ONE_PASSWORD_ITEM }}" ]; then
+          if [ -z "${{ inputs.OP_SERVICE_ACCOUNT_TOKEN }}" ] || \
+            [ -z "${{ inputs.ONE_PASSWORD_ITEM }}" ]; then
             echo "Unable to use 1Password to retrieve publishing key ❌"
             echo "Two required parameters MUST be set/available"
             echo "Secret:   OP_SERVICE_ACCOUNT_TOKEN"
@@ -217,7 +219,8 @@ runs:
       # Also, be cautious pinning v1.12.x to a SHA commit value:
       # https://github.com/pypa/gh-action-pypi-publish/discussions/287
       uses: pypa/gh-action-pypi-publish@fb13cb306901256ace3dab689990e13a5550ffaa # v1.11.0
-      if: steps.conditions.outputs.publish_method == '1Password Vault' && inputs.publish_disable == 'false'
+      if: steps.conditions.outputs.publish_method == '1Password Vault' \
+        && inputs.publish_disable == 'false'
       with:
         repository-url: "${{ env.publish_url }}"
         print-hash: true
@@ -235,7 +238,8 @@ runs:
       # Also, be cautious pinning v1.12.x to a SHA commit value:
       # https://github.com/pypa/gh-action-pypi-publish/discussions/287
       uses: pypa/gh-action-pypi-publish@fb13cb306901256ace3dab689990e13a5550ffaa # v1.11.0
-      if: steps.conditions.outputs.publish_method == 'GitHub Secret' && inputs.publish_disable == 'false'
+      if: steps.conditions.outputs.publish_method == 'GitHub Secret' \
+        && inputs.publish_disable == 'false'
       with:
         repository-url: "${{ env.publish_url }}"
         print-hash: true

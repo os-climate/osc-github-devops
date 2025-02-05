@@ -17,10 +17,10 @@ Also prints some useful GitHub environment variables to the console.
 
 ```yaml
 steps:
-  - name: "Repository metadata"
-    id: repository-metadata
-    # yamllint disable-line rule:line-length
-    uses: lfit/releng-reusable-workflows/.github/actions/repository-metadata-action@main
+    - name: "Repository metadata"
+      id: repository-metadata
+      # yamllint disable-line rule:line-length
+      uses: lfit/releng-reusable-workflows/.github/actions/repository-metadata-action@main
 ```
 
 <!-- markdownlint-enable MD013 -->
