@@ -7,7 +7,7 @@
 
 Checks for the presence of a string in multiline text.
 
-Supports a number of optional matching parameters:
+Supports the following optional parameters:
 
 - Plain or base64 encoded multiline strings accepted as input
 - Case-insensitive matching

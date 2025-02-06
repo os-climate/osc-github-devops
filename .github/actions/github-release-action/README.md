@@ -27,15 +27,15 @@ steps:
 
 <!-- markdownlint-disable MD013 -->
 
-| Variable Name     | Required | Default   | Description                                 |
-| ----------------- | -------- | --------- | ------------------------------------------- |
-| TAG               | True     | N/A       | Fixed preamble/string to embed/inject       |
-| GITHUB_TOKEN      | True     | N/A       | Mandatory token for content write access    |
-| PROJECT_NAME      | False    | See Below | Project/product name                        |
-| RELEASE_TITLE     | False    | See Below | Title for the release                       |
-| PRERELEASE        | False    | False     | Marks the release as a development release  |
-| ARTEFACT_LOCATION | False    | None      | When not set, no artefacts will be packaged |
-| MAKE_LATEST       | False    | True      | Marks the release as the latest release     |
+| Variable Name     | Required | Default   | Description                                  |
+| ----------------- | -------- | --------- | -------------------------------------------- |
+| TAG               | True     | N/A       | Fixed preamble/string to embed/inject        |
+| GITHUB_TOKEN      | True     | N/A       | Mandatory token for content write access     |
+| PROJECT_NAME      | False    | See Below | Project/product name                         |
+| RELEASE_TITLE     | False    | See Below | Title for the release                        |
+| PRERELEASE        | False    | False     | Marks the release as a development release   |
+| ARTEFACT_LOCATION | False    | None      | Unless set, will not package build artefacts |
+| MAKE_LATEST       | False    | True      | Marks the release as the latest release      |
 
 <!-- markdownlint-enable MD013 -->
 
@@ -47,17 +47,6 @@ When not provided, the project/product title will default to the repository name
 
 ### Release Title
 
-When not explicitly provided, the release title will be set to the compound value:
+When not explicitly provided, the default release title is:
 
-`[Project Name] [Tag]`
-
-So, when the following values are enumerated by the release action:
-
-```console
-repository = osc-github-devops
-tag        = v1.0.1
-```
-
-The GitHub release title would be presented as:
-
-osc-github-devops v1.0.1
+`[Python Project Name] [Tag]`
