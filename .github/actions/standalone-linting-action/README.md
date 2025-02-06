@@ -5,7 +5,7 @@
 
 # ⛔️ Linting Action
 
-This action is designed to run as a standalone linting step. This is helpful
+This action runs linting checks as a standalone step, which is helpful
 for tools that do not run well (or cannot run) under the GitHub marketplace
 pre-commit.ci application.
 
@@ -13,7 +13,7 @@ pre-commit.ci application.
 
 ## Usage Example
 
-Can be called as a workflow step with:
+An example workflow step using this action:
 
 ```yaml
 steps:

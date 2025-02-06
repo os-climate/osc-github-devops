@@ -18,25 +18,24 @@
 
 ### Description
 
-This repository contains a number of GitHub composite actions, reusable workflows,
-and workflows. The purpose of these is to provide small modular components and
-larger pieces of shared DevOps functionality which may be helpful to the OS-Climate
+This repository contains shared GitHub composite actions and workflows.
+
+The purpose of these is to provide small modular components and larger pieces
+ of shared DevOps functionality which may be helpful to the OS-Climate
 community, and indeed other open-source projects. Right now, the current focus is
 on Python and the tooling around Python projects, since that is the language
-currently used for the vast majority of OS-Climate projects and repositories.
+used for most of OS-Climate projects and repositories.
 
 ### Python Template Code
 
-The repository also contains some sample Python code which is published to the Python
-package index repository and is installable with the Python "pip" command. The
-dummy sample project ensures Python packages can be built, tested and published
-using the supplied GitHub composite actions, reusable workflows, and workflows.
+The repository also contains a sample/template Python project, published to the
+Python package index and is installable with the Python "pip" command. The
+sample code acts as a test be to ensure Python packages will build, test and
+publish using the supplied GitHub composite actions and workflows.
 
 Relevant link to the Python package index project page:
 
 - [osc-github-devops](https://pypi.org/project/osc-github-devops)
-
-Detailed documentation will be supplied here, once further development is done.
 
 In the meantime, here is some general documentation covering the relevant topics:
 
@@ -46,12 +45,12 @@ In the meantime, here is some general documentation covering the relevant topics
 - [The Ultimate Guide to GitHub Reusable Workflows](https://www.dhiwise.com/post/the-ultimate-guide-to-github-reusable-workflows-maximize-efficiency-and-collaboration)
 
 <!--
-[comment]: # SPDX-License-Identifier: Apache-2.0
-[comment]: # SPDX-FileCopyrightText: 2024 The Linux Foundation
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation
 -->
 
 <!--
-[comment]: # Section below is sourced by the badges displayed under the project heading
+# The section below renders the badges displayed at the top of the page
 -->
 
 [🧪 GitHub Actions CI/CD workflow tests badge]: https://github.com/os-climate/osc-github-devops/actions/workflows/merge-build-test-release.yaml/badge.svg?branch=main&event=push
