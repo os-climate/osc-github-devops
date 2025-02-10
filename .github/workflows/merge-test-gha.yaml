@@ -72,7 +72,7 @@ jobs:
       - name: "Action: python-project-name-action"
         id: python-project-name-action
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/python-project-name-action@main
+        uses: lfit/releng-reusable-workflows/.github/actions/python-project-name-action@431c4e424c15544f98ec1321f6668f655c238d3a # 2025-02-10
 
       - name: "Validate: python-project-name-action"
         shell: bash
@@ -104,7 +104,7 @@ jobs:
       - name: "Action: project-name-action"
         id: project-name-action
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/project-name-action@main
+        uses: lfit/releng-reusable-workflows/.github/actions/project-name-action@main
 
       - name: "Validate: project-name-action"
         shell: bash
