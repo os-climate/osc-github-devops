@@ -85,6 +85,45 @@ jobs:
           else
             echo "Returned project name is correct: $PYTHON_PROJECT_NAME"
           fi
+          PYTHON_PROJECT_NAME="${{ steps.python-project-name-action.outputs.python_package_name }}"
+          if [ "$PYTHON_PACKAGE_NAME" != "osc_github_devops" ]; then
+            echo "ERROR: Python package name was not as expected"
+            echo "python_package_name: $PYTHON_PROJECT_NAME"; exit 1
+          else
+            echo "Returned package name is correct: $PYTHON_PROJECT_NAME"
+          fi
+          PYTHON_PROJECT_FILE="${{ steps.python-project-name-action.outputs.python_project_file }}"
+          if [ "$PYTHON_PROJECT_FILE" != "pyproject.toml" ]; then
+            echo "ERROR: Python project file was not as expected"
+            echo "python_project_file: $PYTHON_PROJECT_FILE"; exit 1
+          else
+            echo "Returned Python project file is correct: $PYTHON_PROJECT_FILE"
+          fi
+
+      # Note: project-name-action depends on action above (python-project-name-action)
+      - name: "Action: project-name-action"
+        id: project-name-action
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/project-name-action@main
+
+      - name: "Validate: project-name-action"
+        shell: bash
+        run: |
+          # Check output from: project-name-action
+          PROJECT_NAME="${{ steps.project-name-action.outputs.project_name }}"
+          if [ "$PROJECT_NAME" != "osc-github-devops" ]; then
+            echo "ERROR: Python project name was not as expected"
+            echo "project_name: $PROJECT_NAME"; exit 1
+          else
+            echo "Returned project name is correct: $PROJECT_NAME"
+          fi
+          MATCH="${{ steps.project-name-action.outputs.match }}"
+          if [ "$MATCH" != "true" ]; then
+            echo "ERROR: Flag NOT set indicating project and repository name match"
+            exit 1
+          else
+            echo "Flag set indicating project and repository name match"
+          fi
 
       - name: "Action: python-project-version-action"
         id: python-project
@@ -101,24 +140,6 @@ jobs:
             echo "python_project_version: $PYTHON_PROJECT_VERSION"; exit 1
           else
             echo "Returned project version is correct: $PYTHON_PROJECT_NAME"
-          fi
-
-      - name: "Action: project-name-compare-action"
-        id: project-name-compare-action
-        # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/project-name-compare-action@main
-
-      - name: "Validate: project-name-compare-action"
-        shell: bash
-        run: |
-          # Check output from: project-name-compare-action
-          MATCHES_REPO_NAME="${{ steps.project-name-compare-action.outputs.MATCHES_REPO_NAME }}"
-          if [ "$MATCHES_REPO_NAME" != "true" ]; then
-            echo "ERROR: Python project name did not match repository name, as expected"
-            echo "MATCHES_REPO_NAME: $MATCHES_REPO_NAME"; exit 1
-          else
-            echo "Project name matched repository name, as expected"
-            echo "MATCHES_REPO_NAME: $MATCHES_REPO_NAME"
           fi
 
       - name: "Extract TOX stanza"

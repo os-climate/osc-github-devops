@@ -58,7 +58,7 @@ runs:
     - name: "Extract project/repository naming"
       id: naming
       # yamllint disable-line rule:line-length
-      uses: os-climate/osc-github-devops/.github/actions/project-name-compare-action@main
+      uses: os-climate/osc-github-devops/.github/actions/project-name-action@main
 
     - name: "Check project version matches pushed tags"
       if: startsWith(github.ref, 'refs/tags/')

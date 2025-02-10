@@ -3,18 +3,23 @@
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 # python-project-name-action
-name: "🐍 Get Python Project Name"
-description: "Returns the name of the Python Project"
-# Retrieves from either pyproject.toml or setup.py
+name: "🐍 Python Project/Package Names"
+description: "Extracts Python project name and derives the package name"
+# Uses project description from pyproject.toml or setup.py
 
 outputs:
+  # Mandatory
+  PYTHON_PROJECT_FILE:
+    # Note: dashes in the name are substituted with underscores
+    description: "File used to extract project metadata [pyproject.toml|setup.py]"
+    value: ${{ steps.capture.outputs.python_project_file }}
   PYTHON_PROJECT_NAME:
-    description: "The name of the Python project from pyproject.toml or setup.py"
-    value: ${{ steps.variables.outputs.python_project_name }}
-  PYTHON_BUILD_NAME:
-    # Any dashes in the name will be replaced with underscores
-    description: "The name of the Python project when built"
-    value: ${{ steps.variables.outputs.python_build_name }}
+    description: "Name of the Python project from pyproject.toml/setup.py"
+    value: ${{ steps.capture.outputs.python_project_name }}
+  PYTHON_PACKAGE_NAME:
+    # Note: dashes in the name are substituted with underscores
+    description: "The name of the Python package"
+    value: ${{ steps.capture.outputs.python_package_name }}
 
 runs:
   using: "composite"
@@ -25,13 +30,7 @@ runs:
       with:
         path: "setup.py"
 
-    # yamllint disable-line rule:line-length
-    - uses: lfit/releng-reusable-workflows/.github/actions/path-check-action@11530dee75e77f063c6e01ac7f3a6cb0cdc95db7 # 2025-02-05
-      id: pyproject-toml
-      with:
-        path: "pyproject.toml"
-
-    - name: "Use project name from setup.py"
+    - name: "Get project name from setup.py"
       id: setup-py-name
       if: steps.setup-py.outputs.type == 'file'
       # yamllint disable-line rule:line-length
@@ -41,7 +40,13 @@ runs:
         regex: '(?<=name=")([^"]*)'
         filename: "setup.py"
 
-    - name: "Use project name from pyproject.toml"
+    # yamllint disable-line rule:line-length
+    - uses: lfit/releng-reusable-workflows/.github/actions/path-check-action@11530dee75e77f063c6e01ac7f3a6cb0cdc95db7 # 2025-02-05
+      id: pyproject-toml
+      with:
+        path: "pyproject.toml"
+
+    - name: "Get project name from pyproject.toml"
       id: pyproject-toml-name
       if: steps.pyproject-toml.outputs.type == 'file'
       # yamllint disable-line rule:line-length
@@ -51,42 +56,52 @@ runs:
         regex: '(?<=^name = ")([^"]*)'
         filename: "pyproject.toml"
 
-    - name: "Throw error if Python project metadata was NOT found"
-      if: steps.pyproject-toml.outputs.type == 'invalid' &&
-        steps.setup-py.outputs.type == 'invalid'
+    - name: "Capture Python project metadata"
+      if: env.python_project != 'false'
+      id: capture
       shell: bash
       run: |
-        # Throw error if Python project metadata was NOT found
-        echo "Neither pyproject.toml NOR setup.py were found"; exit 1
-
-    - name: "Return extracted values"
-      id: variables
-      shell: bash
-      run: |
-        # Return extracted values
+        # Capture Python project metadata
 
         # pyproject.toml is preferred source if both files exist
         if [ ${{ steps.pyproject-toml.outputs.type == 'file' }} ]; then
-          echo "Using project name from source: pyproject.toml"
+          echo "Using project name from: pyproject.toml"
           PYTHON_PROJECT_NAME="${{ steps.pyproject-toml-name.outputs.extracted_string}}"
+          PYTHON_PROJECT_FILE="pyproject.toml"
 
         elif [ ${{ steps.setup-py.outputs.type == 'file' }} ]; then
-          echo "Using project name from source: setup.py"
+
+          # This is a legacy format and does not conform to the latest PEP standards
+
+          echo "Using project name from: setup.py"
           PYTHON_PROJECT_NAME="${{ steps.setup-py-name.outputs.extracted_string}}"
+          PYTHON_PROJECT_FILE="setup.py"
+
+          # Project is defined using legacy standards
+          echo "# ⚠️ Project using outdated format: setup.py"
+          echo "This Python project format is deprecated"
+          echo "The repository content needs updating"
+
+          echo "# ⚠️ Project using outdated format: setup.py" >> "$GITHUB_STEP_SUMMARY"
+          echo "This Python project format is deprecated" >> "$GITHUB_STEP_SUMMARY"
+          echo "The repository content needs updating" >> "$GITHUB_STEP_SUMMARY"
         fi
 
         if [ -z "$PYTHON_PROJECT_NAME" ]; then
-          echo "The project name extraction failed ❌"; exit 1
+          echo "Python project name extraction failed ❌"
+          exit 1
         fi
 
-        echo "python_project_name: $PYTHON_PROJECT_NAME ✅"
+        echo "Python project name: $PYTHON_PROJECT_NAME ✅"
 
         # Replace all dashes in the name with underscores
-        PYTHON_BUILD_NAME=$(echo "$PYTHON_PROJECT_NAME" | tr '-' '_')
-        echo "python_build_name: $PYTHON_BUILD_NAME"
+        PYTHON_PACKAGE_NAME=$(echo "$PYTHON_PROJECT_NAME" | tr '-' '_')
+        echo "Python package name: $PYTHON_PACKAGE_NAME"
 
         # Make available to the GitHub environment
         echo "python_project_name=$PYTHON_PROJECT_NAME" >> "$GITHUB_ENV"
         echo "python_project_name=$PYTHON_PROJECT_NAME" >> "$GITHUB_OUTPUT"
-        echo "python_build_name=$PYTHON_BUILD_NAME" >> "$GITHUB_ENV"
-        echo "python_build_name=$PYTHON_BUILD_NAME" >> "$GITHUB_OUTPUT"
+        echo "python_package_name=$PYTHON_PACKAGE_NAME" >> "$GITHUB_ENV"
+        echo "python_package_name=$PYTHON_PACKAGE_NAME" >> "$GITHUB_OUTPUT"
+        echo "python_project_file=$PYTHON_PROJECT_FILE" >> "$GITHUB_ENV"
+        echo "python_project_file=$PYTHON_PROJECT_FILE" >> "$GITHUB_OUTPUT"
