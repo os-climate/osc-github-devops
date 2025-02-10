@@ -67,7 +67,7 @@ jobs:
       - name: "Action: git-commit-message"
         id: git-commit-message
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/git-commit-message-action@main
+        uses: lfit/releng-reusable-workflows/.github/actions/git-commit-message-action@46fce72e65b1838c2bfbc6ba0ad29cdd9f229303 # 2025-02-10
 
       - name: "Action: python-project-name-action"
         id: python-project-name-action
