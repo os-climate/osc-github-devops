@@ -34,7 +34,7 @@ runs:
     - name: "Extract Python project naming"
       id: project-naming
       # yamllint disable-line rule:line-length
-      uses: os-climate/osc-github-devops/.github/actions/python-project-name-action@main
+      uses: lfit/releng-reusable-workflows/.github/actions/python-project-name-action@431c4e424c15544f98ec1321f6668f655c238d3a # 2025-02-10
 
     - name: "Determine versioning type [static|dynamic]"
       if: steps.project-toml.outputs.type == 'file'
