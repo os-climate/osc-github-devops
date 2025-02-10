@@ -43,6 +43,9 @@ outputs:
 runs:
   using: "composite"
   steps:
+    # yamllint disable-line rule:line-length
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
     # First action performs repository checkout
     - name: "Python project setup"
       id: project-setup
