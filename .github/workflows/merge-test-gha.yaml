@@ -85,7 +85,7 @@ jobs:
           else
             echo "Returned project name is correct: $PYTHON_PROJECT_NAME"
           fi
-          PYTHON_PROJECT_NAME="${{ steps.python-project-name-action.outputs.python_package_name }}"
+          PYTHON_PACKAGE_NAME="${{ steps.python-project-name-action.outputs.python_package_name }}"
           if [ "$PYTHON_PACKAGE_NAME" != "osc_github_devops" ]; then
             echo "ERROR: Python package name was not as expected"
             echo "python_package_name: $PYTHON_PROJECT_NAME"; exit 1
