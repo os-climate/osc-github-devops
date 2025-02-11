@@ -52,7 +52,7 @@ jobs:
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/python-project-build-action@main
         with:
-          build_tag: ${{ needs.repository.outputs.build_tag }}
+          tag: ${{ needs.repository.outputs.build_tag }}
 
   python-test:
     name: "Test"
