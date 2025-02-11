@@ -48,7 +48,7 @@ jobs:
 
       - name: "Update Python dependencies"
         # yamllint disable-line rule:line-length
-        uses: pdm-project/update-deps-action@057a6f365a2a2dc97457af16ae105e9b03fea9ce # v1.10
+        uses: pdm-project/update-deps-action@8b620e3c56653ebb75a4439ecf77420350930528 # v1.11
         with:
           sign-off-commit: "true"
           # The personal access token, default: ${{ github.token }}
