@@ -138,7 +138,10 @@ runs:
         [ "${{ steps.check-remote.outputs.version_match }}" == 'true' ]; then
           echo "This build/release has already been published ❌"
           echo "This build/release has already been published ❌" >> "$GITHUB_STEP_SUMMARY"
-          exit 1
+          if [ ${{ env.pypi_publish_disable != 'true' ]; then
+            # When publishing is disabled, this is NOT considered to be an error
+            exit 1
+          fi
         elif [ "${{ steps.check-remote.outputs.version_match }}" == 'true' ]; then
           echo "This build/release has already been published ❌"
           publish_method="Skipped"
