@@ -6,7 +6,8 @@ name: "⛔️ Standalone Linting"
 
 # yamllint disable-line rule:truthy
 on:
-  workflow_dispatch:
+  # Not supported when upstream workflow contains: amannn/action-semantic-pull-request
+  # workflow_dispatch:
   pull_request:
     types: [opened, reopened, edited, synchronize]
 
