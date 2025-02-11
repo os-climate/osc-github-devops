@@ -118,38 +118,28 @@ runs:
         # Determine publishing method
 
         if [ "${{ steps.check-remote.outputs.package_match }}" = "true" ]; then
-          echo "Project has previously been published ✅"
           publish_method="Trusted Publishing"
+          echo "Project previously published; using Trusted Publishing ✅"
         fi
 
         if [ "${{ steps.check-remote.outputs.version_match }}" != 'true' ]; then
           echo "This build/release has NOT previously been published ✅"
-        fi
-
-        # ToDo: remove line below when supporting reusable workflows
-        if [ "$publish_method" = "Trusted Publishing" ]; then
-        #  echo "⚠️ Trusting published is temporarily disabled"
-        #  publish_method="Trusted Publishing Bypassed"
-        #else
-          echo "Publishing will use Trusted Publishing ✅"
-        fi
-
-        if [ "${{ env.base_url }}" != "https://pypi.org" ] && \
-        [ "${{ steps.check-remote.outputs.version_match }}" == 'true' ]; then
+        else
           echo "This build/release has already been published ❌"
-          echo "This build/release has already been published ❌" >> "$GITHUB_STEP_SUMMARY"
+          if [ "${{ env.base_url }}" != "https://pypi.org" ]; then
+            # This is an error for production/tagged releases
+            echo "This build/release has already been published ❌" >> "$GITHUB_STEP_SUMMARY"
+          else
+            # Publishing is skipped for non-production workflow runs
+            publish_method="Skipped"; exit 0
+          fi
           if [ ${{ env.pypi_publish_disable }} != 'true' ]; then
             # When publishing is disabled, this is NOT considered to be an error
             exit 1
           fi
-        elif [ "${{ steps.check-remote.outputs.version_match }}" == 'true' ]; then
-          echo "This build/release has already been published ❌"
-          publish_method="Skipped"
-          # Skip the rest of the logic in this step for test/development builds
-          exit 0
         fi
 
-        if [ "$publish_method" != "Trusted Publishing" ] && [ "$publish_method" != "Skipped" ]; then
+        if [ "$publish_method" != "Trusted Publishing" ]; then
           echo "Trusted publishing NOT available, using fallback methods 👇🏻"
 
           ### 1Password Vault Credential ###
@@ -179,11 +169,9 @@ runs:
 
         fi
 
-        if [ "$publish_method" != "none" ]; then
-          echo "Publishing to: ${{ env.base_url }} [environment: ${{ inputs.ENVIRONMENT }}]"
-          echo "publish_method=$publish_method" >> "$GITHUB_ENV"
-          echo "publish_method=$publish_method" >> "$GITHUB_OUTPUT"
-        fi
+        echo "Publishing to: ${{ env.base_url }} [environment: ${{ inputs.ENVIRONMENT }}]"
+        echo "publish_method=$publish_method" >> "$GITHUB_ENV"
+        echo "publish_method=$publish_method" >> "$GITHUB_OUTPUT"
 
     - name: "Publish PyPI [Trusted Publishing]"
       # v1.12.x has changed the docker container setup/creation process
@@ -260,19 +248,15 @@ runs:
       run: |
         # Print summary/job output
         if [ "${{ inputs.publish_disable }}" = "true" ]; then
-          echo "## PyPI Publishing Disabled: Dry Run 🛑" >> "$GITHUB_STEP_SUMMARY"
-          echo "For: ${{ env.base_url }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "### Publishing Disabled: Dry Run 🛑" >> "$GITHUB_STEP_SUMMARY"
         elif [ "${{ steps.conditions.outputs.publish_method }}" = "Skipped" ]; then
-          echo "### Publishing skipped due to existing content ⛔️" >> "$GITHUB_STEP_SUMMARY"
-          exit 0
+          echo "### Publishing Skipped: Previously Released ⛔️" >> "$GITHUB_STEP_SUMMARY"
         elif [ ${{ env.base_url }} != "https://pypi.org" ]; then
           echo "# 🧪 Test Release: PyPI" >> "$GITHUB_STEP_SUMMARY"
         else
           echo "# 🚀 Release: PyPI" >> "$GITHUB_STEP_SUMMARY"
         fi
-        echo "Method: ${{ steps.conditions.outputs.publish_method }}"
-        echo "Method: ${{ steps.conditions.outputs.publish_method }}" >> "$GITHUB_STEP_SUMMARY"
-
+        echo "${{ steps.conditions.outputs.publish_method }}: ${{ env.base_url }} " >> "$GITHUB_STEP_SUMMARY"
         if [ "${{ inputs.publish_disable }}" != "true" ]; then
-          echo "🔗 ${{ env.base_url }}/project/${{ steps.naming.outputs.python_project_name }}/${{ inputs.tag }}/" >> "$GITHUB_STEP_SUMMARY"
+          echo "🔗 Release link: ${{ env.base_url }}/project/${{ steps.naming.outputs.python_project_name }}/${{ inputs.tag }}/" >> "$GITHUB_STEP_SUMMARY"
         fi
