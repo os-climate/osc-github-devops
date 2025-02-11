@@ -54,7 +54,7 @@ jobs:
           # The personal access token, default: ${{ github.token }}
           # token: ${{ github.token }}
           token: ${{ github.token }}
-          commit-message: "Chore: Update dependencies and pdm.lock [skip ci]"
+          commit-message: "chore: Update dependencies and pdm.lock [skip ci]"
           pr-title: "Update Python module dependencies"
           update-strategy: eager
           # Whether to install PDM plugins before update
