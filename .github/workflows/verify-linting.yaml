@@ -6,7 +6,7 @@ name: "⛔️ Standalone Linting"
 
 # yamllint disable-line rule:truthy
 on:
-  # Not supported when upstream workflow contains: amannn/action-semantic-pull-request
+  # Not supported when workflow contains: amannn/action-semantic-pull-request
   # workflow_dispatch:
   pull_request:
     types: [opened, reopened, edited, synchronize]
@@ -34,4 +34,4 @@ jobs:
     permissions:
       contents: read
     # yamllint disable-line rule:line-length
-    uses: os-climate/osc-github-devops/.github/workflows/reuse-linting.yaml@e59332b381bbee1cd0ac4f3d951bd31c60b0f98e # 2025-02-05
+    uses: os-climate/osc-github-devops/.github/workflows/reuse-linting.yaml@main # 2025-02-12
