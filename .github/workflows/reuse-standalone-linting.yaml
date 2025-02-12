@@ -43,7 +43,7 @@ jobs:
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/standalone-linting-action@main # 2025-02-12
         with:
-          config_url: ${{ inputs.dependencies_url }}
+          config_url: ${{ inputs.config_url }}
           dependencies_url: ${{ inputs.dependencies_url }}
           remote_config: ${{ inputs.remote_config }}
           python-version: ${{ inputs.python-version }}
