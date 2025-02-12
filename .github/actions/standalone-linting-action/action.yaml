@@ -43,11 +43,13 @@ runs:
         python-version: ${{ inputs.python-version }}
         cache: "pip"
 
-    - name: "Install pre-commit, check prerequisites"
+    - name: "Install pre-commit"
+      run: pip install --disable-pip-version-check pre-commit
+
+    - name: "Check prerequisites"
       shell: bash
       run: |
-        # Install pre-commit, check prerequisites
-        pip install --disable-pip-version-check --upgrade pre-commit
+        # Check prerequisites
         CURL_CMD=$(which curl)
         if [ ! -x "$CURL_CMD" ]; then
          echo "cURL binary not found ❌"; exit 1
@@ -73,20 +75,22 @@ runs:
         curl -sS -o .pre-commit-config.yaml "${{ inputs.CONFIG_URL }}"
         echo "Pre-commit configuration file downloaded ✅"
 
-    - name: "Install additional Python dependencies"
+    - name: "Download Python dependencies configuration"
       if: inputs.DEPENDENCIES_URL != ''
       shell: bash
       run: |
-        # Install additional Python dependencies
+        # Download Python dependencies configuration
         echo "Downloading configuration from:"
         echo "${{ inputs.DEPENDENCIES_URL }}"
         if (curl -sS -o /tmp/requirements.txt "${{ inputs.DEPENDENCIES_URL }}"); then
           echo "Python dependencies file downloaded ✅"
         else
-          echo "Error: unable to download dependencies ❌"; exit 1
+          echo "Error: unable to download Python dependencies configuration ❌"; exit 1
         fi
-        echo "Installing additional Python dependencies"
-        pip install --disable-pip-version-check --upgrade -r /tmp/requirements.txt
+
+    - name: "Install additional Python dependencies"
+      if: inputs.DEPENDENCIES_URL != ''
+      run: pip install --disable-pip-version-check -r /tmp/requirements.txt
 
     - name: "Validate configuration"
       shell: bash
