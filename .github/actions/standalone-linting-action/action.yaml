@@ -44,6 +44,7 @@ runs:
         cache: "pip"
 
     - name: "Install pre-commit"
+      shell: bash
       run: pip install --disable-pip-version-check pre-commit
 
     - name: "Check prerequisites"
@@ -90,6 +91,7 @@ runs:
 
     - name: "Install additional Python dependencies"
       if: inputs.DEPENDENCIES_URL != ''
+      shell: bash
       run: pip install --disable-pip-version-check -r /tmp/requirements.txt
 
     - name: "Validate configuration"
