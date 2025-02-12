@@ -27,4 +27,4 @@ jobs:
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/standalone-linting-action@main # 2025-02-12
         with:
-          force_remote: ${{ inputs.force_remote }}
+          remote_config: ${{ inputs.force_remote }}
