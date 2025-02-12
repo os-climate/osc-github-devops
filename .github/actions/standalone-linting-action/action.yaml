@@ -48,6 +48,7 @@ runs:
         fi
 
     - name: "Check for local linting configuration"
+      if: inputs.force_remote != 'true'
       id: local-precommit-config
       # yamllint disable-line rule:line-length
       uses: lfit/releng-reusable-workflows/.github/actions/path-check-action@473a3c654d58fa0c27f91a9cc25bd9433de43d5e # v0.2.4
