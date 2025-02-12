@@ -18,12 +18,16 @@ inputs:
     type: string
     required: false
     # yamllint disable-line rule:line-length
-    default: "https://raw.githubusercontent.com/lfit/releng-reusable-workflows/refs/heads/main/.github/actions/standalone-linting-action/requirements.txt"
+    default: "https://raw.githubusercontent.com/os-climate/osc-github-devops/refs/heads/main/.github/actions/standalone-linting-action/requirements.txt"
   FORCE_REMOTE:
     description: "Ignore local linting configuration; always install from remote"
     type: string
     required: false
     default: "false"
+
+#
+env:
+  python-version: "3.12"
 
 runs:
   using: "composite"
@@ -32,16 +36,18 @@ runs:
       # yamllint disable-line rule:line-length
       uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
       with:
-        python-version: "3.12"
+        python-version: ${{ env.python-version }}
+        cache: "pip"
 
     - name: "Checkout repository"
       # yamllint disable-line rule:line-length
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-    - name: "Check prerequisites"
+    - name: "Install pre-commit, check prerequisites"
       shell: bash
       run: |
-        # Check prerequisites
+        # Install pre-commit, check prerequisites
+        pip install --disable-pip-version-check --upgrade pre-commit
         CURL_CMD=$(which curl)
         if [ ! -x "$CURL_CMD" ]; then
          echo "cURL binary not found ❌"; exit 1
@@ -55,31 +61,36 @@ runs:
       with:
         path: ".pre-commit-config.yaml"
 
-    - name: "Download pre-commit configuration file"
+    - name: "Download remote pre-commit configuration"
       # yamllint disable-line rule:line-length
       if: steps.local-precommit-config.outputs != 'file' || inputs.force_remote == 'true'
       shell: bash
       run: |
-        # Download pre-commit configuration file
-        if [ -f .pre-commit-config.yaml ]; then
-          mv .pre-commit-config.yaml .pre-commit-config.yaml.local
-        fi
-        echo "Downloading configuration from: ${{ inputs.CONFIG_URL }}"
+        # Download remote pre-commit configuration
+        echo "Downloading configuration from:"
+        echo "${{ inputs.CONFIG_URL }}"
+        # cURL will overwrite any pre-existing local file
         curl -sS -o .pre-commit-config.yaml "${{ inputs.CONFIG_URL }}"
         echo "Pre-commit configuration file downloaded ✅"
-        pre-commit validate-config
 
-    #    - name: "Download/install Python dependencies file"
+    #    - name: "Download/install Python dependencies"
     #      # yamllint disable-line rule:line-length
-    #      if: steps.local-precommit-config.outputs != 'file' || inputs.force_remote == 'true'
     #      shell: bash
+    #      if: steps.local-precommit-config.outputs != 'file' || inputs.force_remote == 'true'
     #      run: |
     #        # Download Python dependencies file
-    #        echo "Downloading configuration from: ${{ inputs.DEPENDENCIES_URL }}"
+    #        echo "Downloading configuration from:"
+    #        echo "${{ inputs.DEPENDENCIES_URL }}"
     #        curl -sS -o /tmp/requirements.txt "${{ inputs.DEPENDENCIES_URL }}"
     #        echo "Python dependencies file downloaded ✅"
-    #        cat  /tmp/requirements.txt
-    #        pip install --disable-pip-version-check --upgrade -r  /tmp/requirements.txt
+    #        echo "Installing Python dependencies and pre-commit"
+    #        pip install --disable-pip-version-check --upgrade -r /tmp/requirements.txt
+
+    - name: "Validate configuration"
+      shell: bash
+      run: |
+        # Validate configuration
+        pre-commit validate-config
 
     - name: "Run all pre-commit hooks"
       shell: bash
