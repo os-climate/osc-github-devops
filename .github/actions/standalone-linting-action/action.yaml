@@ -20,7 +20,7 @@ inputs:
     # yamllint disable-line rule:line-length
     default: "https://raw.githubusercontent.com/lfit/releng-reusable-workflows/refs/heads/main/.github/actions/standalone-linting-action/requirements.txt"
   FORCE_REMOTE:
-    description: "Ignore any local configuration; install remote linting configuration"
+    description: "Ignore local linting configuration; always install from remote"
     type: string
     required: false
     default: "false"

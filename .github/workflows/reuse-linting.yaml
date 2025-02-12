@@ -7,6 +7,12 @@ name: "⛔️ [R] Standalone Linting"
 # yamllint disable-line rule:truthy
 on:
   workflow_call:
+    inputs:
+      FORCE_REMOTE:
+        description: "Ignore local linting configuration; always install from remote"
+        type: string
+        required: false
+        default: "false"
 
 permissions: {}
 
