@@ -19,4 +19,4 @@ jobs:
     steps:
       - name: "Standalone linting action"
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/standalone-linting-action@f43c299c48b9021d41a45cf2e40edfac65e155c8 # 2025-02-05
+        uses: os-climate/osc-github-devops/.github/actions/standalone-linting-action@main # 2025-02-12
