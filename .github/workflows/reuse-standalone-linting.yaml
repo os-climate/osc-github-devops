@@ -46,4 +46,4 @@ jobs:
           config_url: ${{ inputs.dependencies_url }}
           dependencies_url: ${{ inputs.dependencies_url }}
           remote_config: ${{ inputs.remote_config }}
-          python_version: ${{ inputs.python-version }}
+          python-version: ${{ inputs.python-version }}
