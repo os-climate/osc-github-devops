@@ -56,6 +56,6 @@ jobs:
 | Variable Name    | Required | Default                                                                                                                                                                     |
 | ---------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | CONFIG_URL       | False    | [pre-commit-config.yaml](https://raw.githubusercontent.com/lfit/releng-reusable-workflows/refs/heads/main/.github/actions/standalone-linting-action/pre-commit-config.yaml) |
-| DEPENDENCIES_URL | False    | [requirements.txt](https://raw.githubusercontent.com/lfit/releng-reusable-workflow/refs/heads/main/linting/requirements.txt)                                                |
+| DEPENDENCIES_URL | False    | [requirements.txt](https://raw.githubusercontent.com/lfit/releng-reusable-workflows/refs/heads/main/.github/actions/standalone-linting-action/requirements.txt)             |
 
 <!-- markdownlint-enable MD013 -->
