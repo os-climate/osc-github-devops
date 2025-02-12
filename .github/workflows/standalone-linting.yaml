@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
-name: "⛔️ Standalone Linting"
+name: "⛔️ Pull Request"
 
 # yamllint disable-line rule:truthy
 on:
@@ -19,6 +19,7 @@ concurrency:
 
 jobs:
   semantic-pull-request:
+    name: "Semantic Pull Request"
     permissions:
       contents: read
     runs-on: ubuntu-24.04
