@@ -38,15 +38,15 @@ on:
 permissions: {}
 
 jobs:
-    linting:
-        name: "Standalone linting check"
-        runs-on: "ubuntu-24.04"
-        permissions:
-            contents: read
-        steps:
-            - name: Linting action
-              # yamllint disable-line rule:line-length
-              uses: lfit/releng-reusable-workflows/.github/actions/standalone-linting-action@main
+  linting:
+    name: "Standalone linting check"
+    runs-on: "ubuntu-24.04"
+    permissions:
+      contents: read
+    steps:
+      - name: Linting action
+        # yamllint disable-line rule:line-length
+        uses: lfit/releng-reusable-workflows/.github/actions/standalone-linting-action@main
 ```
 
 ## Inputs

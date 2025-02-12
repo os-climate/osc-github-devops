@@ -3,7 +3,7 @@
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 # standalone-linting-action
-name: "Standalone linting action"
+name: "Standalone Linting"
 description: "Runs linting tools that do NOT run under pre-commit.ci"
 
 inputs:
@@ -67,25 +67,19 @@ runs:
         echo "Downloading configuration from: ${{ inputs.CONFIG_URL }}"
         curl -sS -o .pre-commit-config.yaml "${{ inputs.CONFIG_URL }}"
         echo "Pre-commit configuration file downloaded ✅"
-        cat .pre-commit-config.yaml
-
-    - name: "Download/install Python dependencies file"
-      # yamllint disable-line rule:line-length
-      if: steps.local-precommit-config.outputs != 'file' || inputs.force_remote == 'true'
-      shell: bash
-      run: |
-        # Download Python dependencies file
-        echo "Downloading configuration from: ${{ inputs.DEPENDENCIES_URL }}"
-        curl -sS -o requirements.txt "${{ inputs.DEPENDENCIES_URL }}"
-        echo "Python dependencies file downloaded ✅"
-        cat requirements.txt
-        pip install --disable-pip-version-check --upgrade -r requirements.txt
-
-    - name: "Validate configuration"
-      shell: bash
-      run: |
-        # Validate configuration
         pre-commit validate-config
+
+    #    - name: "Download/install Python dependencies file"
+    #      # yamllint disable-line rule:line-length
+    #      if: steps.local-precommit-config.outputs != 'file' || inputs.force_remote == 'true'
+    #      shell: bash
+    #      run: |
+    #        # Download Python dependencies file
+    #        echo "Downloading configuration from: ${{ inputs.DEPENDENCIES_URL }}"
+    #        curl -sS -o /tmp/requirements.txt "${{ inputs.DEPENDENCIES_URL }}"
+    #        echo "Python dependencies file downloaded ✅"
+    #        cat  /tmp/requirements.txt
+    #        pip install --disable-pip-version-check --upgrade -r  /tmp/requirements.txt
 
     - name: "Run all pre-commit hooks"
       shell: bash

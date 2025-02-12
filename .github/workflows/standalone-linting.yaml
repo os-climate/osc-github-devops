@@ -31,7 +31,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   standalone-linting:
-    name: "Standalone linting checks"
+    name: "Standalone Linting"
     permissions:
       contents: read
     # yamllint disable-line rule:line-length
