@@ -12,16 +12,11 @@ permissions: {}
 
 jobs:
   linting:
-    name: "Standalone linting check"
+    name: "Standalone linting checks"
     runs-on: "ubuntu-24.04"
     permissions:
       contents: read
     steps:
-      - name: "Validate pull request title"
-        uses: amannn/action-semantic-pull-request@0723387faaf9b38adef4775cd42cfd5155ed6017 # v5.5.3
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Linting action
+      - name: "Standalone linting action"
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/standalone-linting-action@f43c299c48b9021d41a45cf2e40edfac65e155c8 # 2025-02-05
