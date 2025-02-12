@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
-# standalone-standalone-linting-action
-name: "Linting action"
-description: "Runs linting tools that do NOT work under pre-commit.ci"
+# standalone-linting-action
+name: "Standalone linting action"
+description: "Runs linting tools that do NOT run under pre-commit.ci"
 
 inputs:
   CONFIG_URL:
@@ -12,20 +12,25 @@ inputs:
     type: string
     required: false
     # yamllint disable-line rule:line-length
-    default: "https://raw.githubusercontent.com/os-climate/osc-github-devops/refs/heads/main/.github/actions/standalone-linting-action/pre-commit-config.yaml"
+    default: "https://raw.githubusercontent.com/lfit/releng-reusable-workflows/refs/heads/main/.github/actions/standalone-linting-action/pre-commit-config.yaml"
   DEPENDENCIES_URL:
     description: "Download location for Python dependencies"
     type: string
     required: false
     # yamllint disable-line rule:line-length
-    default: "https://raw.githubusercontent.com/os-climate/osc-github-devops/refs/heads/main/.github/actions/standalone-linting-action/requirements.txt"
+    default: "https://raw.githubusercontent.com/lfit/releng-reusable-workflows/refs/heads/main/.github/actions/standalone-linting-action/requirements.txt"
+  FORCE_REMOTE:
+    description: "Ignore any local configuration; install remote linting configuration"
+    type: string
+    required: false
+    default: "false"
 
 runs:
   using: "composite"
   steps:
     - name: "Setup Python"
       # yamllint disable-line rule:line-length
-      uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+      uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
       with:
         python-version: "3.12"
 
@@ -38,9 +43,34 @@ runs:
       run: |
         # Check prerequisites
         CURL_CMD=$(which curl)
-        if [ ! -x "$CURL_CMD" ]; then echo "curl binary not found"; exit 1; fi
+        if [ ! -x "$CURL_CMD" ]; then
+         echo "cURL binary not found ❌"; exit 1
+        fi
 
-    - name: "Download Python dependencies file"
+    - name: "Check for local linting configuration"
+      id: local-precommit-config
+      # yamllint disable-line rule:line-length
+      uses: lfit/releng-reusable-workflows/.github/actions/path-check-action@473a3c654d58fa0c27f91a9cc25bd9433de43d5e # v0.2.4
+      with:
+        path: ".pre-commit-config.yaml"
+
+    - name: "Download pre-commit configuration file"
+      # yamllint disable-line rule:line-length
+      if: steps.local-precommit-config.outputs != 'file' || inputs.force_remote == 'true'
+      shell: bash
+      run: |
+        # Download pre-commit configuration file
+        if [ -f .pre-commit-config.yaml ]; then
+          mv .pre-commit-config.yaml .pre-commit-config.yaml.local
+        fi
+        echo "Downloading configuration from: ${{ inputs.CONFIG_URL }}"
+        curl -sS -o .pre-commit-config.yaml "${{ inputs.CONFIG_URL }}"
+        echo "Pre-commit configuration file downloaded ✅"
+        cat .pre-commit-config.yaml
+
+    - name: "Download/install Python dependencies file"
+      # yamllint disable-line rule:line-length
+      if: steps.local-precommit-config.outputs != 'file' || inputs.force_remote == 'true'
       shell: bash
       run: |
         # Download Python dependencies file
@@ -48,21 +78,7 @@ runs:
         curl -sS -o requirements.txt "${{ inputs.DEPENDENCIES_URL }}"
         echo "Python dependencies file downloaded ✅"
         cat requirements.txt
-
-    - name: "Install Python dependencies"
-      shell: bash
-      run: |
-        # Install Python dependencies
         pip install --disable-pip-version-check --upgrade -r requirements.txt
-
-    - name: "Download pre-commit configuration file"
-      shell: bash
-      run: |
-        # Download pre-commit configuration file
-        echo "Downloading configuration from: ${{ inputs.CONFIG_URL }}"
-        curl -sS -o .pre-commit-config.yaml "${{ inputs.CONFIG_URL }}"
-        echo "Pre-commit configuration file downloaded ✅"
-        cat .pre-commit-config.yaml
 
     - name: "Validate configuration"
       shell: bash
@@ -76,23 +92,3 @@ runs:
         # Run all pre-commit hooks
         if [ ! -d .mypy_cache ]; then /bin/mkdir .mypy_cache; fi
         pre-commit run -a
-
-      # Provided below as an example, in case needed in future
-
-      # yamllint disable rule:line-length
-      # yamllint disable rule:comments-indentation
-      # yamllint disable rule:comments
-
-      # - name: "Install dependencies"
-      #   run: |
-      #     SOURCE=".pre-commit-config.yaml"
-      #     echo "Install Python dependencies from: $SOURCE"
-      #     echo "With: pip install $PKGS"
-      #     PKGS=$(yq '.repos[] | select (.repo == "https://github.com/pre-commit/mirrors-mypy")' .pre-commit-config.yaml | \
-      #       grep additional_dependencies | \
-      #       awk -F: '{print $2}' | \
-      #       sed "s/\[//g" | \
-      #       sed "s/\]//g" | \
-      #       sed "s/,//g" | \
-      #       sed 's/"//g')
-      #       pip install $PKGS

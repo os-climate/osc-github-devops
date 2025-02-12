@@ -3,7 +3,7 @@ SPDX-License-Identifier: Apache-2.0
 SPDX-FileCopyrightText: 2024 The Linux Foundation
 -->
 
-# ⛔️ Linting Action
+# ⛔️ Standalone Linting Action
 
 This action runs linting checks as a standalone step, which is helpful
 for tools that do not run well (or cannot run) under the GitHub marketplace
@@ -19,7 +19,7 @@ An example workflow step using this action:
 steps:
     - name: Linting action
       # yamllint disable-line rule:line-length
-      uses: os-climate/osc-github-devops/.github/actions/standalone-linting-action@main
+      uses: lfit/releng-reusable-workflows/.github/actions/standalone-linting-action@main
 ```
 
 An example reusable workflow implementation:
@@ -46,16 +46,16 @@ jobs:
         steps:
             - name: Linting action
               # yamllint disable-line rule:line-length
-              uses: os-climate/osc-github-devops/.github/actions/standalone-linting-action@main
+              uses: lfit/releng-reusable-workflows/.github/actions/standalone-linting-action@main
 ```
 
 ## Inputs
 
 <!-- markdownlint-disable MD013 -->
 
-| Variable Name    | Required | Default                                                                                                                                                                   |
-| ---------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| CONFIG_URL       | False    | [pre-commit-config.yaml](https://raw.githubusercontent.com/os-climate/osc-github-devops/refs/heads/main/.github/actions/standalone-linting-action/pre-commit-config.yaml) |
-| DEPENDENCIES_URL | False    | [requirements.txt](https://raw.githubusercontent.com/os-climate/osc-github-devops/refs/heads/main/linting/requirements.txt)                                               |
+| Variable Name    | Required | Default                                                                                                                                                                     |
+| ---------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CONFIG_URL       | False    | [pre-commit-config.yaml](https://raw.githubusercontent.com/lfit/releng-reusable-workflows/refs/heads/main/.github/actions/standalone-linting-action/pre-commit-config.yaml) |
+| DEPENDENCIES_URL | False    | [requirements.txt](https://raw.githubusercontent.com/lfit/releng-reusable-workflow/refs/heads/main/linting/requirements.txt)                                                |
 
 <!-- markdownlint-enable MD013 -->

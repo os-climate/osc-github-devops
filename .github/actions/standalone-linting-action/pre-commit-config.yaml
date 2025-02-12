@@ -18,7 +18,7 @@ repos:
         name: "create mypy cache"
         language: system
         pass_filenames: false
-        entry: bash -c 'if [ ! -d .mypy_cache ]; then /bin/mkdir .mypy_cache; fi; exit 0'
+        entry: bash -c 'if [ ! -d .mypy_cache ]; then mkdir .mypy_cache; fi'
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     # Manually managed version
