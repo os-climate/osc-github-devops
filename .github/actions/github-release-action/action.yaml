@@ -49,11 +49,10 @@ inputs:
     required: false
     default: false
 
-env:
-  GITHUB_TOKEN: ${{ inputs.token }}
-
 runs:
   using: "composite"
+  env:
+    GITHUB_TOKEN: ${{ inputs.token }}
   steps:
     # yamllint disable-line rule:line-length
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
