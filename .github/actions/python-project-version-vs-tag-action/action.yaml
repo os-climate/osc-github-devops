@@ -7,7 +7,7 @@ name: "🐍 Check project version matches {{ github.ref_name }}"
 description: "Checks Python project version matches {{ github.ref_name }}"
 
 inputs:
-  FAIL_ON_MISMATCH:
+  EXIT_ON_FAIL:
     description: "When set true will exit with error on version mismatch"
     required: false
     default: "true"
@@ -43,6 +43,8 @@ runs:
         echo "Version from project metadata: $PROJECT_VERSION"
         echo "Version from tag push: $TAG_VERSION"
 
+        EXIT_ON_FAIL=$(echo ${{ inputs.exit_on_fail }} | tr '[:upper:]' '[:lower:]')
+
         # Compare the two version strings
         if [ "$TAG_VERSION" = "$PROJECT_VERSION" ]; then
           echo "Pushed tag matches version in Python project ✅"
@@ -52,7 +54,7 @@ runs:
           echo "Error: Pushed tag does NOT match version in Python project ❌"
           echo "match=false" >> "$GITHUB_ENV"
           echo "match=false" >> "$GITHUB_OUTPUT"
-          if [ "f$FAIL_ON_MISMATCH" = "ftrue" ]; then
+          if [ "f$EXIT_ON_FAIL" = "ftrue" ]; then
             exit 1
           fi
         fi
