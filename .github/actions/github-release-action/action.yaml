@@ -118,6 +118,7 @@ runs:
 
     - name: "Abort with error when tag already released"
       shell: bash
+      if: steps.release-validate.outputs.released == 'true'
       # yamllint disable-line rule:line-length
       run: |
         # Abort with error when tag already released
