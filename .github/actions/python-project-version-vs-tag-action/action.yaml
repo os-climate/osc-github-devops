@@ -45,8 +45,25 @@ runs:
 
         EXIT_ON_FAIL=$(echo ${{ inputs.exit_on_fail }} | tr '[:upper:]' '[:lower:]')
 
+        compareTag() {
+          if [ "$1" = "$2" ]; then
+            echo "MATCH"
+          else
+            echo "NO_MATCH"
+          fi
+        }
+
         # Compare the two version strings
-        if [ "$TAG_VERSION" = "$PROJECT_VERSION" ]; then
+        RESULT=$(compareTag "$TAG_VERSION" "$PROJECT_VERSION")
+        if [ "$RESULT" != "MATCH" ]; then
+          # If present, strip the leading "v" character and retry
+          if [[ "$TAG_VERSION" == v* ]]; then
+            TAG_VERSION="${TAG_VERSION:1}"
+          fi
+          RESULT=$(compareTag "$TAG_VERSION" "$PROJECT_VERSION")
+        fi
+
+        if [ "$RESULT" = "MATCH" ]; then
           echo "Pushed tag matches version in Python project ✅"
           echo "match=true" >> "$GITHUB_ENV"
           echo "match=true" >> "$GITHUB_OUTPUT"
