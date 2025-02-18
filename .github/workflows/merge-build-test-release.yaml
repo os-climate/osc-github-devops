@@ -211,8 +211,6 @@ jobs:
     permissions:
       contents: write
       id-token: write
-    env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: "GitHub Release"
         # yamllint disable-line rule:line-length
@@ -221,4 +219,4 @@ jobs:
           project_name: ${{ env.python_project_name }}
           artefact_location: "dist"
           tag: ${{ needs.repository.outputs.build_tag }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
