@@ -51,8 +51,6 @@ inputs:
 
 runs:
   using: "composite"
-  env:
-    GITHUB_TOKEN: ${{ inputs.token }}
   steps:
     # yamllint disable-line rule:line-length
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -83,6 +81,9 @@ runs:
           echo "Error: token must be passed as input to composite action 🛑" \
             >> "$GITHUB_STEP_SUMMARY"
           exit 1
+        else
+          # This is THE ONLY way to make the token available to softprops/action-gh-release
+          echo "GITHUB_TOKEN=${{ inputs.token }}" >> "$GITHUB_ENV"
         fi
         # Build tag values
         if [ ${{ steps.tag-validate.outputs.semantic }} == 'true' ]; then
