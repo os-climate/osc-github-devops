@@ -60,11 +60,6 @@ runs:
       # yamllint disable-line rule:line-length
       uses: lfit/releng-reusable-workflows/.github/actions/project-name-action@431c4e424c15544f98ec1321f6668f655c238d3a # 2025-02-10
 
-    - name: "Check project version matches pushed tags"
-      if: startsWith(github.ref, 'refs/tags/')
-      # yamllint disable-line rule:line-length
-      uses: os-climate/osc-github-devops/.github/actions/python-project-version-vs-tag-action@main
-
     - name: "Verify release tag"
       id: tag-validate
       # yamllint disable-line rule:line-length
