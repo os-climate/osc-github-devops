@@ -2,123 +2,28 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
-# github-release-action
-name: "📦 GitHub Release"
-description: "Creates a new GitHub release"
+# github-list-releases-action
+name: "📦 List GitHub Releases"
+description: "Returns a list of releases for the current repository"
 
 inputs:
-  # Mandatory
-  TAG:
-    description: "Semantic tag for this release/build"
-    type: string
-    required: true
-  GITHUB_TOKEN:
-    description: "Required to push new tags to the repository"
-    required: true
-  # Optional
-  PROJECT_NAME:
-    description: "Project/product name"
-    type: string
-    # When not provided, defaults to repository name
+  DISPLAY_IN_SUMMARY:
+    description: "Displays list in summary output"
     required: false
-  RELEASE_TITLE:
-    description: "Title of release/product"
+    default: "false"
     type: string
+  INCLUDE_PRE_RELEASES:
+    description: "Includes pre-release builds in output"
     required: false
-    # When not provided, defaults to project name followed by pushed tag
-    # e.g. osc-github-devops v1.0.0
-  PRERELEASE:
-    description: "Mark release as pre-release/development version"
+    default: "false"
     type: string
-    required: false
-    default: false
-  ARTEFACT_LOCATION:
-    description: "Path/location for build artefacts"
-    type: string
-    required: false
-  MAKE_LATEST:
-    description: "Mark as latest release in the repository"
-    # See: https://github.com/softprops/action-gh-release
-    # Can be either: true, false, or legacy
-    type: string
-    required: false
-    default: false
 
 runs:
   using: "composite"
   steps:
-    - name: "Verify release tag"
-      id: tag-validate
-      # yamllint disable-line rule:line-length
-      uses: os-climate/osc-github-devops/.github/actions/tag-validate-semantic-action@main
-      with:
-        tag: ${{ inputs.tag }}
-
-    - name: "Report build tag, setup ENV"
+    - name: "Placeholder output"
       shell: bash
       run: |
-        # Build tag values
-        if [ ${{ steps.tag-validate.outputs.semantic }} == 'true' ]; then
-          pushed_tag="${{ inputs.tag }}"
-        else
-          echo "Release tag NOT semantic: ${{ inputs.tag }} ❌"
-          echo "Release tag NOT semantic: ${{ inputs.tag }} ❌" >> "$GITHUB_STEP_SUMMARY"
-          exit 1
-        fi
-        if [ -z "${{ inputs.PROJECT_NAME }}" ]; then
-          echo "PROJECT_NAME=${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}" >> "$GITHUB_ENV"
-        else
-          echo "PROJECT_NAME=${{ inputs.PROJECT_NAME }}" >> $GITHUB_ENV
-        fi
-        if [ -z "${{ inputs.RELEASE_TITLE }}" ]; then
-          echo "RELEASE_TITLE="${{ inputs.PROJECT_NAME }}" ${{ inputs.tag }}" >> "$GITHUB_ENV"
-        else
-          echo "RELEASE_TITLE=${{ inputs.RELEASE_TITLE }}" >> "$GITHUB_ENV"
-        fi
-
-    - name: "⬇ Download build artefacts [conditional]"
-      if: inputs.artefact_location != ''
-      uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
-      with:
-        path: ${{ inputs.artefact_location }}
-
-    - name: "GitHub release [with artefacts]"
-      if: inputs.artefact_location != ''
-      # Note: a bug in release v2.2.0 causes upload failures
-      uses: softprops/action-gh-release@01570a1f39cb168c169c802c3bceb9e93fb10974 # v2.1.0
-      with:
-        token: ${{ inputs.GITHUB_TOKEN }}
-        prerelease: ${{ inputs.prerelease }}
-        make_latest: ${{ inputs.MAKE_LATEST }}
-        tag_name: ${{ inputs.tag }}
-        name: ${{ env.RELEASE_TITLE }}
-        # ToDo: Incorporate release notes, etc.
-        # body_path: ${{ github.workspace }}/CHANGELOG.rst
-        files: |
-          ${{ inputs.artefact_location }}/*
-
-    - name: "GitHub release [no artefacts]"
-      if: inputs.artefact_location == ''
-      # Note: a bug in release v2.2.0 causes upload failures
-      uses: softprops/action-gh-release@01570a1f39cb168c169c802c3bceb9e93fb10974 # v2.1.0
-      with:
-        token: ${{ inputs.GITHUB_TOKEN }}
-        prerelease: ${{ inputs.prerelease }}
-        make_latest: ${{ inputs.MAKE_LATEST }}
-        tag_name: ${{ inputs.tag }}
-        name: ${{ env.RELEASE_TITLE }}
-
-    - name: "Print summary/job output"
-      shell: bash
-      # yamllint disable rule:line-length
-      run: |
-        # Print summary/job output
-        echo "# 🚀 Release: GitHub" >> "$GITHUB_STEP_SUMMARY"
-        echo "${{ env.RELEASE_TITLE }}" >> "$GITHUB_STEP_SUMMARY"
-        echo "🔗 https://github.com/${GITHUB_REPOSITORY}/releases/tag/${{ inputs.tag }}" >> "$GITHUB_STEP_SUMMARY"
-        # ToDo: Add release notes here
-        if [ "${{ inputs.prerelease }}" = "true" ]; then
-          echo "Test/Development Build ✅"
-        else
-          echo "Production Release Build ✅"
-        fi
+        # Placeholder output
+        echo "# Placeholder for: 📦 List GitHub Releases"
+        echo "# Placeholder for: 📦 List GitHub Releases" >> "$GITHUB_STEP_SUMMARY"
