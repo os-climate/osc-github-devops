@@ -52,6 +52,8 @@ runs:
           echo "match=true" >> "$GITHUB_OUTPUT"
         else
           echo "Error: Pushed tag does NOT match version in Python project ❌"
+          echo "Error: Pushed tag does NOT match version in Python project ❌" \
+            >> "$GITHUB_STEP_SUMMARY"
           echo "match=false" >> "$GITHUB_ENV"
           echo "match=false" >> "$GITHUB_OUTPUT"
           if [ "f$EXIT_ON_FAIL" = "ftrue" ]; then

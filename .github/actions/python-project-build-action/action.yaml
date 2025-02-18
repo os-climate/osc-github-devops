@@ -43,6 +43,12 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - name: "Build summary heading"
+      shell: bash
+      run: |
+        # Build summary heading
+        echo "# Python Project Build" >> "$GITHUB_STEP_SUMMARY"
+
     # yamllint disable-line rule:line-length
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
@@ -201,3 +207,4 @@ runs:
         echo "Artefact name: ${{ env.python_project_name }}"
         echo "Artefact path: ${{ inputs.ARTEFACT_PATH }}"
         echo "Build successful ✅"
+        echo "Build successful ✅" >> "$GITHUB_STEP_SUMMARY"
