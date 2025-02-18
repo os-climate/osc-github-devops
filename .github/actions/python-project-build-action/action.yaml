@@ -3,7 +3,7 @@
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 # python-project-build-action
-name: "🧱 Python Build"
+name: "🐍 Python Build"
 description: "Builds a Python Project"
 
 inputs:
@@ -47,7 +47,7 @@ runs:
       shell: bash
       run: |
         # Build summary heading
-        echo "# Python Project Build" >> "$GITHUB_STEP_SUMMARY"
+        echo "# 🐍 Python Build" >> "$GITHUB_STEP_SUMMARY"
 
     # yamllint disable-line rule:line-length
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -71,14 +71,6 @@ runs:
         # with:
         #   python-version: ${{ env.base_python }}
         cache: "pip"
-
-    - name: "Output Python used for build"
-      shell: bash
-      run: |
-        # Output Python used for build
-        VERSION=$(python --version)
-        echo "Building with: $VERSION"
-        echo "Building with: $VERSION" >> "$GITHUB_STEP_SUMMARY"
 
     - name: "Install PDM tooling"
       # yamllint disable-line rule:line-length
@@ -169,17 +161,10 @@ runs:
         echo "artefact_path=${{ inputs.ARTEFACT_PATH }}" >> "$GITHUB_OUTPUT"
         echo "Artefact name: ${{ env.python_project_name }}"
         echo "Artefact path: ${{ inputs.ARTEFACT_PATH }}"
-        echo "Build successful ✅"
-        echo "Build successful ✅" >> "$GITHUB_STEP_SUMMARY"
-
-    - name: "Package dependency graph"
-      shell: bash
-      run: |
-        # Package dependency graph
-        GRAPH=$(pdm list --graph)
-        echo "$GRAPH"
-        echo "Package dependency graph:" >> "$GITHUB_STEP_SUMMARY"
-        echo "$GRAPH" >> "$GITHUB_STEP_SUMMARY"
+        # Output Python used for build
+        VERSION=$(python --version)
+        echo "Successful build with $VERSION ✅"
+        echo "Successful build with $VERSION ✅" >> "$GITHUB_STEP_SUMMARY"
 
     # Caution with sequencing; moving twine validation after attestations/signing causes failures
     # These steps produce additional output files unsupported during package uploads
