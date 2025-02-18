@@ -46,6 +46,12 @@ runs:
     # yamllint disable-line rule:line-length
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
+    # Catch this error as soon as possible
+    - name: "Check project version matches pushed tags"
+      if: startsWith(github.ref, 'refs/tags/')
+      # yamllint disable-line rule:line-length
+      uses: os-climate/osc-github-devops/.github/actions/python-project-version-vs-tag-action@main
+
     # First action performs repository checkout
     - name: "Python project setup"
       id: project-setup

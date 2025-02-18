@@ -3,12 +3,18 @@
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 # python-project-version-vs-tag-action
-name: "🐍 Check Project Version matches Tag"
-description: "Verify Python project metadata version matches {{ github.ref_name }}"
+name: "🐍 Check project version matches {{ github.ref_name }}"
+description: "Checks Python project version matches {{ github.ref_name }}"
+
+inputs:
+  FAIL_ON_MISMATCH:
+    description: "When set true will exit with error on version mismatch"
+    required: false
+    default: "true"
 
 outputs:
   MATCH:
-    description: "Set true when pushed tags match version from pyproject.toml"
+    description: "Set true when pushed tags match Python project metadata"
     value: ${{ steps.verify.outputs.match }}
 
 runs:
@@ -39,11 +45,14 @@ runs:
 
         # Compare the two version strings
         if [ "$TAG_VERSION" = "$PROJECT_VERSION" ]; then
-          echo "Pushed tag matches version from pyproject.toml ✅"
+          echo "Pushed tag matches version in Python project ✅"
           echo "match=true" >> "$GITHUB_ENV"
           echo "match=true" >> "$GITHUB_OUTPUT"
         else
-          echo "Pushed tag does NOT match version from pyproject.toml ❌"
+          echo "Error: Pushed tag does NOT match version in Python project ❌"
           echo "match=false" >> "$GITHUB_ENV"
           echo "match=false" >> "$GITHUB_OUTPUT"
+          if [ "f$FAIL_ON_MISMATCH" = "ftrue" ]; then
+            exit 1
+          fi
         fi
