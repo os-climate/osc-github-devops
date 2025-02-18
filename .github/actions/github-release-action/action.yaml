@@ -49,6 +49,9 @@ inputs:
     required: false
     default: false
 
+env:
+  GITHUB_TOKEN: ${{ inputs.token }}
+
 runs:
   using: "composite"
   steps:
@@ -132,10 +135,7 @@ runs:
       if: inputs.artefact_location != '' && inputs.GH_RELEASE_DISABLE == 'false'
       # Note: a bug in release v2.2.0 causes upload failures
       uses: softprops/action-gh-release@c95fe1489396fe8a9eb87c0abf8aa5b2ef267fda # v2.2.1
-      env:
-        GITHUB_TOKEN: ${{ inputs.token }}
       with:
-        token: ${{ inputs.token }}
         prerelease: ${{ inputs.prerelease }}
         make_latest: ${{ inputs.MAKE_LATEST }}
         tag_name: ${{ inputs.tag }}
@@ -149,10 +149,7 @@ runs:
       if: inputs.artefact_location == '' && inputs.GH_RELEASE_DISABLE == 'false'
       # Note: a bug in release v2.2.0 causes upload failures
       uses: softprops/action-gh-release@c95fe1489396fe8a9eb87c0abf8aa5b2ef267fda # v2.2.1
-      env:
-        GITHUB_TOKEN: ${{ inputs.token }}
       with:
-        token: ${{ inputs.token }}
         prerelease: ${{ inputs.prerelease }}
         make_latest: ${{ inputs.MAKE_LATEST }}
         tag_name: ${{ inputs.tag }}
