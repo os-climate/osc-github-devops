@@ -7,6 +7,11 @@ name: "📦 List GitHub Releases"
 description: "Returns a list of releases for the current repository"
 
 inputs:
+  # Optional
+  TAG:
+    description: "When supplied, checks if release is present"
+    required: false
+    type: string
   DISPLAY_IN_SUMMARY:
     description: "Displays list in summary output"
     required: false
@@ -17,13 +22,21 @@ inputs:
     required: false
     default: "false"
     type: string
+outputs:
+  # Optional
+  RELEASED:
+    description: "Set true if a provided tag/version has been released"
+    value: ${{ steps.process.outputs.released }}
 
 runs:
   using: "composite"
   steps:
     - name: "Placeholder output"
+      id: process
       shell: bash
       run: |
         # Placeholder output
         echo "# Placeholder for: 📦 List GitHub Releases"
         echo "# Placeholder for: 📦 List GitHub Releases" >> "$GITHUB_STEP_SUMMARY"
+        echo "released=false" >> "$GITHUB_ENV"
+        echo "released=false" >> "$GITHUB_OUTPUT"
