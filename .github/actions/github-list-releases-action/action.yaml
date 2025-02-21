@@ -107,7 +107,7 @@ runs:
           RELEASE_OUTPUT=$($GH_CLI $CLI_FLAGS --json tagName -q '.[] | .tagName')
         else
           echo "Running: $GH_CLI $CLI_FLAGS"
-          RELEASE_OUTPUT=$($GH_CLI $CLI_FLAGS")
+          RELEASE_OUTPUT=$($GH_CLI $CLI_FLAGS)
         fi
 
         # Check with leading character in place
