@@ -95,7 +95,7 @@ runs:
           echo "PROJECT_NAME=${{ inputs.PROJECT_NAME }}" >> $GITHUB_ENV
         fi
         if [ -z "${{ inputs.RELEASE_TITLE }}" ]; then
-          echo "RELEASE_TITLE="${{ inputs.PROJECT_NAME }}" ${{ inputs.tag }}" >> "$GITHUB_ENV"
+          echo "RELEASE_TITLE="$PROJECT_NAME ${{ inputs.tag }}" >> "$GITHUB_ENV"
         else
           echo "RELEASE_TITLE=${{ inputs.RELEASE_TITLE }}" >> "$GITHUB_ENV"
         fi
@@ -106,7 +106,7 @@ runs:
       with:
         # ToDo: check if this is used/needed and all setup/pre-requisites
         # Such as environment variables are configured correctly
-        # name: ${{ env.python_project_name }}
+        name: ${{ env.project_name }}
         path: ${{ inputs.artefact_location }}
 
     - name: "Check if tag/version already released"
@@ -115,7 +115,6 @@ runs:
       uses: os-climate/osc-github-devops/.github/actions/github-list-releases-action@main
       with:
         tag: ${{ inputs.tag }}
-        summary_output: "true"
 
     - name: "Abort when tag/version already released"
       shell: bash

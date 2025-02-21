@@ -3,7 +3,7 @@
 
 [project]
 name = "osc-github-devops"
-version = "0.1.23"
+version = "0.1.24"
 # Uncomment to enable dynamic versioning
 # dynamic = [ "version" ]
 description = "Python project template"
