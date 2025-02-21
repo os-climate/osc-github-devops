@@ -143,9 +143,9 @@ runs:
         echo "RELEASED=$RELEASED" >> "$GITHUB_OUTPUT"
 
         if [ "$RELEASED" = "true" ]; then
-          echo "Release HAS already been published: $TAG ⚠️"
+          echo "$TAG HAS already been release ⚠️"
         else
-          echo "Release has not been published yet: $TAG ✅"
+          echo "$TAG has not prviously been released ✅"
         fi
         if [ "f$SUMMARY_OUTPUT" = "ftrue" ]; then
           if [ "$RELEASED" = "true" ]; then

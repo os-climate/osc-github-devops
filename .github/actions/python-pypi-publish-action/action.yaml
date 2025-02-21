@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
-# python-pypi-publish-action
+# pypi-publish-action
 name: "📦 PyPI Publish Package"
 description: "Publishes a Python package to PyPI"
 
@@ -52,7 +52,7 @@ runs:
     - name: "⬇ Download build artefacts"
       uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
       with:
-        name: ${{ env.python_project_name }}
+        name: ${{ steps.naming.outputs.python_project_name }}
         path: ${{ inputs.artefact_location }}
 
     - name: "Derive publishing parameters"
@@ -181,7 +181,7 @@ runs:
         repository-url: "${{ env.publish_url }}"
         # Show checksum values
         print-hash: true
-        packages-dir: ${{ env.ARTEFACT_LOCATION }}
+        packages-dir: ${{ inputs.artefact_location }}
         # We already validated earlier in the pipeline (using twine)
         verify-metadata: false
         # Optional debugging, pretty much essential for information on failures
@@ -211,7 +211,7 @@ runs:
       with:
         repository-url: "${{ env.publish_url }}"
         print-hash: true
-        packages-dir: ${{ env.ARTEFACT_LOCATION }}
+        packages-dir: ${{ inputs.artefact_location }}
         verify-metadata: false
         verbose: true
         # Credential retrieved from 1Password using service account
@@ -231,7 +231,7 @@ runs:
       with:
         repository-url: "${{ env.publish_url }}"
         print-hash: true
-        packages-dir: ${{ env.ARTEFACT_LOCATION }}
+        packages-dir: ${{ inputs.artefact_location }}
         verify-metadata: false
         verbose: true
         # Publishing API key stored as secret/variable in GitHub
