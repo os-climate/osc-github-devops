@@ -18,7 +18,7 @@ inputs:
   TAG:
     description: "Tag version/name for this specific build (semantic)"
     required: false
-  GITHUB_ATTEST:
+  ATTESTATIONS:
     # Attestations should not be used for development builds
     description: "Apply GitHub attestations to artefacts"
     required: false
@@ -173,7 +173,7 @@ runs:
 
     - name: "Artefact attestation for: ${{ inputs.ARTEFACT_PATH }}"
       uses: actions/attest-build-provenance@7668571508540a607bdfd90a87a560489fe372eb # v2.1.0
-      if: ${{ inputs.github_attest == 'true' }}
+      if: ${{ inputs.attestations == 'true' }}
       with:
         subject-path: ${{ inputs.ARTEFACT_PATH }}/*
 

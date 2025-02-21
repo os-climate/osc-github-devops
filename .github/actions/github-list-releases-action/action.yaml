@@ -106,7 +106,7 @@ runs:
         fi
 
         # Run and capture GitHub CLI Command
-        if [ "$RETURN_TYPE" = "test" ]; then
+        if [ "$RETURN_TYPE" = "text" ]; then
           # Text output is actually a JSON query processed with fixed arguments
           echo "Running: $GH_CLI $CLI_FLAGS"
           RELEASES=$($GH_CLI $CLI_FLAGS --json tagName -q '.[] | .tagName')
@@ -127,13 +127,14 @@ runs:
         fi
 
         # Check with leading character in place
+        echo "Checking release list for: $TAG"
         checkReleases
 
         if [ "$RELEASED" != "true" ]; then
           if [[ "$TAG" == v* ]]; then
             TAG="${TAG:1}"
             # Check again with leading 'v' character stripped
-            echo "Checking tag input with leading character stripped"
+            echo "Checking release list for: $TAG"
             checkReleases
           fi
         fi
@@ -145,7 +146,7 @@ runs:
         if [ "$RELEASED" = "true" ]; then
           echo "$TAG HAS already been release ⚠️"
         else
-          echo "$TAG has not prviously been released ✅"
+          echo "$TAG has not previously been released ✅"
         fi
         if [ "f$SUMMARY_OUTPUT" = "ftrue" ]; then
           if [ "$RELEASED" = "true" ]; then
