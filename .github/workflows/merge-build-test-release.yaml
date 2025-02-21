@@ -86,6 +86,8 @@ jobs:
         uses: os-climate/osc-github-devops/.github/actions/python-project-build-action@main
         with:
           tag: ${{ needs.repository.outputs.build_tag }}
+          attestations: "true"
+          sigstore_sign: "true"
 
   python-test:
     name: "Test"
@@ -167,6 +169,7 @@ jobs:
           op_service_account_token: ${{ secrets.ONE_PASSWORD_PRODUCTION }}
           pypi_credential: ${{ secrets.PYPI_PRODUCTION }}
           publish_disable: ${{ env.pypi_publish_disable }}
+          attestations: "true"
 
   pypi-release:
     name: "PyPI release"
@@ -199,6 +202,7 @@ jobs:
           op_service_account_token: ${{ secrets.ONE_PASSWORD_PRODUCTION }}
           pypi_credential: ${{ secrets.PYPI_PRODUCTION }}
           publish_disable: ${{ env.pypi_publish_disable }}
+          attestations: "true"
 
   github-release:
     name: "GitHub release"

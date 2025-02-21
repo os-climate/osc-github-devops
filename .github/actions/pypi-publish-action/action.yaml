@@ -37,6 +37,11 @@ inputs:
     type: string
     required: false
     default: "false"
+  ATTESTATIONS:
+    description: "Enables upload/publishing support for attestations"
+    type: string
+    required: false
+    default: "false"
 
 runs:
   using: "composite"
@@ -105,9 +110,9 @@ runs:
       # yamllint disable-line rule:line-length
       uses: os-climate/osc-github-devops/.github/actions/pypi-version-check-action@main
       with:
-        index_url: "${{ env.base_url }}/simple"
-        package_name: "${{ steps.naming.outputs.python_project_name }}"
-        package_version: "${{ inputs.tag }}"
+        index_url: ${{ env.base_url }}/simple
+        package_name: ${{ steps.naming.outputs.python_project_name }}
+        package_version: ${{ inputs.tag }}
         environment: ${{ env.ENVIRONMENT }}
 
     - name: "Determine publishing method"
@@ -174,19 +179,19 @@ runs:
       # Currently it causes failures, and will need careful testing
       # Also, be cautious pinning v1.12.x to a SHA commit value:
       # https://github.com/pypa/gh-action-pypi-publish/discussions/287
-      uses: pypa/gh-action-pypi-publish@fb13cb306901256ace3dab689990e13a5550ffaa # v1.11.0
+      uses: pypa/gh-action-pypi-publish@76f52bc884231f62b9a034ebfe128415bbaabdfc # v1.12.4
       # yamllint disable-line rule:line-length
       if: env.publish_method == 'Trusted Publishing' && inputs.publish_disable == 'false'
       with:
-        repository-url: "${{ env.publish_url }}"
+        repository-url: ${{ env.publish_url }}
+        packages-dir: ${{ inputs.artefact_path }}
+        # We already validated earlier in the pipeline (twine)
+        verify-metadata: false
+        attestations: ${{ inputs.attestations }}
         # Show checksum values
         print-hash: true
-        packages-dir: ${{ inputs.artefact_path }}
-        # We already validated earlier in the pipeline (using twine)
-        verify-metadata: false
         # Optional debugging, pretty much essential for information on failures
         verbose: true
-        attestations: true # Currently too buggy to enable?
 
     - name: "Retrieve Credential [1Password]"
       id: one-password-pypi-test
@@ -196,7 +201,7 @@ runs:
         # Export loaded secrets as environment variables
         export-env: true
       env:
-        PYPI_CREDENTIAL: "${{ inputs.ONE_PASSWORD_ITEM}}"
+        PYPI_CREDENTIAL: ${{ inputs.ONE_PASSWORD_ITEM}}
         OP_SERVICE_ACCOUNT_TOKEN: ${{ inputs.OP_SERVICE_ACCOUNT_TOKEN }}
 
     # Used only once prior to trusted publishing being configured
@@ -205,18 +210,18 @@ runs:
       # Currently it causes failures, and will need careful testing
       # Also, be cautious pinning v1.12.x to a SHA commit value:
       # https://github.com/pypa/gh-action-pypi-publish/discussions/287
-      uses: pypa/gh-action-pypi-publish@fb13cb306901256ace3dab689990e13a5550ffaa # v1.11.0
+      uses: pypa/gh-action-pypi-publish@76f52bc884231f62b9a034ebfe128415bbaabdfc # v1.12.4
       # yamllint disable-line rule:line-length
       if: env.publish_method == '1Password Vault' && inputs.publish_disable == 'false'
       with:
-        repository-url: "${{ env.publish_url }}"
-        print-hash: true
+        repository-url: ${{ env.publish_url }}
         packages-dir: ${{ inputs.artefact_path }}
         verify-metadata: false
-        verbose: true
         # Credential retrieved from 1Password using service account
-        password: "${{ env.PYPI_CREDENTIAL}}"
-        attestations: false
+        password: ${{ env.PYPI_CREDENTIAL}}
+        attestations: ${{ inputs.attestations }}
+        print-hash: true
+        verbose: true
 
     # Fallback method using credential stored as GitHub secret
     - name: "Publish PyPI [GitHub Secret]"
@@ -224,19 +229,19 @@ runs:
       # Currently it causes failures, and will need careful testing
       # Also, be cautious pinning v1.12.x to a SHA commit value:
       # https://github.com/pypa/gh-action-pypi-publish/discussions/287
-      uses: pypa/gh-action-pypi-publish@fb13cb306901256ace3dab689990e13a5550ffaa # v1.11.0
+      uses: pypa/gh-action-pypi-publish@76f52bc884231f62b9a034ebfe128415bbaabdfc # v1.12.4
       if:
         # yamllint disable-line rule:line-length
         env.publish_method == 'GitHub Secret' && inputs.publish_disable == 'false'
       with:
-        repository-url: "${{ env.publish_url }}"
-        print-hash: true
+        repository-url: ${{ env.publish_url }}
         packages-dir: ${{ inputs.artefact_path }}
         verify-metadata: false
-        verbose: true
         # Publishing API key stored as secret/variable in GitHub
         password: ${{ inputs.PYPI_CREDENTIAL }}
-        attestations: false
+        attestations: ${{ inputs.attestations }}
+        print-hash: true
+        verbose: true
 
     - name: "Print summary/job output"
       shell: bash
