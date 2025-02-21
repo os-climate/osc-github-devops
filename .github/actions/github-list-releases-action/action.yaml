@@ -58,7 +58,7 @@ runs:
 
         # Check GitHub CLI is available
         GH_CLI=$(which gh)
-        if [ ! -x GH_CLI ]; then
+        if [ ! -x "$GH_CLI" ]; then
           echo "Error: GitHub CLI was NOT found in PATH ❌"
           exit 1
         fi
