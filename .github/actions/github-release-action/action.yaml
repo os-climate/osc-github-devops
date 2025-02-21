@@ -160,8 +160,8 @@ runs:
         if [ "${{ inputs.GH_RELEASE_DISABLE }}" != 'false' ]; then
           echo "## GitHub Releasing Disabled: Dry Run 🛑" >> "$GITHUB_STEP_SUMMARY"
         else
-          echo "# 🚀 Release: GitHub" >> "$GITHUB_STEP_SUMMARY"
-          echo "${{ env.RELEASE_TITLE }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "# 🚀 GitHub Release" >> "$GITHUB_STEP_SUMMARY"
+          echo "Title: ${{ env.RELEASE_TITLE }}" >> "$GITHUB_STEP_SUMMARY"
           echo "🔗 https://github.com/${GITHUB_REPOSITORY}/releases/tag/${{ inputs.tag }}" >> "$GITHUB_STEP_SUMMARY"
           # ToDo: Add release notes here
           if [ "${{ inputs.prerelease }}" = "true" ]; then
