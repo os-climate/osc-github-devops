@@ -137,7 +137,7 @@ jobs:
       contents: read
 
   pypi-test:
-    name: "PyPI Release [Test]"
+    name: "PyPI test release"
     needs:
       - repository
       - python-build
@@ -169,7 +169,7 @@ jobs:
           publish_disable: ${{ env.pypi_publish_disable }}
 
   pypi-release:
-    name: "PyPI Release"
+    name: "PyPI release"
     # yamllint disable-line rule:line-length
     if: startsWith(github.ref, 'refs/tags/') || contains(github.event.head_commit.message, '[release]')
     needs:
@@ -201,7 +201,7 @@ jobs:
           publish_disable: ${{ env.pypi_publish_disable }}
 
   github-release:
-    name: "GitHub Release"
+    name: "GitHub release"
     # yamllint disable-line rule:line-length
     if: startsWith(github.ref, 'refs/tags/') || contains(github.event.head_commit.message, '[release]')
     needs:
