@@ -21,23 +21,22 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: "Running SED command on: ${{ inputs.FILENAME }}"
+    - name: "Running SED command on: ${{ inputs.PATH }}"
       id: sed
       shell: bash
       run: |
-        # Running SED command on: ${{ inputs.FILENAME }}
+        # Running SED command on: ${{ inputs.PATH }}
         SED_CMD=$(which sed)
         if [ ! -x "$SED_CMD" ]; then
           echo "Error: sed command not in PATH"; exit 1
         fi
-        FILENAME="${{ inputs.FILENAME }}"
-        if [ ! -f $FILENAME ]; then
-          echo "Error: file not found [$FILENAME] ❌"; exit 1
+        FILE_PATH="${{ inputs.PATH }}"
+        if [ ! -f $FILE_PATH ]; then
+          echo "Error: file not found [$FILE_PATH] ❌"; exit 1
         fi
         set -o noglob
-        echo "Running: $SED_CMD ${{ inputs.FLAGS }} ${{ inputs.REGEX }} $FILENAME"
-        if ($SED_CMD "${{ inputs.FLAGS }}" '${{ inputs.REGEX }}' "$FILENAME"); then
+        if ($SED_CMD '${{ inputs.FLAGS }}' '${{ inputs.REGEX }}' "$FILE_PATH"); then
           echo "sed command was successful ✅ "
         else
-          echo "sed command failed with exit status: $? ❌"
+          echo "Error: command failed with exit status: $? ❌"
         fi

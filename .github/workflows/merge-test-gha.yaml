@@ -139,7 +139,7 @@ jobs:
             echo "ERROR: Python project version was not as expected"
             echo "python_project_version: $PYTHON_PROJECT_VERSION"; exit 1
           else
-            echo "Returned project version is correct: $PYTHON_PROJECT_NAME"
+            echo "Returned project version is correct: $PYTHON_PROJECT_VERSION"
           fi
 
       - name: "Extract TOX stanza"
