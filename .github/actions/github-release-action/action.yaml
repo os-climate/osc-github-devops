@@ -90,10 +90,11 @@ runs:
           exit 1
         fi
         if [ -z "${{ inputs.PROJECT_NAME }}" ]; then
-          echo "PROJECT_NAME=${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}" >> "$GITHUB_ENV"
+          PROJECT_NAME="${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}"
         else
-          echo "PROJECT_NAME=${{ inputs.PROJECT_NAME }}" >> $GITHUB_ENV
+          PROJECT_NAME="${{ inputs.PROJECT_NAME }}"
         fi
+        echo "PROJECT_NAME=$PROJECT_NAME" >> "$GITHUB_ENV"
         if [ -z "${{ inputs.RELEASE_TITLE }}" ]; then
           echo "RELEASE_TITLE=$PROJECT_NAME ${{ inputs.tag }}" >> "$GITHUB_ENV"
         else
