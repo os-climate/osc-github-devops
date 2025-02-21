@@ -45,7 +45,7 @@ outputs:
   # Optional
   MATCH:
     description: "Has provided tag/version already been released"
-    type: string
+    value: ${{ steps.releases.outputs.tag }}
 
 runs:
   using: "composite"
@@ -121,6 +121,10 @@ runs:
             checkReleases
           fi
         fi
+
+        # Set output value
+        echo "MATCH=$MATCH" >> "$GITHUB_ENV"
+        echo "MATCH=$MATCH" >> "$GITHUB_OUTPUT"
 
         if [ "$MATCH" = "true" ]; then
           echo "Release has already been published: $TAG ⚠️"
