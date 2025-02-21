@@ -109,14 +109,15 @@ runs:
         # name: ${{ env.python_project_name }}
         path: ${{ inputs.artefact_location }}
 
-    - name: "Check if this tag already released"
+    - name: "Check if tag/version already released"
       id: release-validate
       # yamllint disable-line rule:line-length
       uses: os-climate/osc-github-devops/.github/actions/github-list-releases-action@main
       with:
         tag: ${{ inputs.tag }}
+        summary_output: "true"
 
-    - name: "Abort with error when tag already released"
+    - name: "Abort when tag/version already released"
       shell: bash
       if: steps.release-validate.outputs.released == 'true'
       # yamllint disable-line rule:line-length
@@ -125,6 +126,13 @@ runs:
         echo "⛔️ ## Aborting: tag ${{ inputs.tag }} already released" >> "$GITHUB_STEP_SUMMARY"
         echo "🔗 https://github.com/${GITHUB_REPOSITORY}/releases/tag/${{ inputs.tag }}" \
           >> "$GITHUB_STEP_SUMMARY"
+        exit 1
+
+    - name: "Abort with error during testing"
+      shell: bash
+      # yamllint disable-line rule:line-length
+      run: |
+        # Abort with error during testing
         exit 1
 
     - name: "GitHub release [with artefacts]"
