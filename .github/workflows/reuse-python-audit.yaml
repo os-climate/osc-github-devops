@@ -13,7 +13,7 @@ on:
         description: "Python matrix versions to use for test builds (in JSON)"
         required: true
         type: string
-      ARTEFACT_LOCATION:
+      ARTEFACT_PATH:
         description: "Path/location for build artefacts"
         type: string
         required: false
@@ -43,7 +43,7 @@ jobs:
         uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
         with:
           name: ${{ env.python_project_name }}
-          path: ${{ inputs.artefact_location }}
+          path: ${{ inputs.ARTEFACT_PATH }}
 
       - name: "Set up Python ${{ inputs.python_version }}"
         # yamllint disable-line rule:line-length
@@ -57,7 +57,7 @@ jobs:
           echo "Upgrading: pip, setuptools"
           python -m pip install -q --upgrade pip setuptools
           echo "Installing built package(s) and dependencies"
-          for wheel in ${{ inputs.artefact_location }}/*.whl; do
+          for wheel in ${{ inputs.ARTEFACT_PATH }}/*.whl; do
                   pip install -q "$wheel"
           done
           if [ -f requirements.txt ]; then

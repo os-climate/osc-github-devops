@@ -17,7 +17,7 @@ inputs:
     description: "Semantic tag for this release/build"
     type: string
     required: true
-  ARTEFACT_LOCATION:
+  ARTEFACT_PATH:
     description: "Path/location for build artefacts"
     type: string
     required: false
@@ -53,7 +53,7 @@ runs:
       uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
       with:
         name: ${{ steps.naming.outputs.python_project_name }}
-        path: ${{ inputs.artefact_location }}
+        path: ${{ inputs.artefact_path }}
 
     - name: "Derive publishing parameters"
       id: parameters
@@ -81,21 +81,21 @@ runs:
       shell: bash
       run: |
         # Remove unsupported artefact file types
-        if [ ! -d  ${{ inputs.artefact_location }} ]; then
-          echo "Early exit; build artefacts path NOT found:  ${{ inputs.artefact_location }}"
+        if [ ! -d  ${{ inputs.artefact_path }} ]; then
+          echo "Early exit; build artefacts path NOT found:  ${{ inputs.artefact_path }}"
           exit 0
         fi
-        if [ -f  ${{ inputs.artefact_location }}/buildvars.txt ]; then
-          rm ${{ inputs.artefact_location }}/buildvars.txt
+        if [ -f  ${{ inputs.artefact_path }}/buildvars.txt ]; then
+          rm ${{ inputs.artefact_path }}/buildvars.txt
         else
           echo "No buildvars.txt file to purge"
         fi
         # Remove outputs related to SigStore signing
-        if test -n "$(find ${{ inputs.artefact_location }} \
+        if test -n "$(find ${{ inputs.artefact_path }} \
           -maxdepth 1 -name '*.sigstore*' -print -quit)"
         then
           echo "Found SigStore signing artefacts to purge"
-          rm  ${{ inputs.artefact_location }}/*.sigstore*
+          rm  ${{ inputs.artefact_path }}/*.sigstore*
         else
           echo "No SigStore signing artefacts to purge"
         fi
@@ -181,7 +181,7 @@ runs:
         repository-url: "${{ env.publish_url }}"
         # Show checksum values
         print-hash: true
-        packages-dir: ${{ inputs.artefact_location }}
+        packages-dir: ${{ inputs.artefact_path }}
         # We already validated earlier in the pipeline (using twine)
         verify-metadata: false
         # Optional debugging, pretty much essential for information on failures
@@ -211,7 +211,7 @@ runs:
       with:
         repository-url: "${{ env.publish_url }}"
         print-hash: true
-        packages-dir: ${{ inputs.artefact_location }}
+        packages-dir: ${{ inputs.artefact_path }}
         verify-metadata: false
         verbose: true
         # Credential retrieved from 1Password using service account
@@ -231,7 +231,7 @@ runs:
       with:
         repository-url: "${{ env.publish_url }}"
         print-hash: true
-        packages-dir: ${{ inputs.artefact_location }}
+        packages-dir: ${{ inputs.artefact_path }}
         verify-metadata: false
         verbose: true
         # Publishing API key stored as secret/variable in GitHub

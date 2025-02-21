@@ -27,15 +27,15 @@ steps:
 
 <!-- markdownlint-disable MD013 -->
 
-| Variable Name     | Required | Default   | Description                                  |
-| ----------------- | -------- | --------- | -------------------------------------------- |
-| TAG               | True     | N/A       | Fixed preamble/string to embed/inject        |
-| GITHUB_TOKEN      | True     | N/A       | Mandatory token for content write access     |
-| PROJECT_NAME      | False    | See Below | Project/product name                         |
-| RELEASE_TITLE     | False    | See Below | Title for the release                        |
-| PRERELEASE        | False    | False     | Marks the release as a development release   |
-| ARTEFACT_LOCATION | False    | None      | Unless set, will not package build artefacts |
-| MAKE_LATEST       | False    | True      | Marks the release as the latest release      |
+| Variable Name | Required | Default   | Description                                  |
+| ------------- | -------- | --------- | -------------------------------------------- |
+| TAG           | True     | N/A       | Fixed preamble/string to embed/inject        |
+| GITHUB_TOKEN  | True     | N/A       | Mandatory token for content write access     |
+| PROJECT_NAME  | False    | See Below | Project/product name                         |
+| RELEASE_TITLE | False    | See Below | Title for the release                        |
+| PRERELEASE    | False    | False     | Marks the release as a development release   |
+| ARTEFACT_PATH | False    | None      | Unless set, will not package build artefacts |
+| MAKE_LATEST   | False    | True      | Marks the release as the latest release      |
 
 <!-- markdownlint-enable MD013 -->
 
