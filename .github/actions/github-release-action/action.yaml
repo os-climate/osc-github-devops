@@ -128,13 +128,6 @@ runs:
           >> "$GITHUB_STEP_SUMMARY"
         exit 1
 
-    - name: "Abort with error during testing"
-      shell: bash
-      # yamllint disable-line rule:line-length
-      run: |
-        # Abort with error during testing
-        exit 1
-
     - name: "GitHub release [with artefacts]"
       if: inputs.artefact_location != '' && inputs.GH_RELEASE_DISABLE == 'false'
       # Note: a bug in release v2.2.0 causes upload failures

@@ -55,27 +55,26 @@ runs:
         name: ${{ env.python_project_name }}
         path: ${{ inputs.artefact_location }}
 
-    - name: "Derive additional publishing parameters"
+    - name: "Derive publishing parameters"
       id: parameters
       shell: bash
       run: |
-        # Derive additional publishing parameters
-
-        # ToDo: Check if environment can be directly enumerated (does output below return a value?)
+        # Derive publishing parameters
         if [ -z ${{ inputs.ENVIRONMENT }} ]; then
-          echo "Environment was NOT set explicitly ⛔️"
-          echo "$ENVIRONMENT [$ENVIRONMENT_URL]"
+          echo "Environment was NOT set explicitly ⚠️"
+          echo "Using production publishing settings"
+          ENVIRONMENT="production"
+        else
+          ENVIRONMENT=$(echo ${{ inputs.ENVIRONMENT }} | tr '[:upper:]' '[:lower:]')
         fi
-        if [ ${{ inputs.ENVIRONMENT }} = "test" ] || \
-        [ ${{ inputs.ENVIRONMENT }} = "testing" ] || \
-        [ ${{ inputs.ENVIRONMENT }} = "staging" ] || \
-        [ ${{ inputs.ENVIRONMENT }} = "development" ]; then
+        if [ ${{ inputs.ENVIRONMENT }} != "production" ]; then
           echo "base_url=https://test.pypi.org" >> "$GITHUB_ENV"
           echo "publish_url=https://test.pypi.org/legacy/" >> "$GITHUB_ENV"
         else
           echo "base_url=https://pypi.org" >> "$GITHUB_ENV"
           echo "publish_url=https://upload.pypi.org/legacy/" >> "$GITHUB_ENV"
         fi
+        echo "ENVIRONMENT=$ENVIRONMENT" >> "$GITHUB_ENV"
 
     - name: "Remove unsupported artefact file types"
       id: files
@@ -109,14 +108,13 @@ runs:
         index_url: "${{ env.base_url }}/simple"
         package_name: "${{ steps.naming.outputs.python_project_name }}"
         package_version: "${{ inputs.tag }}"
-        environment: ${{ inputs.ENVIRONMENT }}
+        environment: ${{ env.ENVIRONMENT }}
 
     - name: "Determine publishing method"
       id: conditions
       shell: bash
       run: |
         # Determine publishing method
-
         if [ "${{ steps.check-remote.outputs.package_match }}" = "true" ]; then
           publish_method="Trusted Publishing"
           echo "Project previously published; using Trusted Publishing ✅"
@@ -126,16 +124,14 @@ runs:
           echo "This build/release has NOT previously been published ✅"
         else
           echo "This build/release has already been published ❌"
-          if [ "${{ env.base_url }}" != "https://pypi.org" ]; then
+          if [ "${{ env.ENVIRONMENT }}" = "production" ]; then
             # This is an error for production/tagged releases
             echo "This build/release has already been published ❌" >> "$GITHUB_STEP_SUMMARY"
+            exit 1
           else
             # Publishing is skipped for non-production workflow runs
-            publish_method="Skipped"; exit 0
-          fi
-          if [ ${{ env.pypi_publish_disable }} != 'true' ]; then
-            # When publishing is disabled, this is NOT considered to be an error
-            exit 1
+            publish_method="Skipped"
+            exit 0
           fi
         fi
 
@@ -169,7 +165,7 @@ runs:
 
         fi
 
-        echo "Publishing to: ${{ env.base_url }} [environment: ${{ inputs.ENVIRONMENT }}]"
+        echo "Publishing to: ${{ env.base_url }} [environment: ${{ env.ENVIRONMENT }}]"
         echo "publish_method=$publish_method" >> "$GITHUB_ENV"
         echo "publish_method=$publish_method" >> "$GITHUB_OUTPUT"
 
@@ -180,7 +176,7 @@ runs:
       # https://github.com/pypa/gh-action-pypi-publish/discussions/287
       uses: pypa/gh-action-pypi-publish@fb13cb306901256ace3dab689990e13a5550ffaa # v1.11.0
       # yamllint disable-line rule:line-length
-      if: steps.conditions.outputs.publish_method == 'Trusted Publishing' && inputs.publish_disable == 'false'
+      if: env.publish_method == 'Trusted Publishing' && inputs.publish_disable == 'false'
       with:
         repository-url: "${{ env.publish_url }}"
         # Show checksum values
@@ -194,7 +190,7 @@ runs:
 
     - name: "Retrieve Credential [1Password]"
       id: one-password-pypi-test
-      if: steps.conditions.outputs.publish_method == '1Password Vault'
+      if: env.publish_method == '1Password Vault'
       uses: 1password/load-secrets-action@581a835fb51b8e7ec56b71cf2ffddd7e68bb25e0 # v2.0.0
       with:
         # Export loaded secrets as environment variables
@@ -211,7 +207,7 @@ runs:
       # https://github.com/pypa/gh-action-pypi-publish/discussions/287
       uses: pypa/gh-action-pypi-publish@fb13cb306901256ace3dab689990e13a5550ffaa # v1.11.0
       # yamllint disable-line rule:line-length
-      if: steps.conditions.outputs.publish_method == '1Password Vault' && inputs.publish_disable == 'false'
+      if: env.publish_method == '1Password Vault' && inputs.publish_disable == 'false'
       with:
         repository-url: "${{ env.publish_url }}"
         print-hash: true
@@ -231,7 +227,7 @@ runs:
       uses: pypa/gh-action-pypi-publish@fb13cb306901256ace3dab689990e13a5550ffaa # v1.11.0
       if:
         # yamllint disable-line rule:line-length
-        steps.conditions.outputs.publish_method == 'GitHub Secret' && inputs.publish_disable == 'false'
+        env.publish_method == 'GitHub Secret' && inputs.publish_disable == 'false'
       with:
         repository-url: "${{ env.publish_url }}"
         print-hash: true
@@ -247,16 +243,16 @@ runs:
       # yamllint disable rule:line-length
       run: |
         # Print summary/job output
-        if [ "${{ inputs.publish_disable }}" = "true" ]; then
+        if [ "${{ env.publish_disable }}" = "true" ]; then
           echo "### Publishing Disabled: Dry Run 🛑" >> "$GITHUB_STEP_SUMMARY"
-        elif [ "${{ steps.conditions.outputs.publish_method }}" = "Skipped" ]; then
+        elif [ "${{ env.publish_method }}" = "Skipped" ]; then
           echo "### Publishing Skipped: Previously Released ⛔️" >> "$GITHUB_STEP_SUMMARY"
         elif [ ${{ env.base_url }} != "https://pypi.org" ]; then
           echo "# 🧪 Test Release: PyPI" >> "$GITHUB_STEP_SUMMARY"
         else
           echo "# 🚀 Release: PyPI" >> "$GITHUB_STEP_SUMMARY"
         fi
-        echo "${{ steps.conditions.outputs.publish_method }}: ${{ env.base_url }} " >> "$GITHUB_STEP_SUMMARY"
-        if [ "${{ inputs.publish_disable }}" != "true" ]; then
+        echo "${{ env.publish_method }}: ${{ env.base_url }} " >> "$GITHUB_STEP_SUMMARY"
+        if [ "${{ env.publish_disable }}" != "true" ]; then
           echo "🔗 Release link: ${{ env.base_url }}/project/${{ steps.naming.outputs.python_project_name }}/${{ inputs.tag }}/" >> "$GITHUB_STEP_SUMMARY"
         fi

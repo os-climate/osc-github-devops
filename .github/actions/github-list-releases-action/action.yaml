@@ -5,9 +5,9 @@
 # github-list-releases-action
 name: "📦 List GitHub Releases"
 description: "Returns a list of releases for the current repository"
-# Return limited to 1000 records due to API query limits
-# ToDo: add support for API query pagination
+# Limited to 1000 records due to GitHub API query limits
 # 640K ought to be enough for anybody
+# ToDo: investigate support for API query pagination
 
 inputs:
   # Optional
@@ -16,12 +16,12 @@ inputs:
     required: false
     type: string
   SUMMARY_OUTPUT:
-    description: "Displays list in summary output"
+    description: "Displays summary output"
     required: false
     default: "false"
     type: string
   PRODUCTION_ONLY:
-    description: "Includes pre-release and draft releases in output"
+    description: "Pre-release and draft releases are included"
     required: false
     default: "false"
     type: string
@@ -31,6 +31,7 @@ inputs:
     default: "text"
     type: string
   JSON_FIELDS:
+    # Mandatory when return type (above) is set to JSON
     description: "Fields to return when return type set to JSON"
     required: false
     default: "tagName"
@@ -42,8 +43,12 @@ inputs:
     type: string
 
 outputs:
+  # Mandatory
+  RELEASES:
+    description: "List of releases in specified output format"
+    value: ${{ steps.releases.outputs.releases }}
   # Optional
-  MATCH:
+  RELEASED:
     description: "Has provided tag/version already been released"
     value: ${{ steps.releases.outputs.tag }}
 
@@ -67,9 +72,9 @@ runs:
         checkReleases() {
           while IFS= read -r RELEASE ; do
           if [ "$RELEASE" = "$TAG" ]; then
-            MATCH="true"
+            RELEASED="true"
           fi
-          done <<< "$RELEASE_OUTPUT"
+          done <<< "$RELEASES"
         }
 
         # Case-insensitive matching of inputs
@@ -95,25 +100,36 @@ runs:
           CLI_FLAGS="$CLI_FLAGS --json ${{ inputs.JSON_FIELDS }}"
         fi
 
-        echo "# 📦 GitHub Releases"
+        echo "Fetching GitHub Releases 📦"
         if [ "f$SUMMARY_OUTPUT" = "ftrue" ]; then
-          echo "# 📦 GitHub Releases" >> "$GITHUB_STEP_SUMMARY"
+          echo "### 📦 GitHub List Releases" >> "$GITHUB_STEP_SUMMARY"
         fi
 
         # Run and capture GitHub CLI Command
         if [ "$RETURN_TYPE" = "test" ]; then
           # Text output is actually a JSON query processed with fixed arguments
           echo "Running: $GH_CLI $CLI_FLAGS"
-          RELEASE_OUTPUT=$($GH_CLI $CLI_FLAGS --json tagName -q '.[] | .tagName')
+          RELEASES=$($GH_CLI $CLI_FLAGS --json tagName -q '.[] | .tagName')
         else
           echo "Running: $GH_CLI $CLI_FLAGS"
-          RELEASE_OUTPUT=$($GH_CLI $CLI_FLAGS)
+          RELEASES=$($GH_CLI $CLI_FLAGS)
+        fi
+
+        # Only list releases if/when values are returned
+        if [ -n "$RELEASES" ]; then
+          echo "Releases in this repository:"
+          echo "$RELEASES"
+        fi
+
+        if [ -z "$TAG" ]; then
+          # Exit early if no tag/version to check in releases
+          exit 0
         fi
 
         # Check with leading character in place
         checkReleases
 
-        if [ "$MATCH" != "true" ]; then
+        if [ "$RELEASED" != "true" ]; then
           if [[ "$TAG" == v* ]]; then
             TAG="${TAG:1}"
             # Check again with leading 'v' character stripped
@@ -123,18 +139,18 @@ runs:
         fi
 
         # Set output value
-        echo "MATCH=$MATCH" >> "$GITHUB_ENV"
-        echo "MATCH=$MATCH" >> "$GITHUB_OUTPUT"
+        echo "RELEASED=$RELEASED" >> "$GITHUB_ENV"
+        echo "RELEASED=$RELEASED" >> "$GITHUB_OUTPUT"
 
-        if [ "$MATCH" = "true" ]; then
-          echo "Release has already been published: $TAG ⚠️"
+        if [ "$RELEASED" = "true" ]; then
+          echo "Release HAS already been published: $TAG ⚠️"
         else
-          echo "Release has NOT been published yet: $TAG ✅"
+          echo "Release has not been published yet: $TAG ✅"
         fi
         if [ "f$SUMMARY_OUTPUT" = "ftrue" ]; then
-          if [ "$MATCH" = "true" ]; then
-            echo "Release has already been published: $TAG ⚠️" >> "$GITHUB_STEP_SUMMARY"
+          if [ "$RELEASED" = "true" ]; then
+            echo "Release HAS already been published: $TAG ⚠️" >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "Release has NOT been published yet: $TAG ✅" >> "$GITHUB_STEP_SUMMARY"
+            echo "Release has not been published yet: $TAG ✅" >> "$GITHUB_STEP_SUMMARY"
           fi
         fi
