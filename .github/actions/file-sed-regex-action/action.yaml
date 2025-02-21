@@ -1,71 +1,43 @@
 ---
 # SPDX-License-Identifier: Apache-2.0
-# SPDX-FileCopyrightText: 2024 The Linux Foundation
+# SPDX-FileCopyrightText: 2025 The Linux Foundation
 
 # file-sed-regex-action
-name: "Perform action on file using SED"
-description: "Uses sed, options/flags, and a regular expression to perform actions on a file"
+name: "Runs SED and applies RegEx to a file"
+description: "Applies a regular expression to a file using the SED command"
 
 inputs:
   FLAGS:
-    description: "Flags to use with grep command"
+    description: "Flags to use with SED command"
     required: false
     default: "-i"
   REGEX:
     description: "Regular expression to use"
     required: true
-  FILENAME:
-    description: "File containing text to extract"
+  PATH:
+    description: "Filesystem path to local file"
     required: true
 
 runs:
   using: "composite"
   steps:
-    - name: "Run the SED command on a file"
+    - name: "Running SED command on: ${{ inputs.FILENAME }}"
       id: sed
       shell: bash
       run: |
-        # Run sed against file
-
-        #SHELLCODESTART
-
-        # Allows for testing from a local shell
-        if [ -z "$GITHUB_OUTPUT" ]; then
-          echo "Running from a shell, NOT workflow"
-          export GITHUB_OUTPUT="/dev/null"
-          export GITHUB_ENV="/dev/null"
-          if [ $# -ne 3 ]; then
-            echo "Error: invalid arguments specified"
-            echo "Usage:  $0 [flags] [regex] [filename]"; exit 1
-          else
-            set -o noglob
-            FLAGS="$1"
-            REGEX="$2"
-            FILENAME="$3"
-            set +o noglob
-          fi
-        else
-          set -o noglob
-          FLAGS="${{ inputs.FLAGS }}"
-          REGEX="${{ inputs.REGEX }}"
-          FILENAME="${{ inputs.FILENAME }}"
-          set +o noglob
+        # Running SED command on: ${{ inputs.FILENAME }}
+        SED_CMD=$(which sed)
+        if [ ! -x "$SED_CMD" ]; then
+          echo "Error: sed command not in PATH"; exit 1
         fi
-
+        FILENAME="${{ inputs.FILENAME }}"
         if [ ! -f $FILENAME ]; then
-          echo "Error: file not found [$FILENAME]"; exit 1
+          echo "Error: file not found [$FILENAME] ❌"; exit 1
         fi
-
         set -o noglob
-        echo "Flags to sed command: $FLAGS"
-        echo "Regular expression to use: $REGEX"
-        echo "File to search: $FILENAME"
-
-        if (sed "$FLAGS" '${{ inputs.REGEX }}' "$FILENAME"); then
+        echo "Running: $SED_CMD ${{ inputs.FLAGS }} ${{ inputs.REGEX }} $FILENAME"
+        if ($SED_CMD "${{ inputs.FLAGS }}" '${{ inputs.REGEX }}' "$FILENAME"); then
           echo "sed command was successful ✅ "
         else
-          echo "sed command exit status: $?"
-          echo "sed command failed ❌"
+          echo "sed command failed with exit status: $? ❌"
         fi
-
-        #SHELLCODEEND

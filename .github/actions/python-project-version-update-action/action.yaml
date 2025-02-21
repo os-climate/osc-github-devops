@@ -35,7 +35,7 @@ runs:
       with:
         flags: "-i -E"
         regex: 's:version=.*$:version="${{ inputs.REPLACEMENT_VERSION }}":'
-        filename: "setup.py"
+        path: "setup.py"
 
     - name: "Patch Python project version: pyproject.toml"
       id: patch-version-pyproject-toml
@@ -44,4 +44,4 @@ runs:
       with:
         flags: "-i -E"
         regex: 's:^version =.*$:version = "${{ inputs.REPLACEMENT_VERSION }}":'
-        filename: "pyproject.toml"
+        path: "pyproject.toml"
