@@ -78,23 +78,28 @@ runs:
         }
 
         # Case-insensitive matching of inputs
-        SUMMARY_OUTPUT=$(echo ${{ inputs.summary_output }} | tr '[:upper:]' '[:lower:]')
-        PRODUCTION_ONLY=$(echo ${{ inputs.PRODUCTION_ONLY }} | tr '[:upper:]' '[:lower:]')
-        RETURN_TYPE=$(echo ${{ inputs.return_type }} | tr '[:upper:]' '[:lower:]')
-        ORDER=$(echo ${{ inputs.order }} | tr '[:upper:]' '[:lower:]')
+        SUMMARY_OUTPUT=$(echo ${{ inputs.summary_output }} |\
+          tr '[:upper:]' '[:lower:]')
+        PRODUCTION_ONLY=$(echo ${{ inputs.PRODUCTION_ONLY }} |\
+          tr '[:upper:]' '[:lower:]')
+        RETURN_TYPE=$(echo ${{ inputs.return_type }} |\
+          tr '[:upper:]' '[:lower:]')
+        ORDER=$(echo ${{ inputs.order }} |\
+          tr '[:upper:]' '[:lower:]')
         TAG="${{ inputs.tag }}"
 
         # Set baseline flags for the CLI command
         # Note: limit MUST be provided numerically to GH CLI
-        CLI_FLAGS="release list  --limit 1000 -O ${{ inputs.ORDER }} --limit 1000"
+        CLI_FLAGS="release list  --limit 1000 -O \
+          ${{ inputs.ORDER }} --limit 1000"
 
         if [ "f$PRODUCTION_ONLY" = "ffalse" ]; then
           CLI_FLAGS="$CLI_FLAGS --exclude-drafts --exclude-pre-releases"
         fi
 
         # Check dependent input parameters are coherent
-        if [ "$RETURN_TYPE" = "json" ] && [ -z  "$JSON_FIELDS" ]; then
-          echo "Error: when return type is JSON fields MUST be specified ❌"
+        if [ "$RETURN_TYPE" = "json" ] && [ -z "$JSON_FIELDS" ]; then
+          echo "Error: fields MUST be specified when return type is JSON ❌"
           exit 1
         elif [ "$RETURN_TYPE" = "json" ]; then
           CLI_FLAGS="$CLI_FLAGS --json ${{ inputs.JSON_FIELDS }}"
@@ -127,14 +132,14 @@ runs:
         fi
 
         # Check with leading character in place
-        echo "Checking release list for: $TAG"
+        echo "Checking for: $TAG"
         checkReleases
 
         if [ "$RELEASED" != "true" ]; then
           if [[ "$TAG" == v* ]]; then
             TAG="${TAG:1}"
             # Check again with leading 'v' character stripped
-            echo "Checking release list for: $TAG"
+            echo "Checking for: $TAG"
             checkReleases
           fi
         fi
@@ -144,14 +149,16 @@ runs:
         echo "RELEASED=$RELEASED" >> "$GITHUB_OUTPUT"
 
         if [ "$RELEASED" = "true" ]; then
-          echo "$TAG HAS already been release ⚠️"
+          echo "${{ inputs.tag }} HAS already been release ⚠️"
         else
-          echo "$TAG has not previously been released ✅"
+          echo "${{ inputs.tag }} has not previously been released ✅"
         fi
         if [ "f$SUMMARY_OUTPUT" = "ftrue" ]; then
           if [ "$RELEASED" = "true" ]; then
-            echo "Release HAS already been published: $TAG ⚠️" >> "$GITHUB_STEP_SUMMARY"
+            echo "Release already published: $TAG ⚠️" \
+              >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "Release has not been published yet: $TAG ✅" >> "$GITHUB_STEP_SUMMARY"
+            echo "Release not published yet: $TAG ✅" \
+              >> "$GITHUB_STEP_SUMMARY"
           fi
         fi

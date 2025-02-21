@@ -11,8 +11,9 @@ Lists the GitHub releases for a given repository
 
 ## Usage Example
 
-No inputs are mandatory. When provided with a tag/version as input, will check
-if a release for that tag/version exists in the repository.
+When provided with a tag/version as input, will check if a release for that
+tag/version exists in the repository. Provides the list of releases as an
+output variable for other actions/workflows to consume.
 
 ```yaml
 steps:

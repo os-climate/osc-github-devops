@@ -253,11 +253,11 @@ runs:
         elif [ "${{ env.publish_method }}" = "Skipped" ]; then
           echo "### Publishing Skipped: Previously Released ⛔️" >> "$GITHUB_STEP_SUMMARY"
         elif [ ${{ env.base_url }} != "https://pypi.org" ]; then
-          echo "# 🧪 Test Release: PyPI" >> "$GITHUB_STEP_SUMMARY"
+          echo "# 🧪 Test PyPI Release" >> "$GITHUB_STEP_SUMMARY"
         else
-          echo "# 🚀 Release: PyPI" >> "$GITHUB_STEP_SUMMARY"
+          echo "# 🚀 PyPI Release" >> "$GITHUB_STEP_SUMMARY"
         fi
         echo "Authenticated using: ${{ env.publish_method }}" >> "$GITHUB_STEP_SUMMARY"
         if [ "${{ env.publish_disable }}" != "true" ]; then
-          echo "🔗 Release link: ${{ env.base_url }}/project/${{ steps.naming.outputs.python_project_name }}/${{ inputs.tag }}/" >> "$GITHUB_STEP_SUMMARY"
+          echo "🔗 ${{ env.base_url }}/project/${{ steps.naming.outputs.python_project_name }}/${{ inputs.tag }}/" >> "$GITHUB_STEP_SUMMARY"
         fi
