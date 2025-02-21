@@ -18,6 +18,11 @@ inputs:
     description: "Filesystem path to local file"
     required: true
 
+outputs:
+  EXIT_STATUS:
+    description: "Exit status of sed command"
+    value: ${{ steps.sed.outputs.exit_status }}
+
 runs:
   using: "composite"
   steps:
@@ -35,8 +40,13 @@ runs:
           echo "Error: file not found [$FILE_PATH] ❌"; exit 1
         fi
         set -o noglob
-        if ($SED_CMD '${{ inputs.FLAGS }}' '${{ inputs.REGEX }}' "$FILE_PATH"); then
-          echo "sed command was successful ✅ "
+        $SED_CMD '${{ inputs.FLAGS }}' '${{ inputs.REGEX }}' "$FILE_PATH")
+        EXIT_STATUS="$?"
+        echo "exit_status=$EXIT_STATUS" >> "$GITHUB_OUTPUT"
+        if [ "$EXIT_STATUS" != "0" ]; then
+          echo "Error: sed command failed with exit status: $EXIT_STATUS ❌"
+          exit "$EXIT_STATUS"
         else
-          echo "Error: command failed with exit status: $? ❌"
+          echo "exit_status=0" >> "$GITHUB_OUTPUT"
+          echo "Successful ✅ "
         fi
