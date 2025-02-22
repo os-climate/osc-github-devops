@@ -26,6 +26,7 @@ runs:
       shell: bash
       run: |
         # Validate tag/string is semantic
+        TAG=${{ inputs.TAG }}
         echo "String to check: $TAG"
         # Strip leading "v" character if present
         if [[ "$TAG" == v* ]] || [[ "$TAG" == V* ]]; then
