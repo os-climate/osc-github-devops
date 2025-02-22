@@ -113,7 +113,7 @@ runs:
     - name: "Check if tag/version already released"
       id: release-validate
       # yamllint disable-line rule:line-length
-      uses: os-climate/osc-github-devops/.github/actions/github-list-releases-action@main
+      uses: lfit/releng-reusable-workflows/.github/actions/github-list-releases-action@f01a730905e72598d5ba129509ec10ef420a0b4b # 2025-02-22
       with:
         tag: ${{ inputs.tag }}
 
