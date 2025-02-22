@@ -1,19 +1,21 @@
 ---
 # SPDX-License-Identifier: Apache-2.0
-# SPDX-FileCopyrightText: 2024 The Linux Foundation
+# SPDX-FileCopyrightText: 2025 The Linux Foundation
 
 # tag-validate-semantic-action
-name: "🏷️ Check Tag/String is Semantic"
+name: "🏷️ Check Tag/Version string is Semantic"
 description: "Validates a given string for conformity to semantic value"
 
 inputs:
+  # Mandatory
   TAG:
-    description: "Tag/string to check/verify e.g. v1.2.3"
+    description: "Tag/version string to check/verify"
     required: true
 
 outputs:
+  # Mandatory
   SEMANTIC:
-    description: "True if tag matches semantic versioning check"
+    description: "Set true if tag passes semantic versioning check"
     value: ${{ steps.validate.outputs.semantic }}
 
 runs:
@@ -24,49 +26,22 @@ runs:
       shell: bash
       run: |
         # Validate tag/string is semantic
-
-        #SHELLCODESTART
-
-        # Allows for testing from a local shell
-        if [ -z "$GITHUB_OUTPUT" ]; then
-          echo "Running from a shell, NOT workflow"
-          export GITHUB_OUTPUT="/dev/null"
-          export GITHUB_ENV="/dev/null"
-        else
-          TAG=${{ inputs.TAG }}
-        fi
-
-        if [ -z "$TAG" ]; then
-          echo "Running from shell script outside GitHub"
-          if [ $# -ne 1 ]; then
-            echo "Usage:  $0 [tag to validate]"; exit 1
-          else
-            TAG="$1"
-          fi
-        fi
-
-        echo "Tag to check: $TAG"
-
-        # If present, strip the leading "v" character
+        echo "String to check: $TAG"
+        # Strip leading "v" character if present
         if [[ "$TAG" == v* ]] || [[ "$TAG" == V* ]]; then
           TAG="${TAG:1}"
         fi
-        # Could potentially use the strategy below instead; currently NOT used
-        # Extract only numbers and dots; useful for later manipulation
-        NUMERIC_TAG=$(echo $TAG | grep -oe '\([0-9.]*\)')
 
-        # Regular expression to match semantic tag
-        PATTERN="^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-((0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*))?(\+([0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*))?$"
+        # https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
+        # See: https://regex101.com/r/Ly7O1x/3/
+        PATTERN="^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$"
 
         # Validate supplied (and parsed) tag
         if ! [[ "$TAG" =~ $PATTERN ]]; then
-          echo "Tag is NOT semantic/valid ❌"
-          semantic="false"
+          echo "Tag/version string is NOT semantic/valid ❌"
+          RESULT="false"
         else
-          echo "Tag is semantic/valid ✅"
-          semantic="true"
+          echo "Tag/version string is semantic/valid ✅"
+          RESULT="true"
         fi
-
-        echo "semantic=$semantic" >> $GITHUB_OUTPUT
-
-        #SHELLCODEEND
+        echo "semantic=$RESULT" >> $GITHUB_OUTPUT
