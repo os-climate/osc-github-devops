@@ -40,7 +40,7 @@ runs:
           echo "Error: file not found [$FILE_PATH] ❌"; exit 1
         fi
         set -o noglob
-        $SED_CMD '${{ inputs.FLAGS }}' '${{ inputs.REGEX }}' "$FILE_PATH")
+        $SED_CMD '${{ inputs.FLAGS }}' '${{ inputs.REGEX }}' "$FILE_PATH"
         EXIT_STATUS="$?"
         echo "exit_status=$EXIT_STATUS" >> "$GITHUB_OUTPUT"
         if [ "$EXIT_STATUS" != "0" ]; then
