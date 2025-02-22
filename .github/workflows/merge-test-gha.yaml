@@ -296,7 +296,7 @@ jobs:
       - name: "Action: url-validity-check-action"
         id: url-validity-check-action
         # yamllint disable-line rule:line-length
-        uses: lfit/releng-reusable-workflows/.github/actions/url-validity-check-action@11530dee75e77f063c6e01ac7f3a6cb0cdc95db7 # 2025-02-05
+        uses: lfit/releng-reusable-workflows/.github/actions/url-validity-check-action@f01a730905e72598d5ba129509ec10ef420a0b4b # 2025-02-22
         with:
           url: "https://linuxfoundation.org"
 
