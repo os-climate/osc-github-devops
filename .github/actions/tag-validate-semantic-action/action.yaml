@@ -37,12 +37,14 @@ runs:
         # See: https://regex101.com/r/Ly7O1x/3/
         PATTERN="^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$"
 
-        # Validate supplied (and parsed) tag
-        if ! [[ "$TAG" =~ $PATTERN ]]; then
-          echo "Tag/version string is NOT semantic/valid ❌"
-          RESULT="false"
-        else
+        # Use grep with PCRE regular expression support
+        CHECKED=$(echo $TAG | grep -P "$PATTERN")
+        if [ "$?" = "0" ] && [ "$CHECKED" = "$TAG" ]; then
           echo "Tag/version string is semantic/valid ✅"
-          RESULT="true"
+          echo "semantic=true" >> $GITHUB_ENV
+          echo "semantic=true" >> $GITHUB_OUTPUT
+        else
+          echo "Tag/version string is NOT semantic/valid ❌"
+          echo "semantic=false" >> $GITHUB_ENV
+          echo "semantic=false" >> $GITHUB_OUTPUT
         fi
-        echo "semantic=$RESULT" >> $GITHUB_OUTPUT
