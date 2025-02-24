@@ -1,0 +1,28 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation
+
+# Verifies action/workflow calls are pinned to SHA commit values
+name: "📋 [R] Repository Inventory"
+
+# yamllint disable-line rule:truthy
+on:
+  workflow_call:
+
+permissions: {}
+
+jobs:
+  check-actions:
+    name: Pinned Versions
+    runs-on: ubuntu-24.04
+    permissions:
+      # We want to report on various aspects of the repository content
+      actions: read
+      contents: read
+      issues: read
+      pull-requests: read
+      security-events: read
+    steps:
+      - name: "Run repository inventory"
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/repository-inventory-action@main
