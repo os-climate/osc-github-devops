@@ -59,6 +59,19 @@ runs:
 
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
+    - name: "Checkout reporting repository"
+      shell: bash
+      run: |
+        # Checkout reporting repository
+        ssh-add - <<< "${{ inputs.INVENTORY_DEPLOY_KEY }}"
+        cd /tmp
+        if (git clone ${{ INVENTORY_LOCATION }}); then
+          echo "Cloned reporting repository ✅"
+        else
+          echo "Error: failed to clone reporting repository ❌"
+          exit 1
+        fi
+
     - name: "Inpect repository content"
       id: content
       shell: bash
