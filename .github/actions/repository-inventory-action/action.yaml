@@ -65,7 +65,7 @@ runs:
         # Checkout reporting repository
         ssh-add - <<< "${{ inputs.INVENTORY_DEPLOY_KEY }}"
         cd /tmp
-        if (git clone ${{ INVENTORY_LOCATION }}); then
+        if (git clone ${{ inputs.INVENTORY_LOCATION }}); then
           echo "Cloned reporting repository ✅"
         else
           echo "Error: failed to clone reporting repository ❌"
