@@ -9,8 +9,12 @@ description: "Scans repository content and sets output variables for subsequent 
 inputs:
   INVENTORY_LOCATION:
     description: "Repository used to publish results"
+    type: string
+    required: true
   INVENTORY_DEPLOY_KEY:
     description: "Private key used to publish results"
+    type: string
+    required: true
 
 outputs:
   PYTHON_PROJECT:
@@ -51,8 +55,8 @@ runs:
       shell: bash
       run: |
         # Check publishing credential
-        if [ -z ${{ inputs.INVENTORY_LOCATION }} ] || \
-           [ -z ${{ inputs.INVENTORY_DEPLOY_KEY }} ]; then
+        if [ -z "${{ inputs.INVENTORY_LOCATION }}" ] || \
+           [ -z "${{ inputs.INVENTORY_DEPLOY_KEY }}" ]; then
           echo "Error: reporting repository and deploy key are required ❌"
           exit 1
         fi

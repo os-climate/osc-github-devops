@@ -28,3 +28,4 @@ jobs:
       security-events: read
     # yamllint disable-line rule:line-length
     uses: os-climate/osc-github-devops/.github/workflows/reuse-inventory.yaml@main
+    secrets: inherit
