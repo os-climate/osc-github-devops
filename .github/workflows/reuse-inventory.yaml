@@ -26,3 +26,6 @@ jobs:
       - name: "Run repository inventory"
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/repository-inventory-action@main
+        with:
+          inventory_location: ${{ secrets.INVENTORY_LOCATION }}
+          inventory_deploy_key: ${{ secrets.INVENTORY_DEPLOY_KEY }}
