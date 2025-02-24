@@ -6,6 +6,12 @@
 name: "🔍 Repository Inventory"
 description: "Scans repository content and sets output variables for subsequent actions"
 
+inputs:
+  INVENTORY_LOCATION:
+    description: "Repository used to publish results"
+  INVENTORY_DEPLOY_KEY:
+    description: "Private key used to publish results"
+
 outputs:
   PYTHON_PROJECT:
     description: "Repository contains a Python project with file: pyproject.toml"
@@ -41,6 +47,18 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - name: "Check publishing credential"
+      shell: bash
+      run: |
+        # Check publishing credential
+        if [ -z ${{ inputs.INVENTORY_LOCATION }} ] \
+            [ -z ${{ inputs.INVENTORY_DEPLOY_KEY }} ]; then
+          echo "Error: reporting repository and deploy key are required ❌"
+          exit 1
+        fi
+
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
     - name: "Inpect repository content"
       id: content
       shell: bash

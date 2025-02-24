@@ -13,7 +13,7 @@ permissions: {}
 
 jobs:
   check-actions:
-    name: Pinned Versions
+    name: Gather Status
     runs-on: ubuntu-24.04
     permissions:
       # We want to report on various aspects of the repository content
