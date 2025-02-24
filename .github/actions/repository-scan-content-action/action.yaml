@@ -51,7 +51,8 @@ runs:
         TMPFILE=$(mktemp -p /tmp --suffix "github-summary-output.txt")
 
         # Check for Python project metadata files
-        if [ -f pyproject.toml ] || [ -f setup.py ]; then
+        if [ -f pyproject.toml ] || [ -f setup.py ] || \
+          [ -f Pipfile ] || [ -f requirements.txt ]; then
           PYTHON_PROJECT="true"
         else
           PYTHON_PROJECT="false"
