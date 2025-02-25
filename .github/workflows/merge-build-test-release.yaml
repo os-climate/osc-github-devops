@@ -83,7 +83,7 @@ jobs:
       - name: "Build Python project"
         id: python-build
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/python-project-build-action@main
+        uses: os-climate/osc-github-devops/.github/actions/python-build-action@main
         with:
           tag: ${{ needs.repository.outputs.build_tag }}
           attestations: "true"

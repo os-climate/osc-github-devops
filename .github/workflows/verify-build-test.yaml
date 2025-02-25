@@ -27,7 +27,6 @@ jobs:
     # yamllint disable-line rule:line-length
     uses: os-climate/osc-github-devops/.github/workflows/reuse-inspect-repository.yaml@main
     permissions:
-      # Required for action that creates labels: github-labels
       contents: read
 
   python-build:
@@ -40,17 +39,13 @@ jobs:
       artefact_path: ${{ steps.python-build.outputs.artefact_path }}
     permissions:
       contents: write
-      # Required by SigStore signing action
-      id-token: write
-      # Required for attestations
-      attestations: write
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: "Build Python project"
         id: python-build
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/python-project-build-action@main
+        uses: os-climate/osc-github-devops/.github/actions/python-build-action@main
         with:
           tag: ${{ needs.repository.outputs.build_tag }}
 
