@@ -110,6 +110,7 @@ jobs:
           Issue-ID: CIMAN-33"
           if [[ "${{ env.COMMIT_MESSAGE }}" =~ $AUTOMATION ]]; then
             echo "Automated PR amended with issue id by automation"
+            echo "Pull request created by automation with issue-id ✅"
           fi
           echo "automation_amended=true" >> "$GITHUB_ENV"
 
