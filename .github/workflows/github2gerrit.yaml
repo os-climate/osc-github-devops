@@ -312,7 +312,7 @@ jobs:
 
       - name: Squash commits into a single commit
         shell: bash
-        if: ${{ (env.PR_COMMITS > 0) && (inputs.SUBMIT_SINGLE_COMMITS == false) }}
+        if: ${{ (env.PR_COMMITS > 1) && (inputs.SUBMIT_SINGLE_COMMITS == false) }}
         # yamllint disable rule:line-length
         run: |
           set -x
