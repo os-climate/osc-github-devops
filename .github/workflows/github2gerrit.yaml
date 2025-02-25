@@ -1,0 +1,539 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2024 The Linux Foundation <abelur@linux.com>
+
+name: github2gerrit-reusable-workflow
+
+on:
+  workflow_call:
+    inputs:
+      SUBMIT_SINGLE_COMMITS:
+        description: "Submit one commit at a time to the Gerrit repository"
+        required: false
+        default: false
+        type: boolean
+      USE_PR_AS_COMMIT:
+        description: "Use PR body and tittle as commit message"
+        required: false
+        default: false
+        type: boolean
+      FETCH_DEPTH:
+        description: "fetch-depth for the clone. (Default: 10)"
+        required: false
+        default: "10"
+        type: string
+      GERRIT_KNOWN_HOSTS:
+        description: "known hosts"
+        required: true
+        type: string
+      GERRIT_SERVER:
+        description: "Gerrit hostname ex: git.opendaylight.org"
+        required: false
+        default: ""
+        type: string
+      GERRIT_SERVER_PORT:
+        description: "Gerrit port. (Default: 29418)"
+        required: false
+        default: "29418"
+        type: string
+      GERRIT_PROJECT:
+        description: "Gerrit project name. ex: releng/builder"
+        required: false
+        default: ""
+        type: string
+      GERRIT_SSH_USER_G2G:
+        description: "Gerrit user-id for SSH"
+        required: true
+        type: string
+      GERRIT_SSH_USER_G2G_EMAIL:
+        description: "Email of the SSH user"
+        required: true
+        type: string
+      ORGANIZATION:
+        description: "Organization name, e.g. opendaylight"
+        required: false
+        type: string
+        default: ${{ github.repository_owner }}
+      REVIEWERS_EMAIL:
+        description: "Committers email list (comma separated) to notify on code-reviews"
+        required: false
+        default: ""
+        type: string
+    secrets:
+      GERRIT_SSH_PRIVKEY_G2G:
+        description: "SSH Private key"
+        required: true
+
+concurrency:
+  # yamllint disable-line rule:line-length
+  group: reusable-${{ github.workflow }}-${{ github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  compose-github2gerrit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install python
+        uses: actions/setup-python@v5
+        id: setup-python
+        with:
+          python-version: "3.11"
+
+      - name: Validate workflow inputs
+        if: ${{ (inputs.USE_PR_AS_COMMIT == true) && (inputs.SUBMIT_SINGLE_COMMITS == true) }}
+        shell: bash
+        # yamllint disable rule:line-length
+        run: |
+          echo "Error: USE_PR_AS_COMMIT and SUBMIT_SINGLE_COMMITS cannot be enabled at the same time"
+          exit 1
+
+      - name: "Install required dependencies: git-review,jq"
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip
+          pip install "git-review==2.3.1" jq
+          git review --version
+          jq --version
+
+      - name: "🐞 Check pull request commit history"
+        shell: bash
+        run: |
+          # 🐞 Check pull request commit history
+          # See: https://www.kenmuse.com/blog/the-many-shas-of-a-github-pull-request/
+          echo: "github.event.pull_request.head.sha:"
+          echo "${{ github.event.pull_request.head.sha }}"
+          echo: "github.event.pull_request.base.sha:"
+          echo "${{ github.event.pull_request.base.sha }}"
+          LATEST_BASE_COMMIT=$(git rev-parse ${{ github.sha }}^@ | grep -Fvx ${{ github.event.pull_request.head.sha }})
+          echo: "LATEST_BASE_COMMIT:"
+          echo "$LATEST_BASE_COMMIT"
+          echo "git diff ${{ github.event.pull_request.before }} ${{github.event.after }}"
+          git diff ${{ github.event.pull_request.before }} ${{github.event.after }}
+          echo "github.sha"
+          echo "${{ github.sha }}"
+          echo "github.ref"
+          echo "${{ github.ref }}"
+          echo "github.event.before"
+          echo "${{ github.event.before }}"
+          echo "github.event.after"
+          echo "${{ github.event.after }}"
+
+      - name: Clone Github repo where the PR is submitted
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: ${{ inputs.fetch_depth }}
+          # Original code
+          # ref: ${{ github.event.pull_request.head.sha }}
+          # ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: "Read inputs to set PROJECT_REPO_{GERRIT,GITHUB} if .gitreview is undefined"
+        if: ${{ hashFiles('.gitreview') == '' }}
+        shell: bash
+        run: |
+          set -x
+
+          project_repo_github="${{ github.repository }}"
+          if [[ ${{ inputs.GERRIT_PROJECT }} != "$project_repo_github" ]]; then
+              # remove repo owner name
+              project_repo_github="${project_repo_github#*/}"
+              # change any '-' to '/' and
+              project_repo_gerrit="${project_repo_github//-//}"
+              echo "PROJECT_REPO_GITHUB=${project_repo_github}" >> "$GITHUB_ENV"
+              echo "PROJECT_REPO_GERRIT=${project_repo_gerrit}" >> "$GITHUB_ENV"
+          fi
+
+      - name: Read .gitreview to set PROJECT_REPO_GERRIT & PROJECT_REPO_GITHUB
+        if: ${{ hashFiles('.gitreview') != '' }}
+        shell: bash
+        # yamllint disable rule:line-length
+        run: |
+          set -x
+
+          project_repo_gerrit_git=$(grep -E "project" .gitreview | cut -d "=" -f2)
+          # strip .git suffix
+          project_repo_gerrit="${project_repo_gerrit_git//.*}"
+          # change any '/' to '-' nested repos are not available on Github
+          project_repo_github="${project_repo_gerrit////-}"
+
+          echo "PROJECT_REPO_GERRIT=${project_repo_gerrit}" >> "$GITHUB_ENV"
+          echo "PROJECT_REPO_GITHUB=${project_repo_github}" >> "$GITHUB_ENV"
+
+      - name: Read .gitreview and set env GERRIT_SERVER and GERRIT_PORT
+        if: ${{ hashFiles('.gitreview') != '' }}
+        shell: bash
+        # yamllint disable rule:line-length
+        run: |
+          set -x
+
+          gerrit_server=$(grep -oP -m1 '(?<=host=).*' .gitreview)
+          gerrit_server_port=$(grep -oP -m1 '(?<=port=).*' .gitreview)
+          echo "GERRIT_SERVER=${gerrit_server}" >> "$GITHUB_ENV"
+          echo "GERRIT_SERVER_PORT=${gerrit_server_port}" >> "$GITHUB_ENV"
+
+      - name: Set GERRIT_SERVER and GERRIT_PORT when .gitreview is undefined
+        if: ${{ hashFiles('.gitreview') == '' }}
+        shell: bash
+        # yamllint disable rule:line-length
+        run: |
+          set -x
+
+          if [[ ${{ inputs.GERRIT_SERVER }} != '' ]]; then
+              echo "GERRIT_SERVER=${{ inputs.GERRIT_SERVER }}" >> "$GITHUB_ENV"
+          fi
+
+          if [[ ${{ inputs.GERRIT_SERVER_PORT }} != '' ]]; then
+              echo "GERRIT_SERVER_PORT=${{ inputs.GERRIT_SERVER_PORT }}" >> "$GITHUB_ENV"
+          fi
+
+      - name: Set env GITHUB branch in env
+        shell: bash
+        run: |
+          gerrit_branch="${GITHUB_BASE_REF:-master}"
+          echo "GERRIT_BRANCH=${gerrit_branch}" >> "$GITHUB_ENV"
+
+      - name: Print last X commits in the git log
+        if: env.ACT == 'true'
+        shell: bash
+        # yamllint disable rule:line-length
+        run: |
+          set -x
+          git --no-pager log --graph --all --decorate --pretty=oneline -n5
+
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@d4fffb50872869abe2d9a9098a6d9c5aa7d16be4 # v2.7.0
+        with:
+          key: ${{ secrets.GERRIT_SSH_PRIVKEY_G2G }}
+          name: "id_rsa"
+          known_hosts: ${{ inputs.GERRIT_KNOWN_HOSTS }}
+          config: |
+            Host ${{ env.GERRIT_SERVER }}
+              User ${{ inputs.GERRIT_SSH_USER_G2G }}
+              Port 29418
+              PubkeyAcceptedKeyTypes +ssh-rsa
+              IdentityFile ~/.ssh/id_rsa
+
+      - name: Setup Gerrit remote
+        if: env.PROJECT_REPO_GERRIT != ''
+        shell: bash
+        # yamllint disable rule:line-length
+        run: |
+          set -x
+
+          # Setup global git config required by git-review
+          git config --global gitreview.username ${{ inputs.GERRIT_SSH_USER_G2G }}
+          git config --global user.name ${{ inputs.GERRIT_SSH_USER_G2G }}
+          git config --global user.email ${{ inputs.GERRIT_SSH_USER_G2G_EMAIL }}
+
+          # Workaround for git-review failing to copy the commit-msg hook to submodules
+          git config core.hooksPath "$(git rev-parse --show-toplevel)/.git/hooks"
+          # Init gerrit repo
+          git review -s -v
+
+          # print remote settings
+          git remote -v
+
+      - name: Extract pull-request number
+        shell: bash
+        # yamllint disable rule:line-length
+        run: |
+          set -x
+          export PR_NUMBER="${{ github.event.pull_request.number || github.event.issue.number }}"
+          echo "PR_NUMBER=$PR_NUMBER" >> "$GITHUB_ENV"
+
+      - name: Get the number of commits in the pull-request
+        if: ${{ github.event_name == 'pull_request_target' }}
+        shell: bash
+        # yamllint disable rule:line-length
+        run: |
+          set -x
+          num_commits="$(gh pr view ${{ env.PR_NUMBER }} --json commits | jq '.[] | length')"
+          echo "PR_COMMITS=$num_commits" >> "$GITHUB_ENV"
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Prepare commits to submit one at a time
+        shell: bash
+        if: ${{ (env.PR_COMMITS > 0) && (inputs.SUBMIT_SINGLE_COMMITS == true) }}
+        # yamllint disable rule:line-length
+        run: |
+          set -x
+          commit_shas=$(gh pr view ${{ env.PR_NUMBER }} --json commits --jq '.commits[] | .oid')
+          git checkout -b tmp_branch ${{ github.event.pull_request.base.sha }}
+
+          # Cherry-pick the commits into diff branch and amend to add change-Id
+          for csha in ${commit_shas}; do
+              git checkout tmp_branch
+              git cherry-pick "${csha}"
+              author=$(git show -s --pretty=format:"%an <%ae>" "${csha}")
+              git commit -s -v --no-edit --author "$author" --amend
+              change_id="$(git log --format="%(trailers:key=Change-Id,valueonly,separator=%x2C)" -n1)"
+              if [ -n "${change_id}" ]; then
+                  # Capture the newly created change-Id
+                  echo "$change_id" >> change-Id.txt
+              else
+                  echo "FAIL: Change-Id not created, exit job!"
+                  exit 1
+              fi
+              git checkout ${{ env.GERRIT_BRANCH }}
+          done
+          git log -n3
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Fetch the change-Id when the pull_request was reopened
+        shell: bash
+        if: ${{ github.event_name == 'pull_request_target' && (github.event.action == 'reopened' || github.event.action == 'synchronize') && (env.PR_COMMITS > 0) && (inputs.SUBMIT_SINGLE_COMMITS == false) }}
+        # yamllint disable rule:line-length
+        run: |
+          set -x
+
+          # shellcheck disable=SC2016
+          gh api graphql --paginate \
+              -F number=${{ env.PR_NUMBER }} \
+              -F owner=${{ inputs.ORGANIZATION }} \
+              -F name=${{ env.PROJECT_REPO_GITHUB }} \
+              -f query='query($name: String!, $owner: String!, $number: Int!) {
+              repository(owner: $owner, name: $name) {
+                pullRequest(number: $number ) {
+                  comments(last: 5) {
+                    nodes {
+                      body
+                      author {
+                        login
+                      }
+                    }
+                  }
+                }
+              }
+            }' | jq > "comments-${{ env.PR_NUMBER }}.txt"
+
+          # extract the Change-Id from the comments.
+          jq -r -c '.data.repository.pullRequest.comments.nodes[]
+              | select(.body | contains("Change-Id:"))
+              | .body | match("Change-Id: (?<id>[a-zA-Z0-9]+)").captures[0].string' \
+              "comments-${{ env.PR_NUMBER }}.txt" > "reuse-cids-${{ env.PR_NUMBER }}.txt"
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Squash commits into a single commit
+        shell: bash
+        if: ${{ (env.PR_COMMITS > 0) && (inputs.SUBMIT_SINGLE_COMMITS == false) }}
+        # yamllint disable rule:line-length
+        run: |
+          set -x
+
+          git --no-pager log --graph --all --decorate --pretty=oneline -n"${{ env.PR_COMMITS }}"
+
+          # Create a Change-id from all the PR
+          # Squash all commits in pull-request into a single commit
+          git reset --soft "${{ github.sha }}"
+
+          # Check if change-id is present in each commit and use the first one
+          # Capture and check for signed-of-by and Change-Id
+          git log -v --format=%B --reverse "HEAD..HEAD@{1}" | grep -E "^(Change-Id)" > change-Id.txt || true
+          git log -v --format=%B --reverse "HEAD..HEAD@{1}" | grep -E "^(Signed-off-by)" > signed-off-by.txt || true
+          git log -v --format=%B --reverse "HEAD..HEAD@{1}" | grep -Ev "^(Signed-off-by|Change-Id)" > commit-msg.txt
+
+          # capture author info
+          git show -s --pretty=format:"%an <%ae>" "HEAD..HEAD@{1}" > author-info.txt
+          if [[ -s author-info.txt ]]; then
+              author="$(cat author-info.txt)"
+          fi
+
+          if [[ -f commit-msg.txt ]]; then
+              commit_message="${commit_message:-commit-msg.txt}"
+          fi
+
+          # overide and re-use the same change-id  if the change was updated
+          if [[ -s "reuse-cids-${{ env.PR_NUMBER }}.txt" ]] && (${{ github.event.action == 'reopened' }} || ${{ github.event.action == 'synchronize' }}); then
+              reuse_cid="$(< "reuse-cids-${{ env.PR_NUMBER }}.txt" uniq | tail -1)"
+              if [ -n "${reuse_cid}" ]; then
+                  echo "Change-Id: $reuse_cid" > change-Id.txt
+                  commit_message+=' '
+                  commit_message+="change-Id.txt"
+              fi
+          elif [[ -f change-Id.txt && ! -s "reuse-cids-${{ env.PR_NUMBER }}.txt" ]]; then
+              commit_message+=' '
+              commit_message+="change-Id.txt"
+          fi
+
+          if [[ -f signed-off-by.txt ]]; then
+              sort -u signed-off-by.txt -o signed-off-by-final.txt
+              commit_message+=' '
+              commit_message+="signed-off-by-final.txt"
+          fi
+
+          # shellcheck disable=SC2086
+          git commit -s -v --no-edit --author "$author" -m "$(cat $commit_message)"
+          git log -n2
+
+      - name: Overwrite commit message with PR tittle and body
+        if: ${{ (github.event_name == 'pull_request_target') && (env.PR_COMMITS > 0) && (inputs.USE_PR_AS_COMMIT == true) && (inputs.SUBMIT_SINGLE_COMMITS == false) }}
+        shell: bash
+        # yamllint disable rule:line-length
+        run: |
+          set -x
+
+          pr_tittle_length="$(gh pr view ${{ env.PR_NUMBER }} --json title | jq '.[] | length')"
+          pr_body_length="$(gh pr view ${{ env.PR_NUMBER }} --json body | jq '.[] | length')"
+
+          gh pr view ${{ env.PR_NUMBER }} --json title | jq -r '.title | select( . != null )' > pr_title.txt
+          # add blank line between title and body
+          echo "" >> pr_title.txt
+          gh pr view ${{ env.PR_NUMBER }} --json body | jq -r '.body | select( . != null )' >> pr_body.txt
+
+          # Note: its upto the dev to ensure the 50/72 rule
+          cat pr_title.txt pr_body.txt > pr_commit.txt
+          echo "" >> pr_commit.txt
+          cat signed-off-by-final.txt >> pr_commit.txt
+
+          if [[ -s author-info.txt ]]; then
+              author="$(cat author-info.txt)"
+          fi
+
+          if [[ -f pr_commit.txt ]] && [[ ($pr_body_length -gt 0) ]] && [[ ($pr_tittle_length -gt 0) ]]; then
+              git commit -s -v --amend --author "$author" --no-edit -F "pr_commit.txt"
+              git log -n2
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Submit the change to Gerrit repository
+        id: submit
+        if: env.PR_NUMBER != ''
+        shell: bash
+        # yamllint disable rule:line-length
+        run: |
+          set -x
+
+          if ${{ inputs.SUBMIT_SINGLE_COMMITS == true }}; then
+              git checkout tmp_branch
+          fi
+
+          reviewers_emails_list="${{ inputs.REVIEWERS_EMAIL }}"
+          # If the reviewers email is unset/empty then use a default
+          reviewers=${reviewers_emails_list:-"${{ inputs.GERRIT_SSH_USER_G2G_EMAIL }}"}
+
+          topic="GH-${{ env.PROJECT_REPO_GITHUB }}-${{ env.PR_NUMBER }}"
+          echo "git review .... inprogress"
+          git review --yes -t "$topic" --reviewers "$reviewers"
+
+      - name: Validate Change-ID and retrive the Gerrit change number
+        id: change_num
+        shell: bash
+        # yamllint disable rule:line-length
+        run: |
+          set -x
+
+          if [[ ! -s change-Id.txt ]]; then
+              # retrive change-id from the submitted PR
+              gerrit_change_id=$(git show HEAD --format=%B -s | grep Change-Id: | cut -d " " -f2;)
+              if [[ "$gerrit_change_id" == '' ]]; then
+                  echo "GERRIT_CHANGE_ID: null"; exit 1
+              fi
+              echo "$gerrit_change_id" >> change-Id.txt
+          fi
+
+          if [[ -s change-Id.txt ]]; then
+              GERRIT_CHANGE_ID_VALUES="$(<change-Id.txt)"
+              {
+                echo 'GERRIT_CHANGE_ID<<EOF'
+                echo "${GERRIT_CHANGE_ID_VALUES}"
+                echo EOF
+              } >> "$GITHUB_ENV"
+          fi
+
+          while IFS="" read -r cid; do
+              # Query for a pre-existing gerrit review to retrive Change-Id
+              ssh -v -n -p 29418 "${{ inputs.GERRIT_SSH_USER_G2G }}@${{ env.GERRIT_SERVER }}" \
+                      "gerrit query limit:1 owner:self is:open" \
+                      "project:${{ env.PROJECT_REPO_GERRIT }}" \
+                      --current-patch-set --format=JSON \
+                      "${cid##* }" > query_result.txt
+
+              query_result_url=$(jq -r '.url | select( . != null )' query_result.txt)
+              query_result_number=$(jq -r '.number | select( . != null )' query_result.txt)
+              query_result_commit_sha=$(jq  -r '.currentPatchSet.revision | select( . != null )' query_result.txt)
+
+              echo "${query_result_url}" >> change-url.txt
+              echo "${query_result_commit_sha}" >> commit-sha.txt
+              echo "${query_result_number}" >> change-request-number.txt
+              echo "[${cid}](${query_result_url})" >> cid-url.txt
+          done < change-Id.txt
+
+          GERRIT_CHANGE_REQUEST_URL_VALUES="$(<change-url.txt)"
+          {
+              echo 'GERRIT_CHANGE_REQUEST_URL<<EOF'
+              echo "${GERRIT_CHANGE_REQUEST_URL_VALUES}"
+              echo EOF
+          } >> "$GITHUB_ENV"
+
+          GERRIT_COMMIT_SHA_VALUES="$(<commit-sha.txt)"
+          {
+              echo 'GERRIT_COMMIT_SHA<<EOF'
+              echo "${GERRIT_COMMIT_SHA_VALUES}"
+              echo EOF
+          } >> "$GITHUB_ENV"
+
+          GERRIT_CHANGE_REQUEST_NUM_VALUES="$(<change-request-number.txt)"
+          {
+              echo 'GERRIT_CHANGE_REQUEST_NUM<<EOF'
+              echo "${GERRIT_CHANGE_REQUEST_NUM_VALUES}"
+              echo EOF
+          } >> "$GITHUB_ENV"
+
+          GERRIT_CR_URL_CID_VALUES="$(<cid-url.txt)"
+          {
+              echo 'GERRIT_CR_URL_CID<<EOF'
+              echo "${GERRIT_CR_URL_CID_VALUES}"
+              echo EOF
+          } >> "$GITHUB_ENV"
+
+      - name: Add source of Github PR URL as a gerrit comment
+        if: env.GERRIT_CHANGE_ID != ''
+        shell: bash
+        # yamllint disable rule:line-length
+        run: |
+          set -x
+
+          run_url="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          pr_path="${{ github.server_url }}/${{ github.repository }}/pull/${{ env.PR_NUMBER }}"
+          message="$(printf 'GHPR: %s\nAction-Run: %s\n' "${pr_path}" "${run_url}")"
+
+          # Add comment backref change request to Github PR and workflow job.
+          while IFS="" read -r csha; do
+              ssh -v -n -p 29418 "${{ inputs.GERRIT_SSH_USER_G2G }}@${{ env.GERRIT_SERVER }}" \
+                      gerrit review -m "'""${message}""'" \
+                      --branch ${{ env.GERRIT_BRANCH }} --project "${{ env.PROJECT_REPO_GERRIT }}" \
+                      "$csha"
+          done < commit-sha.txt
+
+      - name: Add comment to refrence the change-request on the pull-request
+        if: |
+          hashFiles('commit-sha.txt') != '' ||
+          (! startsWith(env.GERRIT_CR_URL_CID, ''))
+        uses: actions/github-script@v7
+        with:
+          result-encoding: string
+          retries: 3
+          retry-exempt-status-codes: 400,401
+          script: |
+            const output = `The pull-request PR-${{ env.PR_NUMBER }} is submitted to Gerrit [${{ inputs.ORGANIZATION }}](https://${{ env.GERRIT_SERVER }})! \n
+              To follow up on the change visit: \n \n ${{ env.GERRIT_CR_URL_CID }} \n \n
+              NOTE: The pull-request PR-${{ env.PR_NUMBER }} will be closed, re-opening the pull-request will not update the same commit and may result in duplicate changes on Gerrit.`
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
+
+      - name: Close pull-request
+        if: ${{ github.event_name == 'pull_request_target' }}
+        shell: bash
+        # yamllint disable rule:line-length
+        run: |
+          set -x
+          gh pr close --comment "Auto-closing pull request" --delete-branch "${{ env.PR_NUMBER }}"
+        env:
+          GH_TOKEN: ${{ github.token }}
