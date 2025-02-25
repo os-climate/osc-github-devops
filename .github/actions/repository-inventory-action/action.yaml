@@ -51,14 +51,16 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: "Check publishing credential"
+    - name: "Check publishing credentials"
       shell: bash
       run: |
-        # Check publishing credential
+        # Check publishing credentials
         if [ -z "${{ inputs.INVENTORY_LOCATION }}" ] || \
            [ -z "${{ inputs.INVENTORY_DEPLOY_KEY }}" ]; then
           echo "Error: reporting repository and deploy key are required ❌"
           exit 1
+        else
+          echo "Required credentials were passed as inputs ✅"
         fi
 
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -67,7 +69,11 @@ runs:
       shell: bash
       run: |
         # Checkout reporting repository
+
         ssh-add - <<< "${{ inputs.INVENTORY_DEPLOY_KEY }}"
+        DEPLOY_KEY=$(mktemp -p /tmp --suffix "-deploy-key")
+        echo
+        echo TMPFILE=$(mktemp -p /tmp --suffix "-secrets.txt")
         cd /tmp
         if (git clone ${{ inputs.INVENTORY_LOCATION }}); then
           echo "Cloned reporting repository ✅"
