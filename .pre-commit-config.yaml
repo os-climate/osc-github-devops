@@ -3,7 +3,7 @@
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 ci:
-  autofix_commit_msg: "Chore: pre-commit autoupdate"
+  autofix_commit_msg: "[pre-commit.ci] Chore: automated update"
 
 exclude: |
   (?x)(
