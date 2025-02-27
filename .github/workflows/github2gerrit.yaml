@@ -228,27 +228,8 @@ jobs:
           # print remote settings
           git remote -v
 
-      - name: Enumerate pull-request number [ACTION]
+      - name: Extract information from pull-request
         uses: os-climate/osc-github-devops/.github/actions/github-pr-metadata-action@main
-
-      - name: Extract pull-request number
-        shell: bash
-        # yamllint disable rule:line-length
-        run: |
-          set -x
-          export PR_NUMBER="${{ github.event.pull_request.number || github.event.issue.number }}"
-          echo "PR_NUMBER=$PR_NUMBER" >> "$GITHUB_ENV"
-
-      - name: Get the number of commits in the pull-request
-        if: ${{ github.event_name == 'pull_request_target' }}
-        shell: bash
-        # yamllint disable rule:line-length
-        run: |
-          set -x
-          num_commits="$(gh pr view ${{ env.PR_NUMBER }} --json commits | jq '.[] | length')"
-          echo "PR_COMMITS=$num_commits" >> "$GITHUB_ENV"
-        env:
-          GH_TOKEN: ${{ github.token }}
 
       - name: Prepare commits to submit one at a time
         shell: bash
