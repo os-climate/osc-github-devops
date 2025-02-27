@@ -95,32 +95,28 @@ jobs:
           git review --version
           jq --version
 
-      - name: Clone Github repo with standard settings
-        uses: actions/checkout@v4
-
-      # Standard checkout initially
-      - name: "Retrieve GIT commit message"
-        uses: lfit/releng-reusable-workflows/.github/actions/git-commit-message-action@main
-
-      - name: "Check pull request commit body"
-        shell: bash
-        run: |
-          # Check pull request commit body
-          AUTOMATION="Signed-off-by: dependabot[bot] <support@github.com>
-          Issue-ID: CIMAN-33"
-          if [[ "${{ env.COMMIT_MESSAGE }}" =~ $AUTOMATION ]]; then
-            echo "Automated PR amended with issue id by automation"
-            echo "Pull request created by automation with issue-id ✅"
-          fi
-          echo "automation_amended=true" >> "$GITHUB_ENV"
-
-      # Checkout as per Anil's code
       - name: Clone Github repo where the PR is submitted
-        if: env.automation_amended != 'true'
         uses: actions/checkout@v4
         with:
           fetch-depth: ${{ inputs.fetch_depth }}
           ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: "Check if Issue-ID is required"
+        shell: bash
+        run: |
+          # Check if Issue-ID is required
+          if [ "f${{ vars.ISSUE_ID_MANDATORY }}" = "ftrue" ]; then
+            echo "Project requires Issue-ID string ⚠️"
+            echo "issue_id_mandatory=true" >> "$GITHUB_ENV"
+            echo "key=${{ github.actor }}" >> "$GITHUB_ENV"
+          fi
+
+      - name: "Get issue from JSON lookup table"
+        if: env.issue_id_mandatory == 'true'
+        uses: lfit/releng-reusable-workflows/.github/actions/json-key-value-lookup-action@main
+        with:
+          json: ${{ vars.ISSUE_ID_LOOKUP_JSON }}
+          key: ${{ env.key }}
 
       - name: "Read inputs to set PROJECT_REPO_{GERRIT,GITHUB} if .gitreview is undefined"
         if: ${{ hashFiles('.gitreview') == '' }}
@@ -228,8 +224,24 @@ jobs:
           # print remote settings
           git remote -v
 
-      - name: Extract information from pull-request
-        uses: os-climate/osc-github-devops/.github/actions/github-pull-request-action@main
+      - name: Extract pull-request number
+        shell: bash
+        # yamllint disable rule:line-length
+        run: |
+          set -x
+          export PR_NUMBER="${{ github.event.pull_request.number || github.event.issue.number }}"
+          echo "PR_NUMBER=$PR_NUMBER" >> "$GITHUB_ENV"
+
+      - name: Get the number of commits in the pull-request
+        if: ${{ github.event_name == 'pull_request_target' }}
+        shell: bash
+        # yamllint disable rule:line-length
+        run: |
+          set -x
+          num_commits="$(gh pr view ${{ env.PR_NUMBER }} --json commits | jq '.[] | length')"
+          echo "PR_COMMITS=$num_commits" >> "$GITHUB_ENV"
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: Prepare commits to submit one at a time
         shell: bash
