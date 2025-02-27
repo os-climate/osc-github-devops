@@ -39,9 +39,10 @@ Passing the output through JQ to provide a numerical value:
 
 <!-- markdownlint-disable MD013 -->
 
-| Input        | Required | Description           | Default    |
-| ------------ | -------- | --------------------- | ---------- |
-| PULL_REQUEST | False    | Pull request to query | Enumerated |
+| Input        | Required | Default    | Description                     |
+| ------------ | -------- | ---------- | ------------------------------- |
+| PULL_REQUEST | False    | Enumerated | Pull request to query           |
+| EXIT_ON_FAIL | False    | True       | Do not exit with error when set |
 
 <!-- markdownlint-enable MD013 -->
 

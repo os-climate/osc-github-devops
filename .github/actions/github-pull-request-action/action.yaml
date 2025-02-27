@@ -19,7 +19,7 @@ inputs:
     default: "true"
 
 outputs:
-  # Mandatory
+  # Mandatory
   PULL_REQUEST:
     description: "The enumerated pull request value, when not provided"
     value: ${{ steps.parse.outputs.pull_request }}
