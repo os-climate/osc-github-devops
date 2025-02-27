@@ -1,0 +1,70 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2025 The Linux Foundation
+
+# github-pr-metadata-action
+name: "#️⃣ GitHub Pull Request MetaData"
+description: "Provides useful metrics/metadata from a GitHub pull request"
+
+inputs:
+  # Optional
+  PULL_REQUEST:
+    description: "Pull request to query"
+    required: false
+    # Will enumerate from the current pull request, environment permitting
+    default: "${{ github.event.pull_request.number || github.event.issue.number }}"
+
+outputs:
+  # Mandatory
+  PULL_REQUEST:
+    description: "The current pull request, when not specified as "
+    required: false
+    # Will enumerate from the current pull request, environment permitting
+    default: "${{ github.event.pull_request.number || github.event.issue.number }}"
+  PR_COMMITS:
+    description: "Number of commits in the pull request"
+    value: ${{ steps.commits.outputs.pr_commits }}
+
+runs:
+  using: "composite"
+  steps:
+    # Primarily for if/when using self-hosted/custom runners
+    - name: "Check GitHub CLI availability"
+      shell: bash
+      run: |
+        # Check GitHub CLI availability
+        GH_CLI=$(which gh)
+        if [ ! -x "$GH_CLI" ]; then
+          echo "Error: GitHub CLI was NOT found in PATH ❌"; exit 1
+        fi
+
+    - name: "Check required inputs"
+      shell: bash
+      run: |
+        # Check required inputs
+        if [ -z "${{ inputs.PULL_REQUEST }}" ]; then
+          echo "Error: the pull request could not be enumerated ❌"
+          exit 1
+        else
+          echo "pull_request=${{ inputs.PULL_REQUEST }}" >> "$GITHUB_ENV"
+          echo "Parsing pull request number: ${{ inputs.PULL_REQUEST }} ✅"
+        fi
+
+    - name: "Get the number of commits in the pull-request"
+      id: commits
+      if: inputs.PULL_REQUEST !='' && github.event_name == 'pull_request_target'
+      shell: bash
+      # yamllint disable rule:line-length
+      run: |
+        num_commits="$(gh pr view ${{ env.PULL_REQUEST }} --json commits | jq '.[] | length')"
+        echo "PR_COMMITS=$num_commits" >> "$GITHUB_ENV"
+      env:
+        GH_TOKEN: ${{ github.token }}
+
+    - name: "Not triggered by pull request"
+      if: github.event_name != 'pull_request_target'
+      shell: bash
+      run: |
+        # Not triggered by pull request
+        echo "Error: not triggered/called from a pull request ❌"
+        exit 1
