@@ -229,7 +229,7 @@ jobs:
           git remote -v
 
       - name: Extract information from pull-request
-        uses: os-climate/osc-github-devops/.github/actions/github-pr-metadata-action@main
+        uses: os-climate/osc-github-devops/.github/actions/github-pull-request-action@main
 
       - name: Prepare commits to submit one at a time
         shell: bash
