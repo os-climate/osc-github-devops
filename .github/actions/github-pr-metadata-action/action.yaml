@@ -18,9 +18,7 @@ outputs:
   # Mandatory
   PULL_REQUEST:
     description: "The current pull request, when not specified as "
-    required: false
-    # Will enumerate from the current pull request, environment permitting
-    default: "${{ github.event.pull_request.number || github.event.issue.number }}"
+    value: ${{ steps.pr.outputs.pull_request }}
   PR_COMMITS:
     description: "Number of commits in the pull request"
     value: ${{ steps.commits.outputs.pr_commits }}
@@ -38,10 +36,11 @@ runs:
           echo "Error: GitHub CLI was NOT found in PATH ❌"; exit 1
         fi
 
-    - name: "Check required inputs"
+    - name: "Capture pull request number"
+      id: pr
       shell: bash
       run: |
-        # Check required inputs
+        # Capture pull request number
         if [ -z "${{ inputs.PULL_REQUEST }}" ]; then
           echo "Error: the pull request could not be enumerated ❌"
           exit 1
