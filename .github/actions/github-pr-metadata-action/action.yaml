@@ -2,22 +2,26 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2025 The Linux Foundation
 
-# github-pr-metadata-action
-name: "#️⃣ GitHub Pull Request MetaData"
-description: "Provides useful metrics/metadata from a GitHub pull request"
+# github-pull-request-action
+name: "#️⃣ GitHub Pull Request"
+description: "Identifies the pull request number and gathers metrics"
 
 inputs:
   # Optional
   PULL_REQUEST:
-    description: "Pull request to query"
+    description: "Optional pull request number to query"
     required: false
     # Will enumerate from the current pull request, environment permitting
-    default: "${{ github.event.pull_request.number || github.event.issue.number }}"
+    default: "${{ github.event.pull_request.number }}"
+  EXIT_ON_FAIL:
+    description: "Exit with error if cannot identify pull request"
+    required: false
+    default: "true"
 
 outputs:
   # Mandatory
   PULL_REQUEST:
-    description: "The current pull request, when not specified as "
+    description: "The enumerated pull request value, when not provided"
     value: ${{ steps.parse.outputs.pull_request }}
   PR_COMMITS:
     description: "Number of commits in the pull request"
@@ -43,6 +47,7 @@ runs:
       # yamllint disable rule:line-length
       run: |
         # Extract pull-request data
+        set -o pipefail
         echo "Pull request number: ${{ inputs.PULL_REQUEST }} ✅"
         echo "pull_request=${{ inputs.PULL_REQUEST }}" >> "$GITHUB_ENV"
         echo "pull_request=${{ inputs.PULL_REQUEST }}" >> "$GITHUB_OUTPUT"
@@ -59,4 +64,7 @@ runs:
       run: |
         # Not triggered by pull request
         echo "Error: action not related to a valid pull request ❌"
-        exit 1
+        if [ "f$EXIT_ON_FAIL" = "ftrue" ]; then
+          # Dependent on the action's inputs
+          exit 1
+        fi
