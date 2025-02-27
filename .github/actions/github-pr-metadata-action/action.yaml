@@ -42,11 +42,11 @@ runs:
       shell: bash
       # yamllint disable rule:line-length
       run: |
-        # Enumerate commits in the pull-request
+        # Extract pull-request data
         echo "Pull request number: ${{ inputs.PULL_REQUEST }} ✅"
         echo "pull_request=${{ inputs.PULL_REQUEST }}" >> "$GITHUB_ENV"
         echo "pull_request=${{ inputs.PULL_REQUEST }}" >> "$GITHUB_OUTPUT"
-        num_commits="$(gh pr view ${{ env.PULL_REQUEST }} --json commits | jq '.[] | length')"
+        num_commits="$(gh pr view ${{ inputs.PULL_REQUEST }} --json commits | jq '.[] | length')"
         echo "Number of commits: $num_commits ✅"
         echo "PR_COMMITS=$num_commits" >> "$GITHUB_ENV"
         echo "PR_COMMITS=$num_commits" >> "$GITHUB_OUTPUT"
