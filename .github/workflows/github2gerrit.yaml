@@ -228,6 +228,9 @@ jobs:
           # print remote settings
           git remote -v
 
+      - name: Enumerate pull-request number [ACTION]
+        uses: os-climate/osc-github-devops/.github/actions/github-pr-metadata-action@main
+
       - name: Extract pull-request number
         shell: bash
         # yamllint disable rule:line-length
