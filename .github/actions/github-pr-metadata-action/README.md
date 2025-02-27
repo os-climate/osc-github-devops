@@ -3,13 +3,13 @@
 # SPDX-FileCopyrightText: 2025 The Linux Foundation
 -->
 
-# #️⃣ GitHub Pull Request MetaData
+# #️⃣ GitHub Pull Request
 
 For a specified pull request, provides a count of the commits it contains.
 If no pull request specified, will attempt to identify the current pull
-request and will subsequently provide that as one of the outputs.
+request number and will provide it as one of the action's outputs.
 
-## github-pr-metadata-action
+## github-pull-request-action
 
 ## Usage Example
 
@@ -18,7 +18,7 @@ request and will subsequently provide that as one of the outputs.
 ```yaml
 steps:
   - name: "Get number of commits in PR"
-    uses: lfit/releng-reusable-workflows/.github/actions/git-commits-in-pr-action@main
+    uses: lfit/releng-reusable-workflows/.github/actions/github-pull-request-action@main
     with:
       pull_request: 13
 ```
@@ -48,7 +48,7 @@ Passing the output through JQ to provide a numerical value:
 In the absence of a specific pull request to query, will attempt to source the
 current pull request from the GitHub workflow/action environment using:
 
-`${{ github.event.pull_request.number || github.event.issue.number }}`
+`${{ github.event.pull_request.number }}`
 
 If this doesn't provide a numerical value, the action will fail with an error.
 
