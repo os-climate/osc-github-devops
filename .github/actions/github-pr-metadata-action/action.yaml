@@ -18,10 +18,10 @@ outputs:
   # Mandatory
   PULL_REQUEST:
     description: "The current pull request, when not specified as "
-    value: ${{ steps.pr.outputs.pull_request }}
+    value: ${{ steps.parse.outputs.pull_request }}
   PR_COMMITS:
     description: "Number of commits in the pull request"
-    value: ${{ steps.commits.outputs.pr_commits }}
+    value: ${{ steps.parse.outputs.pr_commits }}
 
 runs:
   using: "composite"
@@ -36,27 +36,20 @@ runs:
           echo "Error: GitHub CLI was NOT found in PATH ❌"; exit 1
         fi
 
-    - name: "Capture pull request number"
-      id: pr
-      shell: bash
-      run: |
-        # Capture pull request number
-        if [ -z "${{ inputs.PULL_REQUEST }}" ]; then
-          echo "Error: the pull request could not be enumerated ❌"
-          exit 1
-        else
-          echo "pull_request=${{ inputs.PULL_REQUEST }}" >> "$GITHUB_ENV"
-          echo "Parsing pull request number: ${{ inputs.PULL_REQUEST }} ✅"
-        fi
-
-    - name: "Get the number of commits in the pull-request"
-      id: commits
+    - name: "Extract pull-request data"
+      id: parse
       if: inputs.PULL_REQUEST !='' && github.event_name == 'pull_request_target'
       shell: bash
       # yamllint disable rule:line-length
       run: |
+        # Enumerate commits in the pull-request
+        echo "Pull request number: ${{ inputs.PULL_REQUEST }} ✅"
+        echo "pull_request=${{ inputs.PULL_REQUEST }}" >> "$GITHUB_ENV"
+        echo "pull_request=${{ inputs.PULL_REQUEST }}" >> "$GITHUB_OUTPUT"
         num_commits="$(gh pr view ${{ env.PULL_REQUEST }} --json commits | jq '.[] | length')"
+        echo "Number of commits: $num_commits ✅"
         echo "PR_COMMITS=$num_commits" >> "$GITHUB_ENV"
+        echo "PR_COMMITS=$num_commits" >> "$GITHUB_OUTPUT"
       env:
         GH_TOKEN: ${{ github.token }}
 
@@ -65,5 +58,5 @@ runs:
       shell: bash
       run: |
         # Not triggered by pull request
-        echo "Error: not triggered/called from a pull request ❌"
+        echo "Error: action not related to a valid pull request ❌"
         exit 1
