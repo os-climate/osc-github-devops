@@ -95,6 +95,14 @@ jobs:
           git review --version
           jq --version
 
+      - name: "Initial checkout where Issue-ID is mandatory"
+        uses: actions/checkout@v4
+        if: vars.ISSUE_ID_MANDATORY == 'true'
+
+      - name: "Extract pull request commit message body"
+        uses: lfit/releng-reusable-workflows/.github/actions/git-commit-message-action@main
+        if: vars.ISSUE_ID_MANDATORY == 'true'
+
       - name: Clone Github repo where the PR is submitted
         uses: actions/checkout@v4
         with:
@@ -292,7 +300,7 @@ jobs:
 
       - name: Squash commits into a single commit
         shell: bash
-        if: ${{ (env.PR_COMMITS > 1) && (inputs.SUBMIT_SINGLE_COMMITS == false) }}
+        if: ${{ (env.PR_COMMITS > 0) && (inputs.SUBMIT_SINGLE_COMMITS == false) }}
         # yamllint disable rule:line-length
         run: |
           set -x
