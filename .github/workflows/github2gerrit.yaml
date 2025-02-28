@@ -96,13 +96,18 @@ jobs:
           jq --version
 
       - name: "Initial checkout where Issue-ID is mandatory"
-        uses: actions/checkout@v4
         if: vars.ISSUE_ID_MANDATORY == 'true'
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.base.sha }}
-          fetch-depth: 1
+          fetch-depth: 3
+
+      - name: "Get pull request metadata"
+        if: vars.ISSUE_ID_MANDATORY == 'true'
+        uses: os-climate/osc-github-devops/.github/actions/github-pull-request-metadata-action@main
 
       - name: "Dump the various commit refs"
+        if: vars.ISSUE_ID_MANDATORY == 'true'
         shell: bash
         run: |
           # Dump the various commit refs
@@ -115,10 +120,14 @@ jobs:
           echo "github.event.pull_request.head.ref: ${{ github.event.pull_request.head.ref }}"
           echo "github.event.pull_request.head.sha: ${{ github.event.pull_request.head.sha }}"
           echo "github.merge_commit_sha: ${{ github.merge_commit_sha }}"
+          echo "gh pr ${{ view env.pull_request }} --json commits"
+          gh pr ${{ view env.pull_request }} --json commits
+          echo "git log -n 5"
+          git log -n 5
 
       - name: "Extract pull request commit message body"
-        uses: lfit/releng-reusable-workflows/.github/actions/git-commit-message-action@main
         if: vars.ISSUE_ID_MANDATORY == 'true'
+        uses: lfit/releng-reusable-workflows/.github/actions/git-commit-message-action@main
 
       - name: Clone Github repo where the PR is submitted
         uses: actions/checkout@v4

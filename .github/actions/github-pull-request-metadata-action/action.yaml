@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2025 The Linux Foundation
 
-# github-pull-request-action
-name: "#️⃣ GitHub Pull Request"
+# github-pull-request-metadata-action
+name: "#️⃣ GitHub Pull Request Metadata"
 description: "Identifies the pull request number and gathers metrics"
 
 inputs:
