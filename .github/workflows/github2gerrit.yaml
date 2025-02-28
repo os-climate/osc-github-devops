@@ -98,6 +98,9 @@ jobs:
       - name: "Initial checkout where Issue-ID is mandatory"
         uses: actions/checkout@v4
         if: vars.ISSUE_ID_MANDATORY == 'true'
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
 
       - name: "Extract pull request commit message body"
         uses: lfit/releng-reusable-workflows/.github/actions/git-commit-message-action@main
