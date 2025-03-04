@@ -40,7 +40,7 @@ runs:
     - name: "Get GIT commit message body"
       id: commit-message
       # yamllint disable rule:line-length
-      uses: ./.github/actions/git-commit-message-action # Test locally
+      uses: os-climate/osc-github-devops/.github/actions/git-commit-message-action@main # Test locally
 
     - name: "Check commit message for issue tracker reference"
       shell: bash
