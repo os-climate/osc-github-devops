@@ -97,9 +97,10 @@ jobs:
 
       - name: Clone Github repo where the PR is submitted
         uses: actions/checkout@v4
-        with:
-          fetch-depth: ${{ inputs.fetch_depth }}
-          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: "Extract pull request commit message body"
+        if: vars.ISSUE_ID_MANDATORY == 'true'
+        uses: os-climate/osc-github-devops/.github/actions/git-commit-message-action@main
 
       - name: "Get pull request metadata"
         if: vars.ISSUE_ID_MANDATORY == 'true'
@@ -107,7 +108,20 @@ jobs:
 
       - name: "Extract pull request commit message body"
         if: vars.ISSUE_ID_MANDATORY == 'true'
+        shell: bash
+        run: |
+          # Checkout pull request
+          gh pr checkout ${{ env.pull_request }}
+
+      - name: "Extract pull request commit message body"
+        if: vars.ISSUE_ID_MANDATORY == 'true'
         uses: os-climate/osc-github-devops/.github/actions/git-commit-message-action@main
+
+      - name: Clone Github repo where the PR is submitted
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: ${{ inputs.fetch_depth }}
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: "Read inputs to set PROJECT_REPO_{GERRIT,GITHUB} if .gitreview is undefined"
         if: ${{ hashFiles('.gitreview') == '' }}
