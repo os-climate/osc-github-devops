@@ -115,6 +115,21 @@ jobs:
         if: vars.ISSUE_ID_MANDATORY == 'true'
         uses: os-climate/osc-github-devops/.github/actions/git-commit-message-action@main
 
+      - name: "Set key to use for JSON lookup"
+        shell: bash
+        run: |
+          # Set key to use for JSON lookup
+          ACTOR="${{ github.actor }}"
+          ACTOR_ID="${{ github.actor_id }}"
+          echo "Using GitHub actor as lookup key: $ACTOR [$ACTOR_ID] 🔑"
+          echo "key=$ACTOR" >> "$GITHUB_ENV"
+
+      - name: "Get ticket from JSON lookup table"
+        uses: lfit/releng-reusable-workflows/.github/actions/json-key-value-lookup-action@main
+        with:
+          json: ${{ vars.ISSUE_ID_LOOKUP_JSON }}
+          key: ${{ env.key }}
+
       - name: Clone Github repo where the PR is submitted
         uses: actions/checkout@v4
         with:
