@@ -95,12 +95,11 @@ jobs:
           git review --version
           jq --version
 
-      - name: "Initial checkout where Issue-ID is mandatory"
-        if: vars.ISSUE_ID_MANDATORY == 'true'
+      - name: Clone Github repo where the PR is submitted
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.base.sha }}
-          fetch-depth: 3
+          fetch-depth: ${{ inputs.fetch_depth }}
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: "Get pull request metadata"
         if: vars.ISSUE_ID_MANDATORY == 'true'
@@ -127,13 +126,7 @@ jobs:
 
       - name: "Extract pull request commit message body"
         if: vars.ISSUE_ID_MANDATORY == 'true'
-        uses: lfit/releng-reusable-workflows/.github/actions/git-commit-message-action@main
-
-      - name: Clone Github repo where the PR is submitted
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: ${{ inputs.fetch_depth }}
-          ref: ${{ github.event.pull_request.head.sha }}
+        uses: ./.github/actions/git-commit-message-action@main
 
       - name: "Read inputs to set PROJECT_REPO_{GERRIT,GITHUB} if .gitreview is undefined"
         if: ${{ hashFiles('.gitreview') == '' }}
