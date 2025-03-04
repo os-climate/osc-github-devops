@@ -116,6 +116,7 @@ jobs:
         uses: os-climate/osc-github-devops/.github/actions/git-commit-message-action@main
 
       - name: "Set key to use for JSON lookup"
+        if: vars.ISSUE_ID_MANDATORY == 'true'
         shell: bash
         run: |
           # Set key to use for JSON lookup
@@ -125,6 +126,7 @@ jobs:
           echo "key=$ACTOR" >> "$GITHUB_ENV"
 
       - name: "Get ticket from JSON lookup table"
+        if: vars.ISSUE_ID_MANDATORY == 'true'
         uses: lfit/releng-reusable-workflows/.github/actions/json-key-value-lookup-action@main
         with:
           json: ${{ vars.ISSUE_ID_LOOKUP_JSON }}
