@@ -1,0 +1,55 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation
+
+name: "💬 GIT Commit Message"
+
+inputs:
+  COMMIT_NUMBER:
+    # Starting at one, which is the last/latest commit
+    description: "SHA value of GIT commit message to retrieve"
+    required: false
+    default: 1
+
+outputs:
+  COMMIT_SHA:
+    description: "SHA value of GIT commit message"
+    value: ${{ steps.return.outputs.commit_sha }}
+  COMMIT_MESSAGE:
+    description: "GIT commit message"
+    value: ${{ steps.return.outputs.commit_message }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Retrieve GIT commit"
+      id: return
+      shell: bash
+      run: |
+        # Retrieve GIT commit
+
+        CHECK_REGEX='^[0-9]+$'
+        if ! [[ "$COMMIT_NUMBER" =~ $CHECK_REGEX ]] ; then
+           echo "Error: commit number/input must be numeric ❌"
+           exit 1
+        fi
+
+        COMMIT_NUMBER="${{ inputs.COMMIT_NUMBER }}"
+        COMMIT_SHA=$(git log --pretty=format:"%H" | awk "NR==$COMMIT_NUMBER")
+        COMMIT_MESSAGE=$(git log --format=%B -n 1 "$COMMIT_SHA")
+
+        if [ -z "$COMMIT_MESSAGE" ]; then
+          echo "GIT commit message string returned was empty ⚠️"
+          echo "Ensure checkout performed and request range covered"
+        fi
+
+        # Set outputs
+        echo "commit_sha=$COMMIT_SHA" >> "$GITHUB_ENV"
+        echo "commit_sha=$COMMIT_SHA" >> "$GITHUB_OUTPUT"
+        echo "COMMIT_MESSAGE<<EOF"$'\n'"$COMMIT_MESSAGE"$'\n'EOF >> \
+          "$GITHUB_ENV"
+        echo "COMMIT_MESSAGE<<EOF"$'\n'"$COMMIT_MESSAGE"$'\n'EOF >> \
+          "$GITHUB_OUTPUT"
+
+        echo "GIT Commit Message 💬"
+        echo "$COMMIT_MESSAGE"
