@@ -28,13 +28,13 @@ runs:
       run: |
         # Retrieve GIT commit
 
+        COMMIT_NUMBER="${{ inputs.COMMIT_NUMBER }}"
         CHECK_REGEX='^[0-9]+$'
         if ! [[ "$COMMIT_NUMBER" =~ $CHECK_REGEX ]] ; then
            echo "Error: commit number/input must be numeric ❌"
            exit 1
         fi
 
-        COMMIT_NUMBER="${{ inputs.COMMIT_NUMBER }}"
         COMMIT_SHA=$(git log --pretty=format:"%H" | awk "NR==$COMMIT_NUMBER")
         COMMIT_MESSAGE=$(git log --format=%B -n 1 "$COMMIT_SHA")
 
