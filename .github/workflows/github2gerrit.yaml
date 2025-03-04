@@ -107,7 +107,7 @@ jobs:
 
       - name: "Extract pull request commit message body"
         if: vars.ISSUE_ID_MANDATORY == 'true'
-        uses: ./.github/actions/git-commit-message-action@main
+        uses: os-climate/osc-github-devops/.github/actions/git-commit-message-action@main
 
       - name: "Read inputs to set PROJECT_REPO_{GERRIT,GITHUB} if .gitreview is undefined"
         if: ${{ hashFiles('.gitreview') == '' }}
