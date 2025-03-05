@@ -95,26 +95,6 @@ jobs:
           git review --version
           jq --version
 
-      - name: Clone Github repo where the PR is submitted
-        uses: actions/checkout@v4
-
-      - name: "Get pull request metadata"
-        if: vars.ISSUE_ID_MANDATORY == 'true'
-        uses: os-climate/osc-github-devops/.github/actions/github-pull-request-metadata-action@main
-
-      - name: "Checkout pull request"
-        if: vars.ISSUE_ID_MANDATORY == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          # Checkout pull request
-          gh pr checkout ${{ env.pull_request }}
-
-      - name: "Extract pull request commit message body"
-        if: vars.ISSUE_ID_MANDATORY == 'true'
-        uses: os-climate/osc-github-devops/.github/actions/git-commit-message-action@main
-
       - name: "Set key to use for JSON lookup"
         if: vars.ISSUE_ID_MANDATORY == 'true'
         shell: bash
