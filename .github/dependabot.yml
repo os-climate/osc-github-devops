@@ -6,17 +6,14 @@ name: "🤖 Dependabot Updates"
 
 version: 2
 updates:
-  # prettier-ignore
   - package-ecosystem: "pip"
-    # prettier-ignore
-    directory: "/" # Location of package manifests
+    directory: "/"
     commit-message:
       prefix: "[dependabot] Chore:"
     open-pull-requests-limit: 1
     schedule:
       interval: "daily"
 
-  # prettier-ignore
   - package-ecosystem: "github-actions"
     directory: "/"
     commit-message:
