@@ -48,7 +48,7 @@ runs:
         # Check commit message for issue tracker reference
         echo "# Checking Commit Message for Issue Tracker" >> "$GITHUB_STEP_SUMMARY"
 
-        COMMIT_MESSAGE="${{ env.COMMIT_MESSAGE }}"
+        COMMIT_MESSAGE="${{ env.commit_message }}"
         if [ -z "$COMMIT_MESSAGE" ]; then
           echo "Commit message body was empty/unpopulated ❌"; exit 1
         fi
