@@ -62,7 +62,7 @@ runs:
         else
           echo "Change-Id found in commit message/body ✅"
           CHANGE_ID="true"
-          CHANGE_ID_VALUE=$(echo "$CHANGE_ID_LINE" | aws '{ print $2 }')
+          CHANGE_ID_VALUE=$(echo "$CHANGE_ID_LINE" | awk '{ print $2 }')
         fi
 
         DCO_LINE=$(echo "$COMMIT_MESSAGE" | grep 'Signed-off-by:' || true)
@@ -72,8 +72,8 @@ runs:
         else
           echo "DCO statement found in commit message/body ✅"
           DCO_SIGNED_OFF="true"
-          DCO_NAME=$(echo "$DCO_LINE" | aws '{ print $2 }')
-          DCO_EMAIL=$(echo "$DCO_LINE" | aws '{ print $3 }')
+          DCO_NAME=$(echo "$DCO_LINE" | awk '{ print $2 }')
+          DCO_EMAIL=$(echo "$DCO_LINE" | awk '{ print $3 }')
         fi
 
         if [ -z "$COMMIT_MESSAGE" ]; then
