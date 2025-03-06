@@ -55,7 +55,7 @@ runs:
         COMMIT_SHA=$(git log --pretty=format:"%H" | awk "NR==$COMMIT_NUMBER")
         COMMIT_MESSAGE=$(git log --format=%B -n 1 "$COMMIT_SHA")
 
-        CHANGE_ID_LINE=$(echo "$COMMIT_MESSAGE" | grep 'Change-Id:')
+        CHANGE_ID_LINE=$(echo "$COMMIT_MESSAGE" | grep 'Change-Id:' || true)
         if [ $? -ne 0 ] || [ -z "$DCO_LINE" ]; then
           echo "Change-Id NOT found in commit message/body ⚠️"
           CHANGE_ID="false"
@@ -65,7 +65,7 @@ runs:
           CHANGE_ID_VALUE=$(echo "$CHANGE_ID_LINE" | aws '{ print $2 }')
         fi
 
-        DCO_LINE=$(echo "$COMMIT_MESSAGE" | grep 'Signed-off-by:')
+        DCO_LINE=$(echo "$COMMIT_MESSAGE" | grep 'Signed-off-by:' || true)
         if [ $? -ne 0 ] || [ -z "$DCO_LINE" ]; then
           echo "DCO statement NOT found in commit message/body ⚠️"
           DCO_SIGNED_OFF="false"
