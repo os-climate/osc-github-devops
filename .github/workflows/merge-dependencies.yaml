@@ -3,7 +3,7 @@
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 # Updates Python dependencies and raises a pull request
-name: "🐍 Update Dependencies"
+name: "Update Dependencies [Merge] 🐍"
 
 # yamllint disable-line rule:truthy
 on:

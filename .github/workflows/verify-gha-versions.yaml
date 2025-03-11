@@ -3,7 +3,7 @@
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 # Verifies action/workflow calls are pinned to SHA commit values
-name: 📌 Audit GitHub Actions
+name: "Actions/Workflows [Verify] 🔍"
 
 # yamllint disable-line rule:truthy
 on:
