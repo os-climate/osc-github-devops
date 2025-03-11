@@ -3,9 +3,9 @@ SPDX-License-Identifier: Apache-2.0
 SPDX-FileCopyrightText: 2024 The Linux Foundation
 -->
 
-# Check Python Dynamic Versioning
+# Check for Python Dynamic Versioning
 
-Parses pyproject.toml for the versioning type used by the project.
+Parses pyproject.toml to check if the project uses dynamic versioning.
 
 ## python-dynamic-version-action
 

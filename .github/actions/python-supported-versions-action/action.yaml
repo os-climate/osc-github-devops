@@ -3,17 +3,17 @@
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 # python-supported-versions-action
-name: "🐍 Extract Python supported versions from pyproject.toml"
-description: "Returns base version for builds and JSON for use in matrix jobs"
-# Base version is the lowest supported Python version specified
+name: "🐍 Extract supported Python versions from pyproject.toml"
+description: "Returns version for builds and JSON for matrix jobs"
+# Build version is the highest supported Python version
 
-# ToDo: Support or implement requires-python support, e.g.
-# requires-python = "<3.13,>=3.10"
+# Future enhancement: support alternative extraction from requires-python
+# e.g. requires-python = "<3.13,>=3.10"
 
 outputs:
-  BASE_PYTHON:
+  BUILD_PYTHON:
     description: "Highest supported Python version specified by project"
-    value: ${{ steps.parse-metadata.outputs.base_python }}
+    value: ${{ steps.parse-metadata.outputs.build_python }}
   MATRIX_JSON:
     description: "All Python versions supported by project as JSON string"
     # Example: matrix_json = {"python-version": ["3.10", "3.11"]}
@@ -23,28 +23,21 @@ runs:
   using: "composite"
   steps:
     - name: "Check for: pyproject.toml"
-      id: pyproject-toml
+      id: path-check
       # yamllint disable-line rule:line-length
       uses: lfit/releng-reusable-workflows/.github/actions/path-check-action@11530dee75e77f063c6e01ac7f3a6cb0cdc95db7 # 2025-02-05
       with:
         path: "pyproject.toml"
 
-    - name: "Check for: setup.py"
-      id: setup-py
-      # yamllint disable-line rule:line-length
-      uses: lfit/releng-reusable-workflows/.github/actions/path-check-action@11530dee75e77f063c6e01ac7f3a6cb0cdc95db7 # 2025-02-05
-      with:
-        path: "setup.py"
-
-    - name: "Error: No supported metadata file found"
-      if: steps.pyproject-toml.outputs.type != 'file'
+    - name: "Error: missing pyproject.toml metadata file"
+      if: steps.path-check.outputs.type != 'file'
       shell: bash
       run: |
-        # Error: No supported metadata file found
-        echo "⛔️ No supported project metadata file found"
+        # Error: missing pyproject.toml metadata file
+        echo "Error: missing pyproject.toml metadata file ❌"
         exit 1
 
-    - name: "Parse supported Python versions from pyproject.toml"
+    - name: "Extract supported Python versions"
       id: capture-versions
       # yamllint disable-line rule:line-length
       uses: lfit/releng-reusable-workflows/.github/actions/file-grep-regex-action@0b3caf21542fc99480016a2c3759264807880bff # 2025-01-30
@@ -58,28 +51,28 @@ runs:
 
     - id: parse-metadata
       name: "Process and transform extracted string"
-      if: steps.pyproject-toml.outputs.type == 'file'
       shell: bash
       run: |
-        # Process extracted string
+        # Process and transform extracted string
         set -o pipefail
 
         PYTHON_VERSIONS=$(echo \
           "${{ steps.capture-versions.outputs.extracted_string }}" \
           | sort | uniq | tr -d ' ') 2>/dev/null
 
-        BASE_PYTHON=$(echo "${PYTHON_VERSIONS}" | sort -r | head -1)
+        BUILD_PYTHON=$(echo "${PYTHON_VERSIONS}" | sort -r | head -1)
 
         STRING=$(echo "$PYTHON_VERSIONS" | awk '{print "\""$1"\""}' | paste -s -d, -)
         STRING="[$STRING]"
 
         MATRIX_JSON="{\"python-version\": $STRING}"
         if ! (echo "$MATRIX_JSON" | jq); then
-          echo "❌ Parsing error; output is NOT valid JSON"; exit 1
+          echo "Error: parsed error NOT valid JSON ❌"
+          exit 1
         fi
-        echo "base_python=$BASE_PYTHON" >> "$GITHUB_ENV"
-        echo "base_python=$BASE_PYTHON" >> "$GITHUB_OUTPUT"
-        echo "base_python = $BASE_PYTHON"
+        echo "build_python=$BUILD_PYTHON" >> "$GITHUB_ENV"
+        echo "build_python=$BUILD_PYTHON" >> "$GITHUB_OUTPUT"
+        echo "build_python = $BUILD_PYTHON"
         echo "matrix_json=$MATRIX_JSON" >> "$GITHUB_ENV"
         echo "matrix_json=$MATRIX_JSON" >> "$GITHUB_OUTPUT"
         echo "matrix_json = $MATRIX_JSON"

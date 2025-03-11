@@ -26,7 +26,7 @@ outputs:
     value: ${{ steps.supported-python-versions.outputs.matrix_json }}
   BUILD_PYTHON_VERSION:
     description: "Python version to use for build (creates artefacts)"
-    value: "${{ steps.supported-python-versions.outputs.base_python }}"
+    value: "${{ steps.supported-python-versions.outputs.build_python }}"
 
 runs:
   using: "composite"
@@ -62,7 +62,7 @@ runs:
         if [ "${{ steps.project-toml.outputs.type }}" = "file" ]; then
           echo "| Dynamic versioning | ${{ steps.dynamic-versioning.outputs.dynamic_version }} |" >> "$GITHUB_STEP_SUMMARY"
         fi
-        echo "| Build Python | ${{ steps.supported-python-versions.outputs.base_python }} |" \
+        echo "| Build Python | ${{ steps.supported-python-versions.outputs.build_python }} |" \
           >> "$GITHUB_STEP_SUMMARY"
 
         echo "### Python versions JSON for matrix jobs" >> "$GITHUB_STEP_SUMMARY"
