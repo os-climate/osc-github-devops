@@ -40,7 +40,7 @@ runs:
       if: steps.project-toml.outputs.type == 'file'
       id: dynamic-versioning
       # yamllint disable-line rule:line-length
-      uses: os-climate/osc-github-devops/.github/actions/python-dynamic-version-action@main
+      uses: lfit/releng-reusable-workflows/.github/actions/python-dynamic-version-action@main
 
     - name: "Get supported Python versions (Base/build and JSON)"
       id: supported-python-versions

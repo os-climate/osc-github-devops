@@ -145,7 +145,7 @@ jobs:
       - name: "Action: python-dynamic-version-action"
         id: dynamic-version
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/python-dynamic-version-action@main
+        uses: lfit/releng-reusable-workflows/.github/actions/python-dynamic-version-action@main
 
       - name: "Validate: python-dynamic-version-action"
         shell: bash
