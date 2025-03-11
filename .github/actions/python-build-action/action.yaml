@@ -68,8 +68,6 @@ runs:
       uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
       with:
         python-version-file: "pyproject.toml"
-        # with:
-        #   python-version: ${{ env.base_python }}
         cache: "pip"
 
     - name: "Install PDM tooling"
@@ -77,8 +75,6 @@ runs:
       uses: pdm-project/setup-pdm@b2472ca4258a9ea3aee813980a0100a2261a42fc # v4.2
       with:
         python-version-file: "pyproject.toml"
-      # with:
-      #   python-version: ${{ env.base_python }}
 
     - name: "Build versioning"
       id: versioning
