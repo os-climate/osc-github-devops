@@ -142,6 +142,22 @@ jobs:
             echo "Returned project version is correct: $PYTHON_PROJECT_VERSION"
           fi
 
+      - name: "Action: python-dynamic-version-action"
+        id: dynamic-version
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/python-dynamic-version-action@main
+
+      - name: "Validate: python-dynamic-version-action"
+        shell: bash
+        run: |
+          # Check output from: python-dynamic-version-action
+          DYNAMIC="${{ steps.dynamic-version.outputs.dynamic_version }}"
+          if [ "$DYNAMIC" = "false" ]; then
+            echo "Dynamic versioning is NOT enabled for this repository ✅"
+          else
+            echo "Dynamic versioning returned: $DYNAMIC ❌"; exit 1
+          fi
+
       - name: "Extract TOX stanza"
         id: tox-parse-stanza-action
         # yamllint disable-line rule:line-length

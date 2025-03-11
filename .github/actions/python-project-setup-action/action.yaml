@@ -38,9 +38,9 @@ runs:
 
     - name: "Determine versioning type [static|dynamic]"
       if: steps.project-toml.outputs.type == 'file'
-      id: versioning-type
+      id: dynamic-versioning
       # yamllint disable-line rule:line-length
-      uses: os-climate/osc-github-devops/.github/actions/python-versioning-type-action@main
+      uses: os-climate/osc-github-devops/.github/actions/python-dynamic-version-action@main
 
     - name: "Get supported Python versions (Base/build and JSON)"
       id: supported-python-versions
@@ -60,7 +60,7 @@ runs:
         echo "| Project file | ${{ steps.project-naming.outputs.python_project_file }} |" >> "$GITHUB_STEP_SUMMARY"
         echo "| Package name | ${{ steps.project-naming.outputs.python_package_name }} |" >> "$GITHUB_STEP_SUMMARY"
         if [ "${{ steps.project-toml.outputs.type }}" = "file" ]; then
-          echo "| Versioning type | ${{ steps.versioning-type.outputs.versioning_type }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Dynamic versioning | ${{ steps.dynamic-versioning.outputs.dynamic_version }} |" >> "$GITHUB_STEP_SUMMARY"
         fi
         echo "| Build Python | ${{ steps.supported-python-versions.outputs.base_python }} |" \
           >> "$GITHUB_STEP_SUMMARY"
