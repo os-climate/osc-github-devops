@@ -135,7 +135,7 @@ jobs:
         run: |
           # Check output from: python-project-version-action
           PYTHON_PROJECT_VERSION="${{ steps.python-project.outputs.python_project_version }}"
-          if [ "$PYTHON_PROJECT_VERSION" != "0.1.26" ]; then
+          if [ "$PYTHON_PROJECT_VERSION" != "0.1.27" ]; then
             echo "ERROR: Python project version was not as expected"
             echo "python_project_version: $PYTHON_PROJECT_VERSION"; exit 1
           else
