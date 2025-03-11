@@ -3,21 +3,24 @@
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 # python-supported-versions-action
-name: "🐍 Extract supported Python versions from pyproject.toml"
+name: "🐍 Extract Python Versions Supported by Project"
 description: "Returns version for builds and JSON for matrix jobs"
-# Build version is the highest supported Python version
+# Note: build version is the most recent/latest Python
 
-# Future enhancement: support alternative extraction from requires-python
-# e.g. requires-python = "<3.13,>=3.10"
+# Future enhancement: switch extraction to use 'requires-python'
+# This would potentially bring alignment with actions/setup-python
+# e.g.
+# Run actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b
+# Extracted <3.13,>=3.10 from pyproject.toml
 
 outputs:
   BUILD_PYTHON:
-    description: "Highest supported Python version specified by project"
-    value: ${{ steps.parse-metadata.outputs.build_python }}
+    description: "Most recent Python version supported by project"
+    value: ${{ steps.parse.outputs.build_python }}
   MATRIX_JSON:
     description: "All Python versions supported by project as JSON string"
     # Example: matrix_json = {"python-version": ["3.10", "3.11"]}
-    value: ${{ steps.parse-metadata.outputs.matrix_json }}
+    value: ${{ steps.parse.outputs.matrix_json }}
 
 runs:
   using: "composite"
@@ -29,12 +32,12 @@ runs:
       with:
         path: "pyproject.toml"
 
-    - name: "Error: missing pyproject.toml metadata file"
+    - name: "Error: missing pyproject.toml file"
       if: steps.path-check.outputs.type != 'file'
       shell: bash
       run: |
-        # Error: missing pyproject.toml metadata file
-        echo "Error: missing pyproject.toml metadata file ❌"
+        # Error: missing pyproject.toml file
+        echo "Error: missing pyproject.toml file ❌"
         exit 1
 
     - name: "Extract supported Python versions"
@@ -49,7 +52,7 @@ runs:
         regex: '(?<="Programming Language :: Python :: ).*\..*(?=")'
         filename: "pyproject.toml"
 
-    - id: parse-metadata
+    - id: parse
       name: "Process and transform extracted string"
       shell: bash
       run: |
@@ -59,20 +62,19 @@ runs:
         PYTHON_VERSIONS=$(echo \
           "${{ steps.capture-versions.outputs.extracted_string }}" \
           | sort | uniq | tr -d ' ') 2>/dev/null
-
         BUILD_PYTHON=$(echo "${PYTHON_VERSIONS}" | sort -r | head -1)
-
         STRING=$(echo "$PYTHON_VERSIONS" | awk '{print "\""$1"\""}' | paste -s -d, -)
         STRING="[$STRING]"
-
         MATRIX_JSON="{\"python-version\": $STRING}"
         if ! (echo "$MATRIX_JSON" | jq); then
-          echo "Error: parsed error NOT valid JSON ❌"
+          echo "Error: parsed string not valid JSON ❌"
           exit 1
         fi
+
+        # Set action outputs
         echo "build_python=$BUILD_PYTHON" >> "$GITHUB_ENV"
         echo "build_python=$BUILD_PYTHON" >> "$GITHUB_OUTPUT"
-        echo "build_python = $BUILD_PYTHON"
+        echo "Build Python: $BUILD_PYTHON 💬"
         echo "matrix_json=$MATRIX_JSON" >> "$GITHUB_ENV"
         echo "matrix_json=$MATRIX_JSON" >> "$GITHUB_OUTPUT"
-        echo "matrix_json = $MATRIX_JSON"
+        echo "Matrix JSON: $MATRIX_JSON"

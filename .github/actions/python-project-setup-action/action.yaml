@@ -42,7 +42,7 @@ runs:
       # yamllint disable-line rule:line-length
       uses: lfit/releng-reusable-workflows/.github/actions/python-dynamic-version-action@main
 
-    - name: "Get supported Python versions (Base/build and JSON)"
+    - name: "Get project supported Python versions"
       id: supported-python-versions
       # yamllint disable-line rule:line-length
       uses: os-climate/osc-github-devops/.github/actions/python-supported-versions-action@main
