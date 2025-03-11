@@ -58,6 +58,7 @@ runs:
       shell: bash
       run: |
         # Check Python package index
+        set -vx
         INDEX_URL="${{ inputs.INDEX_URL }}"
         PACKAGE_NAME="${{ inputs.PACKAGE_NAME }}"
         PACKAGE_VERSION="${{ inputs.PACKAGE_VERSION }}"
