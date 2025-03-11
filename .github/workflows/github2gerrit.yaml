@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright 2024 The Linux Foundation <abelur@linux.com>
 
-name: github2gerrit-reusable-workflow
+name: "GitHub2Gerrit [Pull Request] 🤖"
 
 on:
   workflow_call:

@@ -3,7 +3,7 @@
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 # Test/validation suite for individual actions and workflows
-name: "🧪 Test GitHub Actions"
+name: "Test GitHub Actions 🧪"
 
 # yamllint disable-line rule:truthy
 on:
