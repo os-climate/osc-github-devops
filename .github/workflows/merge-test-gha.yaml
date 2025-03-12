@@ -464,5 +464,5 @@ jobs:
             fi
           fi
 
-      - name: "Action: python-project-setup-action"
-        uses: os-climate/osc-github-devops/.github/actions/python-project-setup-action@main
+      - name: "Action: python-project-metadata-action"
+        uses: os-climate/osc-github-devops/.github/actions/python-project-metadata-action@main
