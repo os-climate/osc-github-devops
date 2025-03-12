@@ -45,7 +45,21 @@ runs:
           echo "Error: mandatory PATH input was not set/configured ❌"
           exit 1
         fi
-        echo -n "Installing: twine"
+
+        if (ls "$ARTEFACT_PATH"); then
+          ARTEFACTS=$(ls dist | wc -l)
+          if [ "$ARTEFACTS" -eq 0 ]; then
+            echo "Error: specified directory/path was empty ❌"
+            exit 1
+          else
+            echo "Files in specified directory/path: $ARTEFACTS"
+          fi
+        else
+          echo "Error: specified directory/path does not exist ❌"
+          exit 1
+        fi
+
+        echo "Installing: twine"
         pip install --disable-pip-version-check -q --upgrade twine
         echo "Running: twine check $ARTEFACT_PATH/*"
         if (twine check $ARTEFACT_PATH/*); then
