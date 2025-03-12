@@ -41,12 +41,17 @@ runs:
           exit 1
         fi
 
+        if [ -z ${{ inputs.path }} ]; then
+          echo "Error: mandatory PATH input was not set/configured ❌"
+          exit 1
+        fi
         echo -n "Installing: twine"
         pip install --disable-pip-version-check -q --upgrade twine
         echo "Running: twine check $ARTEFACT_PATH/*"
         if (twine check $ARTEFACT_PATH/*); then
           echo "Verified Python build artefacts with Twine ✅"
-          echo "Verified Python build artefacts with Twine ✅" >> "$GITHUB_STEP_SUMMARY"
+          echo "Verified Python build artefacts with Twine ✅" \
+            >> "$GITHUB_STEP_SUMMARY"
         else
           echo "Python build artefacts failed Twine verification ❌"
           exit 1
