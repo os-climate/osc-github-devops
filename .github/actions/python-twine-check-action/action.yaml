@@ -21,13 +21,13 @@ runs:
       shell: bash
       run: |
         # Run twine check against build artefacts
-        echo -n "Installing Python tool: twine"
+        echo -n "Installing: twine"
         pip install --disable-pip-version-check -q --upgrade twine
-        echo "Path to check: ${{ inputs.path }}"
         echo "Running: twine check ${{ inputs.path }}/*"
         if (twine check ${{ inputs.path }}/*); then
-          echo "Checked Artefacts with Twine ✅"
+          echo "Checked build artefacts with Twine ✅"
+          echo "Checked build artefacts with Twine ✅" >> "$GITHUB_STEP_SUMMARY"
         else
-          echo "Artefacts failed Twinecheck ❌"
+          echo "Artefacts failed Twine check ❌"
           exit 1
         fi
