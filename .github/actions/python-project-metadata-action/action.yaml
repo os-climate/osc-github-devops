@@ -43,7 +43,7 @@ runs:
       # yamllint disable-line rule:line-length
       uses: lfit/releng-reusable-workflows/.github/actions/python-project-name-action@431c4e424c15544f98ec1321f6668f655c238d3a # 2025-02-10
 
-    - name: "Compare project and package names"
+    - name: "Compare project and package/repository names"
       id: compare
       shell: bash
       run: |
@@ -59,6 +59,7 @@ runs:
         echo "project_match_package=$NAMES_MATCH" >> "$GITHUB_ENV"
         echo "project_match_package=$NAMES_MATCH" >> "$GITHUB_OUTPUT"
 
+        # Compare project and repository names
         REPO_NAME=${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}
         if [ "${{ steps.project-naming.outputs.python_project_name }}" = \
           "$REPO_NAME" ]; then
@@ -94,8 +95,8 @@ runs:
         echo "| Metadata source | ${{ steps.project-naming.outputs.python_project_file }} |" >> "$GITHUB_STEP_SUMMARY"
         echo "| Project name | ${{ steps.project-naming.outputs.python_project_name }} |" >> "$GITHUB_STEP_SUMMARY"
         echo "| Package name | ${{ steps.project-naming.outputs.python_package_name }} |" >> "$GITHUB_STEP_SUMMARY"
-        echo "| Project/Package Match | ${{ steps.project-naming.outputs.python_package_name }} |" >> "$GITHUB_STEP_SUMMARY"
-
+        echo "| Naming | Project and package name match: "${{ env.project_match_package }}"
+          Project and repository name match: "${{ env.project_match_repo }}" | >> "$GITHUB_STEP_SUMMARY"
         if [ "${{ steps.project-toml.outputs.type }}" = "file" ]; then
           echo "| Dynamic versioning | ${{ steps.dynamic-versioning.outputs.dynamic_version }} |" >> "$GITHUB_STEP_SUMMARY"
         fi
