@@ -158,7 +158,7 @@ runs:
         echo "Artefact path: ${{ inputs.ARTEFACT_PATH }}"
         VERSION=$(python --version)
         echo "Build with $VERSION successful ✅"
-        echo "### Build with $VERSION successful ✅" >> "$GITHUB_STEP_SUMMARY"
+        echo "Build with $VERSION successful ✅" >> "$GITHUB_STEP_SUMMARY"
 
     # Caution with sequencing; moving twine validation after attestations/signing causes failures
     # These steps produce additional output files unsupported during package uploads
