@@ -5,9 +5,9 @@
 
 # 📦 Verify Build Artefacts with Twine
 
-Call before package publishing to ensure validity of Python build artefacts.
+Checks validity of Python build artefacts; call before package publishing.
 
-## python-project-metadata-action
+## python-twine-check-action
 
 ## Usage Example
 
@@ -32,20 +32,20 @@ Call before package publishing to ensure validity of Python build artefacts.
 
 ## Outputs
 
-This action has no outputs, but will exit with an error when artefact
+This action has no outputs, but will exit with an error if artefact
 validation fails.
 
 ## Notes
 
-When calling this action from a separate job, perform a download artefacts step
-before calling the action to ensure build products are available.
+When calling this action separate from a build job, ensure build products are
+available by using upload/download artefacts.
 
 ## Action Output Example
 
 ```console
-Run # Verify artefacts with Twine
+Run # Verify Python build artefacts with Twine
 Installing: twineRunning: twine check dist/*
 Checking dist/osc_github_devops-0.1.28.dev1-py3-none-any.whl: PASSED
 Checking dist/osc_github_devops-0.1.28.dev1.tar.gz: PASSED
-Verified build artefacts with Twine ✅
+Verified Python build artefacts with Twine ✅
 ```
