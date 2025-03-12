@@ -56,8 +56,8 @@ runs:
           NAMES_MATCH="false"
           echo "Project and package names are NOT identical ⚠️"
         fi
-        echo "project_match_package=$NAMES_MATCH" >> "$GITHUB_ENV
-        echo "project_match_package=$NAMES_MATCH" >> "$GITHUB_OUTPUT
+        echo "project_match_package=$NAMES_MATCH" >> "$GITHUB_ENV"
+        echo "project_match_package=$NAMES_MATCH" >> "$GITHUB_OUTPUT"
 
         REPO_NAME=${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}
         if [ "${{ steps.project-naming.outputs.python_project_name }}" = \
@@ -68,8 +68,8 @@ runs:
           NAMES_MATCH="true"
           echo "Project and repository names are NOT identical ⚠️"
         fi
-        echo "project_match_repo=$NAMES_MATCH" >> "$GITHUB_ENV
-        echo "project_match_repo=$NAMES_MATCH" >> "$GITHUB_OUTPUT
+        echo "project_match_repo=$NAMES_MATCH" >> "$GITHUB_ENV"
+        echo "project_match_repo=$NAMES_MATCH" >> "$GITHUB_OUTPUT"
 
     - name: "Determine versioning type [static|dynamic]"
       if: steps.project-toml.outputs.type == 'file'

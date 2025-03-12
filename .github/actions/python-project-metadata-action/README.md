@@ -14,8 +14,8 @@ Extracts Python project metadata from a repository.
 <!-- markdownlint-disable MD013 -->
 
 ```yaml
-  - name: "Get project supported Python versions"
-    uses: lfit/releng-reusable-workflows/.github/actions/python-supported-versions-action@main
+  - name: "Get Python project metadata"
+    uses: lfit/releng-reusable-workflows/.github/actions/python-project-metadata-action@main
 ```
 
 <!-- markdownlint-enable MD013 -->
@@ -37,7 +37,7 @@ Extracts Python project metadata from a repository.
 
 Python package names can be different from project names.
 
-Note: dashes in the project name get replaced with underscores
+Note: dashes in the project name typically get replaced with underscores
 
 <!-- markdownlint-enable MD013 -->
 
