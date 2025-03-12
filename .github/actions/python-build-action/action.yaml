@@ -3,7 +3,7 @@
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 # python-build-action
-name: "🧱 Python Build"
+name: "🐍 Python Build"
 description: "Builds a Python Project"
 
 inputs:
@@ -50,7 +50,7 @@ runs:
       shell: bash
       run: |
         # Build summary heading
-        echo "# Python Project Build" >> "$GITHUB_STEP_SUMMARY"
+        echo "# 🐍 Python Build" >> "$GITHUB_STEP_SUMMARY"
 
     - name: "Gather Python project metadata"
       id: python-metadata
@@ -158,7 +158,7 @@ runs:
         echo "Artefact path: ${{ inputs.ARTEFACT_PATH }}"
         VERSION=$(python --version)
         echo "Build with $VERSION successful ✅"
-        echo "Build with $VERSION successful ✅" >> "$GITHUB_STEP_SUMMARY"
+        echo "### Build with $VERSION successful ✅" >> "$GITHUB_STEP_SUMMARY"
 
     # Caution with sequencing; moving twine validation after attestations/signing causes failures
     # These steps produce additional output files unsupported during package uploads
