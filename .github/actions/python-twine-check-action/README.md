@@ -43,8 +43,13 @@ available by using upload/download artefacts.
 ## Action Output Example
 
 ```console
+Run lfit/releng-reusable-workflows/.github/actions/python-twine-check-action@main
 Run # Verify Python build artefacts with Twine
-Installing: twineRunning: twine check dist/*
+osc_github_devops-0.1.28.dev1-py3-none-any.whl
+osc_github_devops-0.1.28.dev1.tar.gz
+Files in specified directory/path: 2
+Installing: twine
+Running: twine check dist/*
 Checking dist/osc_github_devops-0.1.28.dev1-py3-none-any.whl: PASSED
 Checking dist/osc_github_devops-0.1.28.dev1.tar.gz: PASSED
 Verified Python build artefacts with Twine ✅
