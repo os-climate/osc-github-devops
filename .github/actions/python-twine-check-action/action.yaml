@@ -22,12 +22,17 @@ runs:
       shell: bash
       run: |
         # Verify Python build artefacts with Twine
+        if [ -z ${{ inputs.path }} ]; then
+          echo "Error: mandatory PATH input was not set/configured ❌"
+          exit 1
+        fi
         echo -n "Installing: twine"
         pip install --disable-pip-version-check -q --upgrade twine
         echo "Running: twine check ${{ inputs.path }}/*"
         if (twine check ${{ inputs.path }}/*); then
           echo "Verified Python build artefacts with Twine ✅"
-          echo "Verified Python build artefacts with Twine ✅" >> "$GITHUB_STEP_SUMMARY"
+          echo "Verified Python build artefacts with Twine ✅" \
+            >> "$GITHUB_STEP_SUMMARY"
         else
           echo "Python build artefacts failed Twine verification ❌"
           exit 1
