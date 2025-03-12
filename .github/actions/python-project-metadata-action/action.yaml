@@ -3,7 +3,7 @@
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 # python-project-metadata-action
-name: "🛠️ Python Project Setup"
+name: "🛠️ Python Project Metadata"
 description: "Extracts Python project metadata from repository"
 
 outputs:
@@ -12,7 +12,7 @@ outputs:
     description: "The project description file: [pyproject.toml|setup.py]"
     value: ${{ steps.project-naming.outputs.python_project_file }}
   PYTHON_PROJECT_NAME:
-    description: "The name of the Python project from pyproject.toml or setup.py"
+    description: "The name of the Python project"
     value: ${{ steps.project-naming.outputs.python_project_name }}
   PYTHON_PACKAGE_NAME:
     # Any dashes in the name will be replaced with underscores
@@ -52,18 +52,17 @@ runs:
       # yamllint disable rule:line-length
       run: |
         # Display summary output
-        echo "# 🐍 Python Project Information" >> "$GITHUB_STEP_SUMMARY"
+        echo "## Project Information" >> "$GITHUB_STEP_SUMMARY"
 
         echo "| Key | Value |" >> "$GITHUB_STEP_SUMMARY"
         echo "| ----------------- | ------- |" >> "$GITHUB_STEP_SUMMARY"
+        echo "| Metadata source | ${{ steps.project-naming.outputs.python_project_file }} |" >> "$GITHUB_STEP_SUMMARY"
         echo "| Project name | ${{ steps.project-naming.outputs.python_project_name }} |" >> "$GITHUB_STEP_SUMMARY"
-        echo "| Project file | ${{ steps.project-naming.outputs.python_project_file }} |" >> "$GITHUB_STEP_SUMMARY"
         echo "| Package name | ${{ steps.project-naming.outputs.python_package_name }} |" >> "$GITHUB_STEP_SUMMARY"
         if [ "${{ steps.project-toml.outputs.type }}" = "file" ]; then
           echo "| Dynamic versioning | ${{ steps.dynamic-versioning.outputs.dynamic_version }} |" >> "$GITHUB_STEP_SUMMARY"
         fi
         echo "| Build Python | ${{ steps.supported-python-versions.outputs.build_python }} |" \
           >> "$GITHUB_STEP_SUMMARY"
-
-        echo "### Python versions JSON for matrix jobs" >> "$GITHUB_STEP_SUMMARY"
-        echo "${{ steps.supported-python-versions.outputs.matrix_json }}" >> "$GITHUB_STEP_SUMMARY"
+        echo "| Matrix JSON | ${{ steps.supported-python-versions.outputs.matrix_json }} |" \
+          >> "$GITHUB_STEP_SUMMARY"
