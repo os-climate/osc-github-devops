@@ -3,8 +3,8 @@
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 # python-twine-check-action
-name: "📦 Twine Check Artefacts"
-description: "Verifies Python build artefacts can be uploaded to PyPI"
+name: "📦 Verify Artefacts with Twine"
+description: "Verifies Python build artefacts prior to publishing"
 # Checks supported filenames and file types prior to publishing
 
 inputs:
@@ -17,17 +17,17 @@ runs:
   using: "composite"
   steps:
     - id: twine-check
-      name: "Check Artefacts with Twine"
+      name: "Verify artefacts with Twine"
       shell: bash
       run: |
-        # Run twine check against build artefacts
+        # Verify artefacts with Twine
         echo -n "Installing: twine"
         pip install --disable-pip-version-check -q --upgrade twine
         echo "Running: twine check ${{ inputs.path }}/*"
         if (twine check ${{ inputs.path }}/*); then
-          echo "Checked build artefacts with Twine ✅"
-          echo "Checked build artefacts with Twine ✅" >> "$GITHUB_STEP_SUMMARY"
+          echo "Verified build artefacts with Twine ✅"
+          echo "Verified build artefacts with Twine ✅" >> "$GITHUB_STEP_SUMMARY"
         else
-          echo "Artefacts failed Twine check ❌"
+          echo "Artefacts failed Twine verification check ❌"
           exit 1
         fi
