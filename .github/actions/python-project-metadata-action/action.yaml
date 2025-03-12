@@ -95,8 +95,6 @@ runs:
         echo "| Metadata source | ${{ steps.project-naming.outputs.python_project_file }} |" >> "$GITHUB_STEP_SUMMARY"
         echo "| Project name | ${{ steps.project-naming.outputs.python_project_name }} |" >> "$GITHUB_STEP_SUMMARY"
         echo "| Package name | ${{ steps.project-naming.outputs.python_package_name }} |" >> "$GITHUB_STEP_SUMMARY"
-        echo "| Naming | Project and package name match: "${{ env.project_match_package }}"
-          Project and repository name match: "${{ env.project_match_repo }}" | >> "$GITHUB_STEP_SUMMARY"
         if [ "${{ steps.project-toml.outputs.type }}" = "file" ]; then
           echo "| Dynamic versioning | ${{ steps.dynamic-versioning.outputs.dynamic_version }} |" >> "$GITHUB_STEP_SUMMARY"
         fi
