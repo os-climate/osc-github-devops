@@ -32,36 +32,35 @@ inputs:
 outputs:
   MATRIX_JSON:
     description: "Project supported Python versions as JSON"
-    value: ${{ steps.project-setup.outputs.matrix_json }}
+    value: ${{ steps.python-metadata.outputs.matrix_json }}
   ARTEFACT_NAME:
     description: "Build artefacts will be output to this folder/directory"
-    value: ${{ steps.project-setup.outputs.python_project_name }}
+    value: ${{ steps.python-metadata.outputs.python_project_name }}
   ARTEFACT_PATH:
     description: "Build artefacts will be output to this folder/directory"
-    value: ${{ steps.project-setup.outputs.matrix_json }}
+    value: ${{ steps.python-metadata.outputs.matrix_json }}
 
 runs:
   using: "composite"
   steps:
+    # yamllint disable-line rule:line-length
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
     - name: "Build summary heading"
       shell: bash
       run: |
         # Build summary heading
         echo "# Python Project Build" >> "$GITHUB_STEP_SUMMARY"
 
-    # yamllint disable-line rule:line-length
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - name: "Gather Python project metadata"
+      id: python-metadata
+      uses: os-climate/osc-github-devops/.github/actions/python-project-metadata-action@main
 
     # Catch this error as soon as possible
     - name: "Check project version matches pushed tags"
       if: startsWith(github.ref, 'refs/tags/')
       # yamllint disable-line rule:line-length
       uses: os-climate/osc-github-devops/.github/actions/python-project-version-vs-tag-action@main
-
-    # First action performs repository checkout
-    - name: "Python project setup"
-      id: project-setup
-      uses: os-climate/osc-github-devops/.github/actions/python-project-setup-action@main
 
     - name: "Set up Python ${{ inputs.build_python_version }}"
       # yamllint disable-line rule:line-length
