@@ -79,7 +79,7 @@ jobs:
 
       - name: "Configure GIT"
         # yamllint disable-line rule:line-length
-        uses: lfit/releng-reusable-workflows/.github/actions/git-configure-action@fd9bc3881956c2645d4da312079580d331f562ed # v0.2.2
+        uses: lfit/releng-reusable-workflows/.github/actions/git-configure-action@1d327501514102db5018642036a974e79415ec5a # v0.2.8
 
       - name: "Push Tag, Trigger Release"
         uses: actions-ecosystem/action-push-tag@6e82caefe706f5a729e354df7443dc82f98a414f # v1.0.0

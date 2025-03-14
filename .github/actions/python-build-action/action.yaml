@@ -54,7 +54,7 @@ runs:
 
     - name: "Gather Python project metadata"
       id: python-metadata
-      uses: os-climate/osc-github-devops/.github/actions/python-project-metadata-action@main
+      uses: lfreleng-actions/python-project-metadata-action@main
 
     # Catch this error as soon as possible
     - name: "Check project version matches pushed tags"
@@ -164,7 +164,7 @@ runs:
     # These steps produce additional output files unsupported during package uploads
     - name: "Validate artefacts with Twine"
       # yamllint disable-line rule:line-length
-      uses: os-climate/osc-github-devops/.github/actions/python-twine-check-action@main
+      uses: lfreleng-actions/python-twine-check-action@main
 
     - name: "Artefact attestation for: ${{ inputs.ARTEFACT_PATH }}"
       uses: actions/attest-build-provenance@7668571508540a607bdfd90a87a560489fe372eb # v2.1.0
