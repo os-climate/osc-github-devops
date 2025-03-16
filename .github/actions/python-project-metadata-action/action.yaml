@@ -81,7 +81,7 @@ runs:
     - name: "Get project supported Python versions"
       id: supported-python-versions
       # yamllint disable-line rule:line-length
-      uses: os-climate/osc-github-devops/.github/actions/python-supported-versions-action@main
+      uses: lfreleng-actions/python-supported-versions-action@2466ad0e7e119e5484bb404b84b97253c862991b # v0.1.0
 
     - name: "Display summary output"
       shell: bash

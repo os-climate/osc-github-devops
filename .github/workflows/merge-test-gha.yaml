@@ -67,12 +67,11 @@ jobs:
       - name: "Action: git-commit-message"
         id: git-commit-message
         # yamllint disable-line rule:line-length
-        uses: lfit/releng-reusable-workflows/.github/actions/git-commit-message-action@46fce72e65b1838c2bfbc6ba0ad29cdd9f229303 # 2025-02-10
-
+        uses: lfit/releng-reusable-workflows/.github/actions/git-commit-message-action@1d327501514102db5018642036a974e79415ec5a # v0.2.8
       - name: "Action: python-project-name-action"
         id: python-project-name-action
         # yamllint disable-line rule:line-length
-        uses: lfit/releng-reusable-workflows/.github/actions/python-project-name-action@431c4e424c15544f98ec1321f6668f655c238d3a # 2025-02-10
+        uses: lfit/releng-reusable-workflows/.github/actions/python-project-name-actionn@1d327501514102db5018642036a974e79415ec5a # v0.2.8
 
       - name: "Validate: python-project-name-action"
         shell: bash
@@ -166,7 +165,7 @@ jobs:
       - name: "Action: python-supported-versions-action"
         id: python-supported-versions-action
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/python-supported-versions-action@main
+        uses: lfreleng-actions/python-supported-versions-action@2466ad0e7e119e5484bb404b84b97253c862991b # v0.1.0
 
       - name: "Action: tag-validate-semantic-action [semantic tag]"
         id: tag-validate-semantic-good

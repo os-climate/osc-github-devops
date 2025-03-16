@@ -164,7 +164,7 @@ runs:
     # These steps produce additional output files unsupported during package uploads
     - name: "Validate artefacts with Twine"
       # yamllint disable-line rule:line-length
-      uses: os-climate/osc-github-devops/.github/actions/python-twine-check-action@main
+      uses: lfreleng-actions/python-twine-check-action@e72540b7947abcb1634408728ee8946738d85b2b # v0.1.0
 
     - name: "Artefact attestation for: ${{ inputs.ARTEFACT_PATH }}"
       uses: actions/attest-build-provenance@7668571508540a607bdfd90a87a560489fe372eb # v2.1.0
