@@ -1,21 +1,25 @@
 ---
 # SPDX-License-Identifier: Apache-2.0
-# SPDX-FileCopyrightText: 2024 The Linux Foundation
+# SPDX-FileCopyrightText: 2025 The Linux Foundation
 
-name: "🐍 Get Python Project Version"
-description: "Returns the version of the Python Project"
-# Supports both pyproject.toml and setup.py project configuration files
+# python-project-version-action
+name: "🐍 Python Project Current Version"
+description: "Returns the current version of a Python Project"
+# Supports both pyproject.toml and setup.py project descriptions
 
 outputs:
   PYTHON_PROJECT_VERSION:
-    description: "The version of the Python project from pyproject.toml or setup.py"
-    value: ${{ steps.variables.outputs.python_project_version }}
+    description: "The current version declared for a Python project"
+    value: ${{ steps.publish.outputs.python_project_version }}
+  SOURCE:
+    description: "File used to source project metadata [ pyproject.toml|setup.py ]"
+    value: ${{ steps.publish.outputs.python_project_version }}
 
 runs:
   using: "composite"
   steps:
     # yamllint disable-line rule:line-length
-    - uses: lfit/releng-reusable-workflows/.github/actions/path-check-action@11530dee75e77f063c6e01ac7f3a6cb0cdc95db7 # 2025-02-05
+    - uses: lfit/releng-reusable-workflows/.github/actions/path-check-action@1d327501514102db5018642036a974e79415ec5a # v0.2.8
       id: setup-py
       with:
         path: "setup-py"
@@ -24,7 +28,7 @@ runs:
       id: setup-py-version
       if: steps.setup-py.outputs.type == 'file'
       # yamllint disable-line rule:line-length
-      uses: lfit/releng-reusable-workflows/.github/actions/file-grep-regex-action@0b3caf21542fc99480016a2c3759264807880bff # 2025-01-30
+      uses: lfit/releng-reusable-workflows/.github/actions/file-grep-regex-action@1d327501514102db5018642036a974e79415ec5a # v0.2.8
       with:
         flags: "-oP -m1"
         # https://regex101.com/r/QKYHId/1
@@ -32,7 +36,7 @@ runs:
         filename: "setup.py"
 
     # yamllint disable-line rule:line-length
-    - uses: lfit/releng-reusable-workflows/.github/actions/path-check-action@11530dee75e77f063c6e01ac7f3a6cb0cdc95db7 # 2025-02-05
+    - uses: lfit/releng-reusable-workflows/.github/actions/path-check-action@1d327501514102db5018642036a974e79415ec5a # v0.2.8
       id: pyproject-toml
       with:
         path: "pyproject.toml"
@@ -41,43 +45,47 @@ runs:
       id: pyproject-toml-version
       if: steps.pyproject-toml.outputs.type == 'file'
       # yamllint disable-line rule:line-length
-      uses: lfit/releng-reusable-workflows/.github/actions/file-grep-regex-action@0b3caf21542fc99480016a2c3759264807880bff # 2025-01-30
+      uses: lfit/releng-reusable-workflows/.github/actions/file-grep-regex-action@1d327501514102db5018642036a974e79415ec5a # v0.2.8
       with:
         flags: "-oP -m1"
         # https://regex101.com/r/MWmRge/1
         regex: '(?<=^version = ")([^"]*)'
         filename: "pyproject.toml"
 
-    - name: "Throw error if Python project metadata was NOT found"
+    - name: "Error: Python project metadata NOT found"
       if: steps.pyproject-toml.outputs.type == 'invalid' &&
         steps.setup-py.outputs.type == 'invalid'
       shell: bash
       run: |
-        # Throw error if Python project metadata was NOT found
-        echo "Neither pyproject.toml NOR setup.py were found"; exit 1
+        # Error: Python project metadata NOT found
+        echo "Error: neither pyproject.toml nor setup.py were found ❌"
+        exit 1
 
     - name: "Return extracted values"
-      id: variables
+      id: publish
       shell: bash
       run: |
         # Return extracted values
 
         # pyproject.toml is preferred source if both files exist
         if [ ${{ steps.pyproject-toml.outputs.type == 'file' }} ]; then
-          echo "Using project version from source: pyproject.toml"
+          echo "Using project version from source: pyproject.toml ✅"
+          echo "source=pyproject.toml" >> "$GITHUB_ENV"
+          echo "source=pyproject.toml" >> "$GITHUB_OUTPUT"
           PYTHON_PROJECT_VERSION="${{ steps.pyproject-toml-version.outputs.extracted_string}}"
 
         elif [ ${{ steps.setup-py.outputs.type == 'file' }} ]; then
-          echo "Using project version from source: setup.py"
+          echo "Using project version from source: setup.py ⚠️"
+          echo "Warning: consider migrating to modern PEP standards"
+          echo "source=setup.py" >> "$GITHUB_ENV"
+          echo "source=setup.py" >> "$GITHUB_OUTPUT"
           PYTHON_PROJECT_VERSION="${{ steps.setup-py-version.outputs.extracted_string}}"
         fi
 
+        # Validate and output captured value
         if [ -z "$PYTHON_PROJECT_VERSION" ]; then
           echo "The project name extraction failed ❌"; exit 1
         fi
-
         echo "python_project_version: $PYTHON_PROJECT_VERSION ✅"
-
-        # Make available to the GitHub environment
         echo "python_project_version=$PYTHON_PROJECT_VERSION" >> "$GITHUB_ENV"
         echo "python_project_version=$PYTHON_PROJECT_VERSION" >> "$GITHUB_OUTPUT"
