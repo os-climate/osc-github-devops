@@ -58,12 +58,12 @@ runs:
     - name: "Extract project/repository naming"
       id: naming
       # yamllint disable-line rule:line-length
-      uses: lfit/releng-reusable-workflows/.github/actions/project-name-action@431c4e424c15544f98ec1321f6668f655c238d3a # 2025-02-10
+      uses: lfit/releng-reusable-workflows/.github/actions/project-name-action@9b845102d5158f0b80bd53405a0b6855b26dc4a0 # v0.2.9
 
     - name: "Verify release tag"
       id: tag-validate
       # yamllint disable-line rule:line-length
-      uses: lfit/releng-reusable-workflows/.github/actions/tag-validate-semantic-action@main
+      uses: lfit/releng-reusable-workflows/.github/actions/tag-validate-semantic-action@9b845102d5158f0b80bd53405a0b6855b26dc4a0 # v0.2.9
       with:
         tag: ${{ inputs.tag }}
 
@@ -113,7 +113,7 @@ runs:
     - name: "Check if tag/version already released"
       id: release-validate
       # yamllint disable-line rule:line-length
-      uses: lfit/releng-reusable-workflows/.github/actions/github-list-releases-action@f01a730905e72598d5ba129509ec10ef420a0b4b # 2025-02-22
+      uses: lfit/releng-reusable-workflows/.github/actions/github-list-releases-action@9b845102d5158f0b80bd53405a0b6855b26dc4a0 # v0.2.9
       with:
         tag: ${{ inputs.tag }}
 
