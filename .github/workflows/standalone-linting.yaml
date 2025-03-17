@@ -57,4 +57,4 @@ jobs:
     permissions:
       contents: read
     # yamllint disable-line rule:line-length
-    uses: lfit/releng-reusable-workflows/.github/workflows/reuse-standalone-linting.yaml@93066e7f3502aa52df83c32ae3a9d41f66884204 # 2025-02-18
+    uses: lfit/releng-reusable-workflows/.github/workflows/reuse-standalone-linting.yaml@9b845102d5158f0b80bd53405a0b6855b26dc4a0 # v0.2.9
