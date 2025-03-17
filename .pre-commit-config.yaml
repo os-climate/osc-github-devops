@@ -90,7 +90,7 @@ repos:
       - id: actionlint
 
   - repo: https://github.com/adrienverge/yamllint.git
-    rev: d5b6c4a6ae74d21065dbd40e2805e584ff06e483 # frozen: v1.36.0
+    rev: cd96692595b4c5ed1a93b182b4c808786b34d4ee # frozen: v1.36.2
     hooks:
       - id: yamllint
         types: [yaml]
@@ -101,7 +101,7 @@ repos:
           ]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: 41d2daf392fbf43341a77f24a9c6481a4b66af98 # frozen: v0.9.10
+    rev: 99abe27a5a16f301d9e0a3828181399dfbf54ebd # frozen: v0.11.0
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix, --config=pyproject.toml]
@@ -121,7 +121,7 @@ repos:
         entry: bash -c 'if [ ! -d .mypy_cache ]; then /bin/mkdir .mypy_cache; fi; exit 0'
 
   - repo: https://github.com/abravalheri/validate-pyproject
-    rev: f45606bad11ad90ddac1212fa83ebe2a4d724351 # frozen: v0.23
+    rev: 14a365cbb013769ee42b9c7b7430594470daae24 # frozen: v0.24
     hooks:
       - id: validate-pyproject
         # Optional extra validations from SchemaStore:
