@@ -22,7 +22,8 @@ runs:
   steps:
     - name: "Retrieve project version"
       id: fetch
-      uses: os-climate/osc-github-devops/.github/actions/python-project-version-action@main
+      # yamllint disable-line rule:line-length
+      uses: lfreleng-actions/python-project-version-action@7e49f13405f9d85a9df56da360e34c23385b813f # v0.1.0
 
     - name: "Check tag/versions for consistency"
       id: verify

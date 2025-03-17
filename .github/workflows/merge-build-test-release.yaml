@@ -46,6 +46,11 @@ jobs:
     runs-on: ubuntu-24.04
     permissions: {}
     steps:
+      # Harden the runner used by this workflow
+      - uses: step-security/harden-runner@4d991eb9b905ef189e4c376166672c3f2f230481 # v2.11.0
+        with:
+          egress-policy: audit
+
       - name: "Check for required secrets/API keys/tokens"
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/test-github-secrets-action@main
@@ -80,6 +85,11 @@ jobs:
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
+      # Harden the runner used by this workflow
+      - uses: step-security/harden-runner@4d991eb9b905ef189e4c376166672c3f2f230481 # v2.11.0
+        with:
+          egress-policy: audit
+
       - name: "Build Python project"
         id: python-build
         # yamllint disable-line rule:line-length
@@ -155,6 +165,11 @@ jobs:
     # Note: environment must be specified at BOTH job level, and input to publish action
     environment: development
     steps:
+      # Harden the runner used by this workflow
+      - uses: step-security/harden-runner@4d991eb9b905ef189e4c376166672c3f2f230481 # v2.11.0
+        with:
+          egress-policy: audit
+
       # Need repository content to extract project name
       - name: "Test Package Publishing"
         # yamllint disable-line rule:line-length

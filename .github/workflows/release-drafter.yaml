@@ -32,6 +32,11 @@ jobs:
       pull-requests: write
     runs-on: ubuntu-24.04
     steps:
+      # Harden the runner used by this workflow
+      - uses: step-security/harden-runner@4d991eb9b905ef189e4c376166672c3f2f230481 # v2.11.0
+        with:
+          egress-policy: audit
+
       # (Optional) GitHub Enterprise requires GHE_HOST variable set
       #- name: Set GHE_HOST
       #  run: |
