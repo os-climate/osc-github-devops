@@ -31,7 +31,7 @@ runs:
     - name: "Patch Python project version: setup.py"
       id: patch-version-setup-py
       if: steps.setup-py.outputs.type == 'file'
-      uses: os-climate/osc-github-devops/.github/actions/file-sed-regex-action@main
+      uses: lfreleng-actions/file-sed-regex-action@8b6ab94c60adb3d87bbc5ecd81fc3c55dc9516af # v0.1.0
       with:
         flags: "-i -E"
         regex: 's:version=.*$:version="${{ inputs.REPLACEMENT_VERSION }}":'
@@ -40,7 +40,7 @@ runs:
     - name: "Patch Python project version: pyproject.toml"
       id: patch-version-pyproject-toml
       if: steps.pyproject-toml.outputs.type == 'file'
-      uses: os-climate/osc-github-devops/.github/actions/file-sed-regex-action@main
+      uses: lfreleng-actions/file-sed-regex-action@main
       with:
         flags: "-i -E"
         regex: 's:^version =.*$:version = "${{ inputs.REPLACEMENT_VERSION }}":'
