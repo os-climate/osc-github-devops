@@ -67,20 +67,7 @@ runs:
     - name: "Check project version matches pushed tags"
       if: startsWith(github.ref, 'refs/tags/')
       # yamllint disable-line rule:line-length
-      uses: os-climate/osc-github-devops/.github/actions/python-project-version-vs-tag-action@main
-
-    - name: "Set up Python ${{ inputs.build_python_version }}"
-      # yamllint disable-line rule:line-length
-      uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
-      with:
-        python-version-file: "pyproject.toml"
-        cache: "pip"
-
-    - name: "Install PDM tooling"
-      # yamllint disable-line rule:line-length
-      uses: pdm-project/setup-pdm@b2472ca4258a9ea3aee813980a0100a2261a42fc # v4.2
-      with:
-        python-version-file: "pyproject.toml"
+      uses: os-climate/osc-github-devops/.github/actions/python-project-tag-push-verify-action@main
 
     - name: "Build versioning"
       id: versioning
@@ -94,9 +81,22 @@ runs:
     - name: "Patch project versioning metadata"
       if: env.python_project_version != inputs.tag
       # yamllint disable-line rule:line-length
-      uses: lfreleng-actions/python-project-version-action@37c1be5e5e1923632c568c8227a39a13c644bffe # v0.1.0
+      uses: lfreleng-actions/python-project-version-patch-action@37c1be5e5e1923632c568c8227a39a13c644bffe # v0.1.0
       with:
         replacement_version: ${{ env.tag }}
+
+    - name: "Set up Python ${{ inputs.build_python_version }}"
+      # yamllint disable-line rule:line-length
+      uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+      with:
+        python-version-file: "pyproject.toml"
+        cache: "pip"
+
+    - name: "Install PDM tooling"
+      # yamllint disable-line rule:line-length
+      uses: pdm-project/setup-pdm@b2472ca4258a9ea3aee813980a0100a2261a42fc # v4.2
+      with:
+        python-version-file: "pyproject.toml"
 
     - name: "Build Python project"
       id: perform-build
