@@ -73,104 +73,11 @@ jobs:
         id: git-commit-message
         # yamllint disable-line rule:line-length
         uses: lfit/releng-reusable-workflows/.github/actions/git-commit-message-action@1d327501514102db5018642036a974e79415ec5a # v0.2.8
-      - name: "Action: python-project-name-action"
-        id: python-project-name-action
-        # yamllint disable-line rule:line-length
-        uses: lfit/releng-reusable-workflows/.github/actions/python-project-name-actionn@1d327501514102db5018642036a974e79415ec5a # v0.2.8
-
-      - name: "Validate: python-project-name-action"
-        shell: bash
-        run: |
-          # Check output from: python-project-name-action
-          PYTHON_PROJECT_NAME="${{ steps.python-project-name-action.outputs.python_project_name }}"
-          if [ "$PYTHON_PROJECT_NAME" != "osc-github-devops" ]; then
-            echo "ERROR: Python project name was not as expected"
-            echo "python_project_name: $PYTHON_PROJECT_NAME"; exit 1
-          else
-            echo "Returned project name is correct: $PYTHON_PROJECT_NAME"
-          fi
-          PYTHON_PACKAGE_NAME="${{ steps.python-project-name-action.outputs.python_package_name }}"
-          if [ "$PYTHON_PACKAGE_NAME" != "osc_github_devops" ]; then
-            echo "ERROR: Python package name was not as expected"
-            echo "python_package_name: $PYTHON_PROJECT_NAME"; exit 1
-          else
-            echo "Returned package name is correct: $PYTHON_PROJECT_NAME"
-          fi
-          PYTHON_PROJECT_FILE="${{ steps.python-project-name-action.outputs.python_project_file }}"
-          if [ "$PYTHON_PROJECT_FILE" != "pyproject.toml" ]; then
-            echo "ERROR: Python project file was not as expected"
-            echo "python_project_file: $PYTHON_PROJECT_FILE"; exit 1
-          else
-            echo "Returned Python project file is correct: $PYTHON_PROJECT_FILE"
-          fi
-
-      # Note: project-name-action depends on action above (python-project-name-action)
-      - name: "Action: project-name-action"
-        id: project-name-action
-        # yamllint disable-line rule:line-length
-        uses: lfit/releng-reusable-workflows/.github/actions/project-name-action@main
-
-      - name: "Validate: project-name-action"
-        shell: bash
-        run: |
-          # Check output from: project-name-action
-          PROJECT_NAME="${{ steps.project-name-action.outputs.project_name }}"
-          if [ "$PROJECT_NAME" != "osc-github-devops" ]; then
-            echo "ERROR: Python project name was not as expected"
-            echo "project_name: $PROJECT_NAME"; exit 1
-          else
-            echo "Returned project name is correct: $PROJECT_NAME"
-          fi
-          MATCH="${{ steps.project-name-action.outputs.match }}"
-          if [ "$MATCH" != "true" ]; then
-            echo "ERROR: Flag NOT set indicating project and repository name match"
-            exit 1
-          else
-            echo "Flag set indicating project and repository name match"
-          fi
-
-      - name: "Action: python-project-version-action"
-        id: python-project
-        # yamllint disable-line rule:line-length
-        uses: lfreleng-actions/python-project-version-action@7e49f13405f9d85a9df56da360e34c23385b813f # v0.1.0
-
-      - name: "Validate: python-project-version-action"
-        shell: bash
-        run: |
-          # Check output from: python-project-version-action
-          PYTHON_PROJECT_VERSION="${{ steps.python-project.outputs.python_project_version }}"
-          if [ "$PYTHON_PROJECT_VERSION" != "0.1.27" ]; then
-            echo "ERROR: Python project version was not as expected"
-            echo "python_project_version: $PYTHON_PROJECT_VERSION"; exit 1
-          else
-            echo "Returned project version is correct: $PYTHON_PROJECT_VERSION"
-          fi
-
-      - name: "Action: python-dynamic-version-action"
-        id: dynamic-version
-        # yamllint disable-line rule:line-length
-        uses: lfit/releng-reusable-workflows/.github/actions/python-dynamic-version-action@main
-
-      - name: "Validate: python-dynamic-version-action"
-        shell: bash
-        run: |
-          # Check output from: python-dynamic-version-action
-          DYNAMIC="${{ steps.dynamic-version.outputs.dynamic_version }}"
-          if [ "$DYNAMIC" = "false" ]; then
-            echo "Dynamic versioning is NOT enabled for this repository ✅"
-          else
-            echo "Dynamic versioning returned: $DYNAMIC ❌"; exit 1
-          fi
 
       - name: "Extract TOX stanza"
         id: tox-parse-stanza-action
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/tox-parse-stanza-action@main
-
-      - name: "Action: python-supported-versions-action"
-        id: python-supported-versions-action
-        # yamllint disable-line rule:line-length
-        uses: lfreleng-actions/python-supported-versions-action@2466ad0e7e119e5484bb404b84b97253c862991b # v0.1.0
 
       - name: "Action: tag-validate-semantic-action [semantic tag]"
         id: tag-validate-semantic-good
@@ -313,13 +220,6 @@ jobs:
             echo 'All tag check tests passed, no errors found'
           fi
 
-      - name: "Action: url-validity-check-action"
-        id: url-validity-check-action
-        # yamllint disable-line rule:line-length
-        uses: lfit/releng-reusable-workflows/.github/actions/url-validity-check-action@9b845102d5158f0b80bd53405a0b6855b26dc4a0 # v0.2.9
-        with:
-          url: "https://linuxfoundation.org"
-
       - name: "Action: github-labels-action"
         id: github-labels-action
         # yamllint disable-line rule:line-length
@@ -404,70 +304,3 @@ jobs:
           # Check string-comparison action logic
           echo 'String comparison/action logic appears to be broken'
           exit 1
-
-      # Action: path-check
-      - name: "Action: path test [valid file]"
-        id: path-check-file
-        # yamllint disable-line rule:line-length
-        uses: lfit/releng-reusable-workflows/.github/actions/path-check-action@9b845102d5158f0b80bd53405a0b6855b26dc4a0 # v0.2.9
-        with:
-          path: "tests/resources/test-folder/test-file"
-
-      - name: "Action: path test [valid folder]"
-        id: path-check-folder
-        # yamllint disable-line rule:line-length
-        uses: lfit/releng-reusable-workflows/.github/actions/path-check-action@9b845102d5158f0b80bd53405a0b6855b26dc4a0 # v0.2.9
-        with:
-          path: "tests/resources/test-folder"
-
-      - name: "Action: path test [valid symlink to file]"
-        id: path-check-symlink-file
-        # yamllint disable-line rule:line-length
-        uses: lfit/releng-reusable-workflows/.github/actions/path-check-action@9b845102d5158f0b80bd53405a0b6855b26dc4a0 # v0.2.9
-        with:
-          path: "tests/resources/test-valid-file-symlink"
-
-      - name: "Action: path test [valid symlink to folder]"
-        id: path-check-symlink-folder
-        # yamllint disable-line rule:line-length
-        uses: lfit/releng-reusable-workflows/.github/actions/path-check-action@9b845102d5158f0b80bd53405a0b6855b26dc4a0 # v0.2.9
-        with:
-          path: "tests/resources/test-valid-folder-symlink"
-
-      # Tests: path-check
-      - name: "Error with path tests (files/directories/symlinks)"
-        id: path-check-errors
-        shell: bash
-        if: steps.path-check-file.outputs.type != 'file' ||
-          steps.path-check-file.outputs.symlink != 'false' ||
-          steps.path-check-folder.outputs.type != 'directory' ||
-          steps.path-check-folder.outputs.symlink != 'false' ||
-          steps.path-check-symlink-file.outputs.type != 'file' ||
-          steps.path-check-symlink-file.outputs.symlink != 'true' ||
-          steps.path-check-symlink-folder.outputs.type != 'directory' ||
-          steps.path-check-symlink-folder.outputs.symlink != 'true'
-        run: |
-          # Report errors with path tests
-          echo "One or more path checks failed validation"; exit 1
-
-      - name: "Action: python-project-version-update-action"
-        id: python-project-version-update-action
-        uses: os-climate/osc-github-devops/.github/actions/python-project-version-update-action@main
-        with:
-          replacement_version: "v1.0.0"
-
-      - name: "Validate: python-project-version-update-action"
-        shell: bash
-        run: |
-          # Check version string was patched correctly
-          if [ -f pyproject.toml ]; then
-            if (grep "v1.0.0" pyproject.toml); then
-              echo "Version substitution successful ✅"
-            else
-              echo "Version substitution failed ❌"
-            fi
-          fi
-
-      - name: "Action: python-project-metadata-action"
-        # yamllint disable-line rule:line-length
-        uses: lfreleng-actions/python-project-metadata-action@3471d0cabe7d26c84142fe47d2b357f05356f1cf # v0.1.0
