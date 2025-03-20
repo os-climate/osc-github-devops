@@ -113,7 +113,7 @@ runs:
       shell: bash
       run: |
         # Build Python project
-        if [ -n ${{ inputs.path_prefix }} ]; then
+        if [ ${{ inputs.path_prefix }} != '' ]; then
           echo "Change to project directory: ${{ inputs.path_prefix }}"
           cd ${{ inputs.path_prefix }}
         fi
