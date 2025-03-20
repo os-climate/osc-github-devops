@@ -1,21 +1,21 @@
 ---
 # SPDX-License-Identifier: Apache-2.0
-# SPDX-FileCopyrightText: 2024 The Linux Foundation
+# SPDX-FileCopyrightText: 2025 The Linux Foundation
 
 # python-build-action
-name: "🐍 Python Build"
+name: "🐍 Build Python Project"
 description: "Builds a Python Project"
 
 inputs:
   # Optional
-  PURGE_OUTPUT_PATH:
-    description: "Purge target artefact path prior to builds"
-    required: false
-    default: "false"
   ARTEFACT_PATH:
     description: "Build artefacts will be output to this folder/directory"
     required: false
     default: "dist"
+  PURGE_ARTEFACT_PATH:
+    description: "Purge target artefact path prior to builds"
+    required: false
+    default: "false"
   TAG:
     description: "Tag version/name for this specific build (semantic)"
     required: false
@@ -29,6 +29,11 @@ inputs:
     description: "Sign build artefacts with Sigstore"
     required: false
     default: "false"
+  PATH_PREFIX:
+    description: "Directory location containing project code"
+    type: string
+    required: false
+    default: ""
 
 outputs:
   MATRIX_JSON:
@@ -62,13 +67,17 @@ runs:
     - name: "Gather Python project metadata"
       id: python-metadata
       # yamllint disable-line rule:line-length
-      uses: lfreleng-actions/python-project-metadata-action@3471d0cabe7d26c84142fe47d2b357f05356f1cf # v0.1.0
+      uses: lfreleng-actions/python-project-metadata-action@34d653e17fbd4e4685c505dd2000cbf5836d4ff5 # v0.1.2
+      with:
+        path_prefix: "${{ inputs.path_prefix }}"
 
     # Catch this error as soon as possible
     - name: "Check project version matches pushed tags"
       if: startsWith(github.ref, 'refs/tags/')
       # yamllint disable-line rule:line-length
-      uses: os-climate/osc-github-devops/.github/actions/python-project-tag-push-verify-action@main
+      uses: lfreleng-actions/python-project-tag-push-verify-action@27478ec0a2d9acc3a3dc80da4648f4d1eb9d429e # v0.1.0
+      with:
+        path_prefix: "${{ inputs.path_prefix }}"
 
     - name: "Build versioning"
       id: versioning
@@ -82,27 +91,32 @@ runs:
     - name: "Patch project versioning metadata"
       if: env.python_project_version != inputs.tag
       # yamllint disable-line rule:line-length
-      uses: lfreleng-actions/python-project-version-patch-action@37c1be5e5e1923632c568c8227a39a13c644bffe # v0.1.0
+      uses: lfreleng-actions/python-project-version-patch-action@37c1be5e5e1923632c568c8227a39a13c644bffe # v0.1.0
       with:
         replacement_version: ${{ env.tag }}
+        path_prefix: "${{ inputs.path_prefix }}"
 
     - name: "Set up Python ${{ inputs.build_python_version }}"
       # yamllint disable-line rule:line-length
       uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
       with:
-        python-version-file: "pyproject.toml"
+        python-version-file: "${{ inputs.path_prefix }}pyproject.toml"
 
     - name: "Install PDM tooling"
       # yamllint disable-line rule:line-length
       uses: pdm-project/setup-pdm@b2472ca4258a9ea3aee813980a0100a2261a42fc # v4.2
       with:
-        python-version-file: "pyproject.toml"
+        python-version-file: "${{ inputs.path_prefix }}pyproject.toml"
 
     - name: "Build Python project"
       id: perform-build
       shell: bash
       run: |
         # Build Python project
+        if [ -n ${{ inputs.path_prefix }} ]; then
+          echo "Change to project directory: ${{ inputs.path_prefix }}"
+          cd ${{ inputs.path_prefix }}
+        fi
 
         # Set build parameters/variables
         echo "Action triggered by: ${GITHUB_TRIGGERING_ACTOR}"
@@ -123,7 +137,7 @@ runs:
         # PDM Build
         if [ -f pyproject.toml ]; then
           echo "Found file: pyproject.toml"
-          echo "Building with command: pdm build --dest ${{ inputs.ARTEFACT_PATH }}"
+          echo "Building with: pdm build --dest ${{ inputs.ARTEFACT_PATH }}"
           if (pdm build --dest ${{ inputs.ARTEFACT_PATH }}); then
             echo "Build with PDM successful ✅"
           else
@@ -134,7 +148,8 @@ runs:
         elif [ -f tox.ini ]; then
           echo "Found TOX configuration file: tox.ini"
           echo "Attempting to install TOX..."
-          python -m pip install --disable-pip-version-check -q --upgrade tox tox-gh-actions
+          python -m pip install --disable-pip-version-check \
+            -q --upgrade tox tox-gh-actions
           echo "Attempting build with: tox -e build"
           echo "WARNING: assumes build artefact path is valid"
           if (tox -e build); then
@@ -167,13 +182,14 @@ runs:
         echo "Build with $VERSION successful ✅"
         echo "Build with $VERSION successful ✅" >> "$GITHUB_STEP_SUMMARY"
 
-    # Caution with sequencing; moving twine validation after attestations/signing causes failures
-    # These steps produce additional output files unsupported during package uploads
+    # Note: caution with sequencing of steps
+    # Twine validation after attestations/signing causes failures
     - name: "Validate artefacts with Twine"
       # yamllint disable-line rule:line-length
       uses: lfreleng-actions/python-twine-check-action@e72540b7947abcb1634408728ee8946738d85b2b # v0.1.0
 
     - name: "Artefact attestation for: ${{ inputs.ARTEFACT_PATH }}"
+      # yamllint disable-line rule:line-length
       uses: actions/attest-build-provenance@7668571508540a607bdfd90a87a560489fe372eb # v2.1.0
       if: ${{ inputs.attestations == 'true' }}
       with:
@@ -186,11 +202,10 @@ runs:
         # Add heading to separate signing from attestations
         echo "### Sigstore Signing ✍🏼" >> "$GITHUB_STEP_SUMMARY"
 
-    # This step optional and must be explicitly requested (passed the relevant input)
     - name: "Sign packages with SigStore"
+      if: ${{ inputs.sigstore_sign == 'true' }}
       # yamllint disable-line rule:line-length
       uses: sigstore/gh-action-sigstore-python@f514d46b907ebcd5bedc05145c03b69c1edd8b46 # v3.0.0
-      if: ${{ inputs.sigstore_sign == 'true' }}
       env:
         package-path: ${{ inputs.ARTEFACT_PATH }}
       with:
