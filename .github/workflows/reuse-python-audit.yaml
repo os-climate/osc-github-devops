@@ -41,7 +41,7 @@ jobs:
       - name: "Extract Python project naming/metadata"
         id: naming
         # yamllint disable-line rule:line-length
-        uses: lfit/releng-reusable-workflows/.github/actions/python-project-name-action@9b845102d5158f0b80bd53405a0b6855b26dc4a0 # v0.2.9
+        uses: lfreleng-actions/python-project-name-action@56072b5e9311b06d6be1631f683d397b6d60e48f # v0.1.0
 
       - name: "⬇ Download build artefacts"
         # yamllint disable-line rule:line-length

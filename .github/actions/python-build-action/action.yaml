@@ -7,6 +7,7 @@ name: "🐍 Python Build"
 description: "Builds a Python Project"
 
 inputs:
+  # Optional
   PURGE_OUTPUT_PATH:
     description: "Purge target artefact path prior to builds"
     required: false
@@ -90,7 +91,6 @@ runs:
       uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
       with:
         python-version-file: "pyproject.toml"
-        cache: "pip"
 
     - name: "Install PDM tooling"
       # yamllint disable-line rule:line-length

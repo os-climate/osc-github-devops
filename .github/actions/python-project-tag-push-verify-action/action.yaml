@@ -3,8 +3,8 @@
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 # python-project-version-vs-tag-action
-name: "🐍 Check project version matches {{ github.ref_name }}"
-description: "Checks Python project version matches {{ github.ref_name }}"
+name: "🐍 Check Pushed Tag Matches Project Version"
+description: "Checks declared Python project version matches {{ github.ref_name }}"
 
 inputs:
   EXIT_ON_FAIL:
