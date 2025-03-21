@@ -81,15 +81,24 @@ runs:
         # Run tests and generate coverage report
         NEVER_FAIL=$(echo ${{ inputs.NEVER_FAIL }} |\
         tr '[:upper:]' '[:lower:]')
-        if [ -d "${{ inputs.tests_path }}" ]; then
+
+        if [ "f$NEVER_FAIL" = "ftrue" ]; then
+          SUFFIX="|| true"
+        fi
+
+        echo "Never fail set: $NEVER_FAIL"
+        if [ -d "${{ inputs.path_prefix }}${{ inputs.tests_path }}" ]; then
+          echo "Test path: ${{ inputs.path_prefix }}${{ inputs.tests_path }}"
           pytest --cov --cov-report=html:coverage_report \
-            "${{ inputs.path_prefix }}${{ inputs.tests_path }}"
-        elif [ -d tests ]; then
+            "${{ inputs.path_prefix }}${{ inputs.tests_path }}" $SUFFIX
+        elif [ -d ${{ inputs.path_prefix }}tests ]; then
+          echo "Test path: tests"
           pytest --cov --cov-report=html:coverage_report \
-            "${{ inputs.path_prefix }}tests"
-        elif [ -d test ]; then
+            "${{ inputs.path_prefix }}tests"  $SUFFIX
+        elif [ -d ${{ inputs.path_prefix }}test ]; then
+          echo "Test path: test"
           pytest --cov --cov-report=html:coverage_report \
-            "${{ inputs.path_prefix }}test"
+            "${{ inputs.path_prefix }}test"  $SUFFIX
         else
           echo "Error: path to tests could not be located ❌"
           if [ "f$NEVER_FAIL" != "ftrue" ]; then
