@@ -1,0 +1,68 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2025 The Linux Foundation
+
+# python-test-project-action
+name: "🛑 Python Audit"
+description: "Tests a Python Project and generates coverage reports"
+
+inputs:
+  # The matrix Python build version should be passed into this action
+  PYTHON_VERSION:
+    description: "Python version used to build artefacts"
+    required: true
+  NEVER_FAIL:
+    description: "Continue even when an audit fails"
+    required: false
+    default: false
+  ARTEFACT_PATH:
+    description: "Store test/coverage report as artefact"
+    required: false
+    default: false
+
+runs:
+  using: "composite"
+  steps:
+    # Harden the runner used by this workflow
+    - uses: step-security/harden-runner@4d991eb9b905ef189e4c376166672c3f2f230481 # v2.11.0
+      with:
+        egress-policy: audit
+
+    - name: "Checkout repository"
+      # yamllint disable-line rule:line-length
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+    - name: "Extract Python project naming/metadata"
+      id: naming
+      # yamllint disable-line rule:line-length
+      uses: lfreleng-actions/python-project-name-action@56072b5e9311b06d6be1631f683d397b6d60e48f # v0.1.0
+
+    - name: "⬇ Download build artefacts"
+      # yamllint disable-line rule:line-length
+      uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+      with:
+        name: ${{ env.python_project_name }}
+        path: ${{ inputs.ARTEFACT_PATH }}
+
+    - name: "Set up Python ${{ inputs.python_version }}"
+      # yamllint disable-line rule:line-length
+      uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+      with:
+        python-version: ${{ inputs.python_version }}
+
+    - name: "Install build products/dependencies"
+      run: |
+        # Install build products/dependencies
+        echo "Upgrading: pip, setuptools"
+        python -m pip install -q --upgrade pip setuptools
+        echo "Installing built package(s) and dependencies"
+        for wheel in ${{ inputs.ARTEFACT_PATH }}/*.whl; do
+                pip install -q "$wheel"
+        done
+        if [ -f requirements.txt ]; then
+          echo "Installing dependencies from: requirements.txt"
+          pip install -q -r requirements.txt
+        fi
+
+    - name: "Auditing with: pip audit"
+      uses: pypa/gh-action-pip-audit@1220774d901786e6f652ae159f7b6bc8fea6d266 # v1.1.0
