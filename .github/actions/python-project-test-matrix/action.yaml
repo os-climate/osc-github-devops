@@ -84,8 +84,8 @@ runs:
           echo "never_fail=true" >> "$GITHUB_ENV"
         fi
 
-    - name: "Run tests and generate coverage report [NEVER_FAIL]"
-      if: env.NEVER_FAIL == 'true'
+    - name: "Run tests and generate coverage report [NEVER FAIL]"
+      if: ${{ env.NEVER_FAIL }} == 'true'
       shell: bash
       run: |
         # Run tests and generate coverage report
@@ -105,8 +105,8 @@ runs:
           echo "Error: path to tests could not be located ❌"
         fi
 
-    - name: "Run tests and generate coverage report"
-      if: env.NEVER_FAIL != 'true'
+    - name: "Run tests and generate coverage report [WILL FAIL]"
+      if: ${{ env.NEVER_FAIL }} != 'true'
       shell: bash
       run: |
         # Run tests and generate coverage report
