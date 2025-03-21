@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2025 The Linux Foundation
 
-# python-test-project-action
+# python-project-audit-matrix
 name: "🛑 Python Audit"
 description: "Tests a Python Project and generates coverage reports"
 
@@ -51,6 +51,7 @@ runs:
         python-version: ${{ inputs.python_version }}
 
     - name: "Install build products/dependencies"
+      shell: bash
       run: |
         # Install build products/dependencies
         echo "Upgrading: pip, setuptools"
