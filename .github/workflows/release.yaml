@@ -1,9 +1,9 @@
 ---
 # SPDX-License-Identifier: Apache-2.0
-# SPDX-FileCopyrightText: 2024 The Linux Foundation
+# SPDX-FileCopyrightText: 2025 The Linux Foundation
 
 # Single workflow designed to test entire action/workflow suite end-to-end
-name: "Build/Test/Release"
+name: "Python Build/Test/Release"
 
 # yamllint disable-line rule:truthy
 on:
