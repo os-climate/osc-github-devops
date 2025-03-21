@@ -3,7 +3,7 @@
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 # Single workflow designed to test entire action/workflow suite end-to-end
-name: "Build/Test/Release [Merge] 🤖"
+name: "Build/Test/Release"
 
 # yamllint disable-line rule:truthy
 on:

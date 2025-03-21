@@ -19,10 +19,9 @@ Supports these optional features:
 <!-- markdownlint-disable MD046 -->
 
 ```yaml
+  # Checkout code repository performed in earlier step
   - name: "Build Python project"
     uses: lfreleng-actions/python-build-action@main
-    with:
-      tag: ${{ needs.repository.outputs.build_tag }}
 ```
 
 <!-- markdownlint-enable MD046 -->
@@ -57,6 +56,47 @@ Supports these optional features:
 
 <!-- markdownlint-enable MD013 -->
 
-## Implementation Details
+## Build Versioning
+
+When triggered by a tag push event in the GitHub environment, the build version
+will be the pushed tag. The action can optionally accept an input to explicitly
+set/configure the version to build. In this scenario, the project metadata file
+gets modified to match the supplied version, to ensure consistency in the
+output package. If the action was not triggered by a pushed tag, and a build
+version has not been explicitly provided, the pyproject.toml file or setup.py
+file will determine the build versioning.
+
+## Build Process/Steps
+
+The action performs the following steps to perform the build:
+
+- Gather project metadata from the relevant file(s)
+- Tag/version consistency check (production builds/tag push events)
+- Patch project metadata to match build version (explicit versioning)
+- Setup Python environment using information extracted from project metadata
+- Install PDM build tool
+- **Perform build of Python project**
+- Output build summary
+- Test build artefacts with Twine
+- Github build attestation (production builds/tag push events)
+- Sign artefacts with SigStore (production builds/tag push events)
+- Upload build artefacts to Github
+
+## Mechanism Used for Builds
+
+Note: this build action is primarily designed around modern PEP standards.
+
+PDM is the primary/preferred build tool, with optional fallback to other
+methods/mechanisms, such as the Python "build" module.
 
 ## Notes
+
+The current action has not been extensively tested with legacy projects types.
+
+Dynamic versioning may work, but has NOT been extensively tested.
+
+e.g. pyproject.toml file contains the option:
+
+```yaml
+dynamic = [ "version" ]
+```

@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
-name: "CodeQL [Merge] 🔐"
+name: "CodeQL"
 
 on:
   workflow_dispatch:

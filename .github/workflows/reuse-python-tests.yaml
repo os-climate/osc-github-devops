@@ -3,7 +3,7 @@
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 # Runs tests on a Python project for a number of specified Python versions"
-name: "🧪 [R] Python Tests"
+name: "[R] Python Tests"
 
 on:
   workflow_call:
