@@ -44,7 +44,7 @@ outputs:
     value: ${{ steps.python-metadata.outputs.python_project_name }}
   ARTEFACT_PATH:
     description: "Build artefacts will be output to this folder/directory"
-    value: ${{ steps.python-metadata.outputs.matrix_json }}
+    value: ${{ inputs.artefact_path }}
 
 runs:
   using: "composite"
