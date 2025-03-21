@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2025 The Linux Foundation
 
-# python-test-project-action
+# python-project-test-matrix
 name: "🧪 Python Tests"
 description: "Tests a Python Project and generates coverage reports"
 

@@ -70,7 +70,7 @@ jobs:
     steps:
       - name: "Test Python project"
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/python-test-matrix@main
+        uses: os-climate/osc-github-devops/.github/actions/python-project-test-matrix@main
         with:
           python_version: ${{ matrix.python-version }}
           never_fail: true
@@ -90,7 +90,7 @@ jobs:
     steps:
       - name: "Audit Python project"
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/python-audit-matrix@main
+        uses: os-climate/osc-github-devops/.github/actions/python-project-audit-matrix@main
         with:
           python_version: ${{ matrix.python-version }}
           never_fail: true
