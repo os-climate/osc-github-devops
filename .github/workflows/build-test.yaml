@@ -68,6 +68,12 @@ jobs:
     permissions:
       contents: read
     steps:
+      - name: "Summary output"
+        shell: bash
+        run: |
+          # Summary output
+          echo "# 🧪 Python Tests"
+
       - name: "Test Python project"
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/python-project-test-matrix@main
@@ -88,6 +94,12 @@ jobs:
     permissions:
       contents: read
     steps:
+      - name: "Summary output"
+        shell: bash
+        run: |
+          # Summary output
+          echo "# 🔍 Python Audit"
+
       - name: "Audit Python project"
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/python-project-audit-matrix@main
