@@ -74,38 +74,58 @@ runs:
     # Use tox if configured for tests
     # Otherwise proceed to regular method (pytest)
 
-    - name: "Run tests and generate coverage report"
-      id: run-tests
+    - name: "Setup failure handling"
+      shell: bash
+      run: |
+        # Setup failure handling
+        NEVER_FAIL=$(echo ${{ inputs.NEVER_FAIL }} |\
+        tr '[:upper:]' '[:lower:]')
+        if [ "f$NEVER_FAIL" = "ftrue" ]; then
+          echo "never_fail=true" >> "$GITHUB_ENV"
+        fi
+
+    - name: "Run tests and generate coverage report [NEVER_FAIL]"
+      if: env.NEVER_FAIL == 'true'
       shell: bash
       run: |
         # Run tests and generate coverage report
-        NEVER_FAIL=$(echo ${{ inputs.NEVER_FAIL }} |\
-        tr '[:upper:]' '[:lower:]')
-
-        if [ "f$NEVER_FAIL" = "ftrue" ]; then
-          SUFFIX="|| true"
-        fi
-
-        echo "Never fail set: $NEVER_FAIL"
         if [ -d "${{ inputs.path_prefix }}${{ inputs.tests_path }}" ]; then
           echo "Test path: ${{ inputs.path_prefix }}${{ inputs.tests_path }}"
           pytest --cov --cov-report=html:coverage_report \
-            "${{ inputs.path_prefix }}${{ inputs.tests_path }}" $SUFFIX
+            "${{ inputs.path_prefix }}${{ inputs.tests_path }}" || true
         elif [ -d ${{ inputs.path_prefix }}tests ]; then
           echo "Test path: tests"
           pytest --cov --cov-report=html:coverage_report \
-            "${{ inputs.path_prefix }}tests"  $SUFFIX
+            "${{ inputs.path_prefix }}tests" || true
         elif [ -d ${{ inputs.path_prefix }}test ]; then
           echo "Test path: test"
           pytest --cov --cov-report=html:coverage_report \
-            "${{ inputs.path_prefix }}test"  $SUFFIX
+            "${{ inputs.path_prefix }}test" || true
         else
           echo "Error: path to tests could not be located ❌"
-          if [ "f$NEVER_FAIL" != "ftrue" ]; then
-            exit 1
-          fi
         fi
 
+    - name: "Run tests and generate coverage report"
+      if: env.NEVER_FAIL != 'true'
+      shell: bash
+      run: |
+        # Run tests and generate coverage report
+        if [ -d "${{ inputs.path_prefix }}${{ inputs.tests_path }}" ]; then
+          echo "Test path: ${{ inputs.path_prefix }}${{ inputs.tests_path }}"
+          pytest --cov --cov-report=html:coverage_report \
+            "${{ inputs.path_prefix }}${{ inputs.tests_path }}"
+        elif [ -d ${{ inputs.path_prefix }}tests ]; then
+          echo "Test path: tests"
+          pytest --cov --cov-report=html:coverage_report \
+            "${{ inputs.path_prefix }}tests"
+        elif [ -d ${{ inputs.path_prefix }}test ]; then
+          echo "Test path: test"
+          pytest --cov --cov-report=html:coverage_report \
+            "${{ inputs.path_prefix }}test"
+        else
+          echo "Error: path to tests could not be located ❌"
+          exit 1
+        fi
     - name: "Create ZIP archive of coverage report"
       shell: bash
       run: |
