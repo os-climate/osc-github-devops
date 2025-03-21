@@ -56,35 +56,45 @@ jobs:
         with:
           tag: ${{ needs.repository.outputs.build_tag }}
 
-  python-test:
-    name: "Test"
-    # yamllint disable-line rule:line-length
-    uses: os-climate/osc-github-devops/.github/workflows/reuse-python-tests.yaml@main
+  python-tests:
+    name: "Python Test"
+    runs-on: "ubuntu-24.04"
     needs:
       - python-build
     # Matrix job
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.python-build.outputs.matrix_json) }}
-    with:
-      python_version: ${{ matrix.python-version }}
     permissions:
       contents: read
+    steps:
+      - name: "Test Python project"
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/python-test-matrix@main
+        with:
+          python_version: ${{ matrix.python-version }}
+          never_fail: true
+          report_artefact: true
 
   python-audit:
-    name: "Audit"
-    # yamllint disable-line rule:line-length
-    uses: os-climate/osc-github-devops/.github/workflows/reuse-python-audit.yaml@main
+    name: "Python Audit"
+    runs-on: "ubuntu-24.04"
     needs:
       - python-build
     # Matrix job
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.python-build.outputs.matrix_json) }}
-    with:
-      python_version: ${{ matrix.python-version }}
     permissions:
       contents: read
+    steps:
+      - name: "Audit Python project"
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/python-audit-matrix@main
+        with:
+          python_version: ${{ matrix.python-version }}
+          never_fail: true
+          artefact_path: ${{ needs.python-build.outputs.artefact_path }}
 
   notebooks:
     name: "Jupyter notebooks"
