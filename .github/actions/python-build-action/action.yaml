@@ -20,12 +20,12 @@ inputs:
     description: "Tag version/name for this specific build (semantic)"
     required: false
   ATTESTATIONS:
-    # Attestations should not be used for development builds
+    # Attestations should NOT be enabled for development builds
     description: "Apply GitHub attestations to artefacts"
     required: false
     default: "false"
   SIGSTORE_SIGN:
-    # Signing should not be used for development builds
+    # Signing should NOT be enabled for development builds
     description: "Sign build artefacts with Sigstore"
     required: false
     default: "false"
@@ -49,15 +49,6 @@ outputs:
 runs:
   using: "composite"
   steps:
-    # Harden the runner used by this workflow
-    # yamllint disable-line rule:line-length
-    - uses: step-security/harden-runner@4d991eb9b905ef189e4c376166672c3f2f230481 # v2.11.0
-      with:
-        egress-policy: audit
-
-    # yamllint disable-line rule:line-length
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-
     - name: "Build summary heading"
       shell: bash
       run: |
@@ -67,11 +58,11 @@ runs:
     - name: "Gather Python project metadata"
       id: python-metadata
       # yamllint disable-line rule:line-length
-      uses: lfreleng-actions/python-project-metadata-action@34d653e17fbd4e4685c505dd2000cbf5836d4ff5 # v0.1.2
+      uses: lfreleng-actions/python-project-metadata-action@a06f1609159c097d7fc3105e487b031b59d5a28a # v0.1.3
       with:
         path_prefix: "${{ inputs.path_prefix }}"
 
-    # Catch this error as soon as possible
+    # Catch this condition early in build process
     - name: "Check project version matches pushed tags"
       if: startsWith(github.ref, 'refs/tags/')
       # yamllint disable-line rule:line-length
@@ -79,16 +70,16 @@ runs:
       with:
         path_prefix: "${{ inputs.path_prefix }}"
 
-    - name: "Build versioning"
-      id: versioning
+    - name: "Explicit build versioning step"
       if: inputs.tag
       shell: bash
       run: |
-        # Explicit build versioning
-        echo "Explicit build versioning: ${{ inputs.tag }}"
+        # Explicit build versioning step
+        echo "Explicit build versioning: ${{ inputs.tag }} 💬"
         echo "tag=${{ inputs.tag }}" >> "$GITHUB_ENV"
 
     - name: "Patch project versioning metadata"
+      # Optionally patch Python project file to match requested build tag
       if: env.python_project_version != inputs.tag
       # yamllint disable-line rule:line-length
       uses: lfreleng-actions/python-project-version-patch-action@37c1be5e5e1923632c568c8227a39a13c644bffe # v0.1.0
@@ -100,13 +91,13 @@ runs:
       # yamllint disable-line rule:line-length
       uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
       with:
-        python-version-file: "${{ inputs.path_prefix }}pyproject.toml"
+        python-version: "${{ env.build_python }}"
 
     - name: "Install PDM tooling"
       # yamllint disable-line rule:line-length
       uses: pdm-project/setup-pdm@b2472ca4258a9ea3aee813980a0100a2261a42fc # v4.2
       with:
-        python-version-file: "${{ inputs.path_prefix }}pyproject.toml"
+        python-version: "${{ env.build_python }}"
 
     - name: "Build Python project"
       id: perform-build
@@ -187,13 +178,15 @@ runs:
     - name: "Validate artefacts with Twine"
       # yamllint disable-line rule:line-length
       uses: lfreleng-actions/python-twine-check-action@e72540b7947abcb1634408728ee8946738d85b2b # v0.1.0
+      with:
+        path: "${{ inputs.path_prefix }}${{ inputs.ARTEFACT_PATH }}"
 
     - name: "Artefact attestation for: ${{ inputs.ARTEFACT_PATH }}"
       # yamllint disable-line rule:line-length
       uses: actions/attest-build-provenance@7668571508540a607bdfd90a87a560489fe372eb # v2.1.0
       if: ${{ inputs.attestations == 'true' }}
       with:
-        subject-path: ${{ inputs.ARTEFACT_PATH }}/*
+        subject-path: "${{ inputs.path_prefix }}${{ inputs.ARTEFACT_PATH }}/*"
 
     - name: "Add heading to separate signing from attestations"
       if: ${{ inputs.sigstore_sign == 'true' }}
@@ -202,21 +195,22 @@ runs:
         # Add heading to separate signing from attestations
         echo "### Sigstore Signing ✍🏼" >> "$GITHUB_STEP_SUMMARY"
 
+    # SigStore signing adds JSON files to the artefacts directory
     - name: "Sign packages with SigStore"
       if: ${{ inputs.sigstore_sign == 'true' }}
       # yamllint disable-line rule:line-length
       uses: sigstore/gh-action-sigstore-python@f514d46b907ebcd5bedc05145c03b69c1edd8b46 # v3.0.0
       env:
-        package-path: ${{ inputs.ARTEFACT_PATH }}
+        package-path: "${{ inputs.path_prefix }}${{ inputs.ARTEFACT_PATH }}"
       with:
         inputs: >-
-          ./${{ inputs.ARTEFACT_PATH }}/*.tar.gz
-          ./${{ inputs.ARTEFACT_PATH }}/*.whl
+          ./${{ inputs.path_prefix }}${{ inputs.ARTEFACT_PATH }}/*.tar.gz
+          ./${{ inputs.path_prefix }}${{ inputs.ARTEFACT_PATH }}/*.whl
 
     - name: "Upload build artefacts"
       # yamllint disable-line rule:line-length
       uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
       with:
-        name: ${{ env.python_project_name }}
-        path: ${{ inputs.ARTEFACT_PATH }}
+        name: "${{ env.python_project_name }}"
+        path: "${{ inputs.path_prefix }}${{ inputs.ARTEFACT_PATH }}"
         if-no-files-found: error

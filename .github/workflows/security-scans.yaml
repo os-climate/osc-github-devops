@@ -6,7 +6,7 @@
 # by a third-party and are governed by separate terms of service, privacy
 # policy, and support documentation.
 
-name: "Security Scans 🔐"
+name: "Security Scans"
 on:
   workflow_dispatch:
   # For Branch-Protection check. Only the default branch is supported. See

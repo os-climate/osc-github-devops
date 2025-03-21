@@ -3,7 +3,7 @@
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 # Runs tests on a Python project's Jupyter Notebooks
-name: "🧪 [R] Notebook Tests"
+name: "[R] Notebook Tests"
 
 on:
   workflow_call:
