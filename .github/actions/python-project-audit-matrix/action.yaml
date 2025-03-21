@@ -16,9 +16,10 @@ inputs:
     required: false
     default: false
   ARTEFACT_PATH:
-    description: "Store test/coverage report as artefact"
+    description: "Path/location for build artefacts"
+    type: string
     required: false
-    default: false
+    default: "dist"
 
 runs:
   using: "composite"
