@@ -52,17 +52,17 @@ build-backend = "pdm.backend"
 [tool.pdm]
 distribution = true
 
-[tool.pdm.scripts]
-test = "pytest"
-tox = "tox"
-docs = { shell = "cd docs && mkdocs serve", help = "Start the dev server for doc preview" }
-lint = "pre-commit run --all-files"
-complete = { call = "tasks.complete:main", help = "Create autocomplete files for bash and fish" }
+#[tool.pdm.scripts]
+#test = "pytest"
+#tox = "tox"
+#docs = { shell = "cd docs && mkdocs serve", help = "Start the dev server for doc preview" }
+#lint = "pre-commit run --all-files"
+#complete = { call = "tasks.complete:main", help = "Create autocomplete files for bash and fish" }
 
-[tool.pdm.dev-dependencies]
-tox = ["tox", "tox-pdm"]
-docs = ["sphinx", "sphinx-copybutton"]
-lint = ["pre-commit"]
+#[tool.pdm.dev-dependencies]
+#tox = ["tox", "tox-pdm"]
+#docs = ["sphinx", "sphinx-copybutton"]
+#lint = ["pre-commit"]
 
 [tool.pytest.ini_options]
 testpaths = [
@@ -168,3 +168,20 @@ skip-magic-trailing-comma = false
 line-ending = "auto"
 docstring-code-format = false
 docstring-code-line-length = "dynamic"
+
+[dependency-groups]
+test = [
+    "pytest>=8.3.5",
+    "coverage>=7.7.1",
+]
+tox = [
+    "tox>=4.24.2",
+    "tox-pdm>=0.7.2",
+]
+lint = [
+    "pre-commit>=4.2.0",
+]
+docs = [
+    "sphinx>=8.2.3",
+    "sphinx-copybutton>=0.5.2",
+]
