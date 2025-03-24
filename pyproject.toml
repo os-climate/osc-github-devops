@@ -1,18 +1,19 @@
 # SPDX-License-Identifier: Apache-2.0
-# SPDX-FileCopyrightText: 2024 The Linux Foundation
+# SPDX-FileCopyrightText: 2025 The Linux Foundation
 
 [project]
 name = "osc-github-devops"
-version = "0.1.27"
+version = "0.1.28"
 # Uncomment to enable dynamic versioning
 # dynamic = [ "version" ]
-description = "Python project template"
+description = "Template Python project"
 authors = [
-  { name = "Matthew Watkins", email = "93649628+ModeSevenIndustrialSolutions@users.noreply.github.com" },
+    {name = "Matthew Watkins", email = "93649628+ModeSevenIndustrialSolutions@users.noreply.github.com" },
 ]
-requires-python = "<3.13,>=3.10"
+dependencies = ["typer>=0.15.2", "jupyterlab>=4.3.6"]
+requires-python = "<3.13,>=3.11"
 readme = "README.md"
-license = { text = "Apache-2.0" }
+license = {text = "Apache-2.0"}
 keywords = ["Climate", "Finance"]
 classifiers = [
   "Intended Audience :: Developers",
@@ -32,11 +33,6 @@ classifiers = [
   "Topic :: Software Development",
 ]
 
-dependencies = [
-    "typer",
-    "jupyterlab"
-]
-
 [project.urls]
 Homepage = "https://github.com/os-climate/osc-github-devops"
 Repository = "https://github.com/os-climate/osc-github-devops"
@@ -52,28 +48,9 @@ osc-github-devops = "devops_reusable_workflows.cli:run"
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
 
-[project.optional-dependencies]
-dev = [
-  "ruff",
-  "toml",
-  "pdm",
-  "tox",
-  "tox-pdm",
-]
-test = [
-    "pdm[pytest]",
-    "pytest",
-    "pytest-cov",
-    "pytest-html",
-]
 
-# [tool.pdm.version]
-# This stanza is documented here:
-# https://backend.pdm-project.org/metadata/#read-from-scm-tag-supporting-git-and-hg
-# Get versioning directly from GIT
-# source = "scm"
-# fallback_version = "0.0.0"
-# write_to = "version.txt"
+[tool.pdm]
+distribution = true
 
 [tool.pdm.scripts]
 test = "pytest"

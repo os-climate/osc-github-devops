@@ -68,19 +68,14 @@ jobs:
     permissions:
       contents: read
     steps:
-      - name: "Summary output"
-        shell: bash
-        run: |
-          # Summary output
-          echo "# 🧪 Python Tests" >> "$GITHUB_STEP_SUMMARY"
-
       - name: "Test Python project"
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/python-project-test-matrix@main
         with:
           python_version: ${{ matrix.python-version }}
-          never_fail: true
           report_artefact: true
+          # Required, as local Python project has deliberate test failure
+          never_fail: true
 
   python-audit:
     name: "Python Audit"
@@ -94,18 +89,11 @@ jobs:
     permissions:
       contents: read
     steps:
-      - name: "Summary output"
-        shell: bash
-        run: |
-          # Summary output
-          echo "# 🔍 Python Audit" >> "$GITHUB_STEP_SUMMARY"
-
       - name: "Audit Python project"
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/python-project-audit-matrix@main
         with:
           python_version: ${{ matrix.python-version }}
-          never_fail: true
           artefact_path: ${{ needs.python-build.outputs.artefact_path }}
 
   notebooks:

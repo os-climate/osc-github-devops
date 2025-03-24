@@ -28,12 +28,6 @@ Below is a sample matrix job configuration for this action:
     permissions:
       contents: read
     steps:
-      - name: "Summary output"
-        shell: bash
-        run: |
-          # Summary output
-          echo "# 🔍 Python Audit"
-
       - name: "Audit Python project"
         uses: lfreleng-actions//python-project-audit-matrix@main
         with:
