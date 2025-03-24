@@ -11,29 +11,44 @@ inputs:
   ARTEFACT_PATH:
     description: "Build artefacts will be output to this folder/directory"
     required: false
+    type: string
     default: "dist"
+  ARTEFACT_UPLOAD:
+    description: "Build artefacts will be output to this folder/directory"
+    required: false
+    type: boolean
+    default: true
   PURGE_ARTEFACT_PATH:
     description: "Purge target artefact path prior to builds"
     required: false
-    default: "false"
+    type: boolean
+    default: false
   TAG:
     description: "Tag version/name for this specific build (semantic)"
     required: false
+    type: string
   ATTESTATIONS:
     # Attestations should NOT be enabled for development builds
     description: "Apply GitHub attestations to artefacts"
     required: false
-    default: "false"
+    type: boolean
+    default: false
   SIGSTORE_SIGN:
     # Signing should NOT be enabled for development builds
     description: "Sign build artefacts with Sigstore"
     required: false
-    default: "false"
+    type: boolean
+    default: false
   PATH_PREFIX:
     description: "Directory location containing project code"
-    type: string
     required: false
+    type: string
     default: ""
+  TOX_BUILD:
+    description: "Attempt to use TOX to perform build"
+    required: false
+    type: boolean
+    default: true
 
 outputs:
   MATRIX_JSON:
@@ -49,11 +64,25 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: "Build summary heading"
+    - name: "Pre-build steps"
       shell: bash
       run: |
-        # Build summary heading
+        # Pre-build steps
         echo "# 🐍 Python Build" >> "$GITHUB_STEP_SUMMARY"
+
+        # Handle boolean inputs carefully, add to environment
+        ARTEFACT_UPLOAD=$(echo "${{ inputs.artefact_upload }}" |\
+        tr '[:upper:]' '[:lower:]')
+        ATTESTATIONS=$(echo "${{ inputs.attestations }}" |\
+        tr '[:upper:]' '[:lower:]')
+        SIGSTORE_SIGN=$(echo "${{ inputs.sigstore_sign }}" |\
+        tr '[:upper:]' '[:lower:]')
+        TOX_BUILD=$(echo "${{ inputs.tox_build }}" |\
+        tr '[:upper:]' '[:lower:]')
+        echo "artefact_upload=$ARTEFACT_UPLOAD" >> "$GITHUB_ENV"
+        echo "attestations=$ATTESTATIONS" >> "$GITHUB_ENV"
+        echo "sigstore_sign=$SIGSTORE_SIGN" >> "$GITHUB_ENV"
+        echo "tox_build=$TOX_BUILD" >> "$GITHUB_ENV"
 
     - name: "Gather Python project metadata"
       id: python-metadata
@@ -93,11 +122,20 @@ runs:
       with:
         python-version: "${{ env.build_python }}"
 
+    # - name: "Install PDM tooling"
+    # yamllint disable-line rule:line-length
+    #   uses: pdm-project/setup-pdm@b2472ca4258a9ea3aee813980a0100a2261a42fc # v4.2
+    #   with:
+    #     python-version: "${{ env.build_python }}"
+
     - name: "Build Python project"
       id: perform-build
       shell: bash
       run: |
         # Build Python project
+
+        python -m pip install --disable-pip-version-check -q --upgrade pip
+
         if [ ${{ inputs.path_prefix }} != '' ]; then
           echo "Change to project directory: ${{ inputs.path_prefix }}"
           cd ${{ inputs.path_prefix }}
@@ -117,25 +155,20 @@ runs:
           rm -Rf ${{ inputs.ARTEFACT_PATH }}/*
         fi
 
-        python -m pip install --disable-pip-version-check -q --upgrade pip
-
         # TOX Build
-        if [ -f tox.ini ]; then
-          echo "Found TOX configuration file: tox.ini"
-          echo "Attempting to install TOX..."
+        if [ -f tox.ini ] && [ "f${{ env.tox_build }}" = "ftrue" ]; then
+          echo "TOX configuration file present: tox.ini"
           python -m pip install --disable-pip-version-check \
             -q --upgrade tox tox-gh-actions
           echo "Attempting build with: tox -e build"
-          echo "WARNING: assumes build artefact path is valid"
           if (tox -e build); then
             echo "Build with TOX successful ✅"
           else
             echo "Build with TOX failed ❌"; exit 1
           fi
 
-        # Build with Python module
-        else
-          echo "Neither file found: tox.ini/pyproject.toml"
+        # Python build module
+        elif [ -f pyproject.toml ] || [ -f setup.py ]; then
           echo "Attempting build with: python -m build"
           python -m pip install --disable-pip-version-check -q --upgrade build
           if (python -m build --outdir ${{ inputs.ARTEFACT_PATH }}); then
@@ -168,12 +201,12 @@ runs:
     - name: "Artefact attestation for: ${{ inputs.ARTEFACT_PATH }}"
       # yamllint disable-line rule:line-length
       uses: actions/attest-build-provenance@7668571508540a607bdfd90a87a560489fe372eb # v2.1.0
-      if: ${{ inputs.attestations == 'true' }}
+      if: ${{ env.attestations == 'true' }}
       with:
         subject-path: "${{ inputs.path_prefix }}${{ inputs.ARTEFACT_PATH }}/*"
 
     - name: "Add heading to separate signing from attestations"
-      if: ${{ inputs.sigstore_sign == 'true' }}
+      if: ${{ env.sigstore_sign == 'true' }}
       shell: bash
       run: |
         # Add heading to separate signing from attestations
@@ -181,7 +214,7 @@ runs:
 
     # SigStore signing adds JSON files to the artefacts directory
     - name: "Sign packages with SigStore"
-      if: ${{ inputs.sigstore_sign == 'true' }}
+      if: ${{ env.sigstore_sign == 'true' }}
       # yamllint disable-line rule:line-length
       uses: sigstore/gh-action-sigstore-python@f514d46b907ebcd5bedc05145c03b69c1edd8b46 # v3.0.0
       env:
@@ -192,6 +225,7 @@ runs:
           ./${{ inputs.path_prefix }}${{ inputs.ARTEFACT_PATH }}/*.whl
 
     - name: "Upload build artefacts"
+      if: ${{ env.artefact_upload == 'true' }}
       # yamllint disable-line rule:line-length
       uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
       with:

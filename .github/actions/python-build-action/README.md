@@ -5,7 +5,7 @@
 
 # 🐍 Build Python Project
 
-Builds a Python project, uploads build artefacts to GitHub.
+Builds a Python project, uploads/stores built artefact in GitHub.
 
 Supports these optional features:
 
@@ -30,17 +30,23 @@ Supports these optional features:
 
 <!-- markdownlint-disable MD013 -->
 
-| Variable Name       | Required | Description                                                |
-| ------------------- | -------- | ---------------------------------------------------------- |
-| ARTEFACT_PATH       | False    | Output path/directory to use for build artefacts           |
-| PURGE_ARTEFACT_PATH | False    | Deletes any pre-existing content in build/target directory |
-| TAG                 | False    | Version to use for Python project build artefacts          |
-| ATTESTATIONS        | False    | Attest build artefacts using GitHub Attestations           |
-| SIGSTORE_SIGN       | False    | Uses SigStyore application to sign binary build artefacts  |
-| PATH_PREFIX         | False    | Path/directory to Python project code                      |
+| Variable Name       | Required | Default | Description                                                |
+| ------------------- | -------- | ------- | ---------------------------------------------------------- |
+| ARTEFACT_PATH       | False    | "dist"  | Output path/directory to use for build artefacts           |
+| ARTEFACT_UPLOAD     | False    | True    | Output path/directory to use for build artefacts           |
+| PURGE_ARTEFACT_PATH | False    | False   | Deletes any pre-existing content in build/target directory |
+| TAG                 | False    |         | Explicit tag/version to use for project build              |
+| ATTESTATIONS        | False    | False   | Attest build artefacts using GitHub Attestations           |
+| SIGSTORE_SIGN       | False    | False   | Uses SigStore to sign binary build artefacts               |
+| PATH_PREFIX         | False    |         | Path/directory to Python project code                      |
+| TOX_BUILD           | False    | True    | Builds using tox environment, if configuration present     |
 
-[Github Attestations](https://docs.github.com/en/actions/security-for-github-actions/using-artifact-attestations/using-artifact-attestations-to-establish-provenance-for-builds_)
-[SigStore](https://www.sigstore.dev/)
+Note: do now enable attestations for development/test builds
+
+See the following links for more information on artefact signing and attestations:
+
+- [Github Attestations](https://docs.github.com/en/actions/security-for-github-actions/using-artifact-attestations/using-artifact-attestations-to-establish-provenance-for-builds_)
+- [SigStore](https://www.sigstore.dev/)
 
 <!-- markdownlint-enable MD013 -->
 
@@ -52,7 +58,7 @@ Supports these optional features:
 | ------------- | -------------------------------- |
 | MATRIX_JSON   | Python version supported as JSON |
 | ARTEFACT_NAME | Name/label for build artefacts   |
-| ARTEFACT_PATH | Patch to build artefacts         |
+| ARTEFACT_PATH | Path to build artefacts          |
 
 <!-- markdownlint-enable MD013 -->
 
