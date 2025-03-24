@@ -5,11 +5,7 @@
 groups = ["default", "docs", "lint", "test", "tox"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-<<<<<<< HEAD
-content_hash = "sha256:8c5052213532a780ba95dbb007f8581cb83179c2cdff55702047735e1a4aa2f2"
-=======
 content_hash = "sha256:84c4dec98b24ee5e4e409fa0ab6cdc126cc42d12132b98a48171f45d2306b695"
->>>>>>> 6984ef4 (Chore: Update deps and groups)
 
 [[metadata.targets]]
 requires_python = ">=3.11,<3.13"
