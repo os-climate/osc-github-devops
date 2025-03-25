@@ -3,11 +3,11 @@
 # SPDX-FileCopyrightText: 2025 The Linux Foundation
 -->
 
-# 🐍 Audit Python Project [Matrix Job]
+# 🐍 Audit Python Project
 
-Audits a Python project, generates coverage reports.
+Audits a Python project's dependencies for security issues.
 
-## python-project-audit-matrix
+## python-project-audit-action
 
 ## Usage Example
 
