@@ -68,6 +68,11 @@ jobs:
     permissions:
       contents: read
     steps:
+      # Harden the runner used by this workflow
+      - uses: step-security/harden-runner@4d991eb9b905ef189e4c376166672c3f2f230481 # v2.11.0
+        with:
+          egress-policy: audit
+
       - name: "Test Python project [Standard Tests]"
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/python-project-test-matrix@main
@@ -107,6 +112,11 @@ jobs:
     permissions:
       contents: read
     steps:
+      # Harden the runner used by this workflow
+      - uses: step-security/harden-runner@4d991eb9b905ef189e4c376166672c3f2f230481 # v2.11.0
+        with:
+          egress-policy: audit
+
       - name: "Audit Python project"
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/python-project-audit-matrix@main
