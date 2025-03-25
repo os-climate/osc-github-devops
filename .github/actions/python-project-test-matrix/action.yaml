@@ -57,6 +57,7 @@ runs:
           echo "Error: invalid path/prefix to test directory ❌"
           echo "${{ inputs.path_prefix }}${{ inputs.tests_path }}"
           exit 1
+        fi
         PERMIT_TEST_FAIL=$(echo "${{ inputs.PERMIT_TEST_FAIL }}" |\
         tr '[:upper:]' '[:lower:]')
         if [ "f$PERMIT_TEST_FAIL" = "ftrue" ]; then
