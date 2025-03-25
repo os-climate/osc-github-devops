@@ -66,17 +66,30 @@ runs:
         echo "Installing project dependencies"
         if [ -f "${{ inputs.path_prefix }}pyproject.toml" ]; then
           echo "Source: ${{ inputs.path_prefix }}pyproject.toml ⬇️"
-          pip install -q "${{ inputs.path_prefix }}pyproject.toml"
+          pip install "${{ inputs.path_prefix }}pyproject.toml"
         fi
         if [ -f "${{ inputs.path_prefix }}requirements.txt" ]; then
           echo "Source: ${{ inputs.path_prefix }}requirements.txt ⬇️"
-          pip install -q -r "${{ inputs.path_prefix }}requirements.txt"
+          pip install -r "${{ inputs.path_prefix }}requirements.txt"
         fi
         if [ -z "${{ inputs.python_version }}" ]; then
           echo "Error: Python version was not provided ❌"
           exit 1
         else
           echo "Using Python: ${{ inputs.python_version }} 🐍"
+        fi
+
+        # Setup test path
+        if [ -n "${{ inputs.tests_path }}" ]; then
+          TEST_PATH="${{ inputs.path_prefix }}${{ inputs.tests_path }}"
+        # Otherwise use common locations
+        elif [ -d "${{ inputs.path_prefix }}tests" ]; then
+          TEST_PATH="${{ inputs.path_prefix }}tests"
+        elif [ -d "${{ inputs.path_prefix }}test" ]; then
+          TEST_PATH="${{ inputs.path_prefix }}test"
+        else
+          echo "Error: no valid test path was found ❌"
+          exit 1
         fi
 
     - name: "Set up Python ${{ inputs.python_version }}"
@@ -91,44 +104,14 @@ runs:
     # Use tox if configured for tests
     # Otherwise proceed to regular method (pytest)
 
-    - name: "Run tests and generate coverage report [NEVER FAIL]"
-      if: ${{ env.PERMIT_TEST_FAIL }} == 'true'
+    - name: "Run tests and coverage report"
       shell: bash
       run: |
-        # Test folder has been specified
-        if [ -n "${{ inputs.tests_path }}" ]; then
-          TEST_PATH="${{ inputs.path_prefix }}${{ inputs.tests_path }}"
-        # Otherwise use common locations
-        elif [ -d "${{ inputs.path_prefix }}tests" ]; then
-          TEST_PATH="${{ inputs.path_prefix }}tests"
-        elif [ -d "${{ inputs.path_prefix }}test" ]; then
-          TEST_PATH="${{ inputs.path_prefix }}test"
+        # Run tests and coverage report
+        if [ "${{ env.PERMIT_TEST_FAIL }}" = 'true' ]; then
+          pytest --cov --cov-report=html:coverage_report "$TEST_PATH" || true
         else
-          echo "Error: no valid test path was found ❌"
-          exit 1
-        fi
-        pytest --cov --cov-report=html:coverage_report "$TEST_PATH" || true
-
-    - name: "Run tests and generate coverage report [WILL FAIL]"
-      if: ${{ env.PERMIT_TEST_FAIL }} != 'true'
-      shell: bash
-      run: |
-        # Run tests and generate coverage report
-        if [ -d "${{ inputs.path_prefix }}${{ inputs.tests_path }}" ]; then
-          echo "Test path: ${{ inputs.path_prefix }}${{ inputs.tests_path }}"
-          pytest --cov --cov-report=html:coverage_report \
-            "${{ inputs.path_prefix }}${{ inputs.tests_path }}"
-        elif [ -d ${{ inputs.path_prefix }}tests ]; then
-          echo "Test path: tests"
-          pytest --cov --cov-report=html:coverage_report \
-            "${{ inputs.path_prefix }}tests"
-        elif [ -d ${{ inputs.path_prefix }}test ]; then
-          echo "Test path: test"
-          pytest --cov --cov-report=html:coverage_report \
-            "${{ inputs.path_prefix }}test"
-        else
-          echo "Error: path to tests could not be located ❌"
-          exit 1
+          pytest --cov --cov-report=html:coverage_report "$TEST_PATH"
         fi
 
     - name: "Create ZIP archive of coverage report"
