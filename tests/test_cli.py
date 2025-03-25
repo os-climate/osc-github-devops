@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # SPDX-License-Identifier: Apache-2.0
-# SPDX-FileCopyrightText: 2024 The Linux Foundation
+# SPDX-FileCopyrightText: 2025 The Linux Foundation
 
 import os
 import subprocess
@@ -60,10 +60,3 @@ def test_script_completion_run():
         encoding="utf-8",
     )
     assert "Says goodbye" in result.stdout
-
-
-def test_wrong(runner):
-    """Example for a test that fails."""
-    result = runner.invoke(app, ["wrong"])
-    assert result.exit_code == 2
-    assert "Missing argument 'NAME'" in result.stdout

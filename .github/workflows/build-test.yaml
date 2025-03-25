@@ -68,14 +68,32 @@ jobs:
     permissions:
       contents: read
     steps:
-      - name: "Test Python project"
+      - name: "Test Python project [Standard Tests]"
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/python-project-test-matrix@main
         with:
           python_version: ${{ matrix.python-version }}
           report_artefact: true
-          # Required, as local Python project has deliberate test failure
+
+      - name: "Test Python project [Test Failures]"
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/python-project-test-matrix@main
+        with:
+          python_version: ${{ matrix.python-version }}
+          report_artefact: true
+          tests_path: "tests-fail"
+          # Required, as this Python project has deliberate test failure
           never_fail: true
+
+      - name: "Test Python project [Test Failures]"
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/python-project-test-matrix@main
+        # Required, as this Python project has deliberate test failure
+        continue-on-error: true
+        with:
+          python_version: ${{ matrix.python-version }}
+          report_artefact: true
+          tests_path: "tests-fail"
 
   python-audit:
     name: "Python Audit"
