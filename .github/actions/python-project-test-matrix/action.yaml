@@ -57,7 +57,7 @@ runs:
           echo "Error: invalid path/prefix to test directory ❌"
           echo "${{ inputs.path_prefix }}${{ inputs.tests_path }}"
           exit 1
-        PERMIT_TEST_FAIL=$(echo ${{ inputs.PERMIT_TEST_FAIL }} |\
+        PERMIT_TEST_FAIL=$(echo "${{ inputs.PERMIT_TEST_FAIL }}" |\
         tr '[:upper:]' '[:lower:]')
         if [ "f$PERMIT_TEST_FAIL" = "ftrue" ]; then
           echo "Warning: test failures will be permitted ⚠️"
@@ -68,19 +68,19 @@ runs:
         echo "Installing test tooling: pytest, pytest-cov ⬇️"
         python -m pip install --disable-pip-version-check -q pytest pytest-cov
         echo "Installing project dependencies ⬇️"
-        if [ -f ${{ inputs.path_prefix }}pyproject.toml ]; then
+        if [ -f "${{ inputs.path_prefix }}pyproject.toml" ]; then
           echo "Source: ${{ inputs.path_prefix }}pyproject.toml"
-          pip install -q ${{ inputs.path_prefix }}pyproject.toml
+          pip install -q "${{ inputs.path_prefix }}pyproject.toml"
         fi
-        if [ -f ${{ inputs.path_prefix }}requirements.txt ]; then
-          echo "Source: requirements.txt"
-          pip install -q -r ${{ inputs.path_prefix }}requirements.txt
+        if [ -f "${{ inputs.path_prefix }}requirements.txt" ]; then
+          echo "Source: ${{ inputs.path_prefix }}requirements.txt"
+          pip install -q -r "${{ inputs.path_prefix }}requirements.txt"
         fi
         if [ -z "${{ inputs.python_version }}" ]; then
           echo "Error: Python version was not provided ❌"
           exit 1
         else
-          echo "Using Python: "${{ inputs.python_version }} 🐍"
+          echo "Using Python: ${{ inputs.python_version }} 🐍"
         fi
 
     - name: "Set up Python ${{ inputs.python_version }}"

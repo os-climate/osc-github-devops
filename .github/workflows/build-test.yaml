@@ -75,7 +75,7 @@ jobs:
           python_version: ${{ matrix.python-version }}
           report_artefact: true
 
-      - name: "Test Python project [Test Failures]"
+      - name: "Test Python project [With Failure]"
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/python-project-test-matrix@main
         with:
@@ -85,7 +85,7 @@ jobs:
           # Required, as this Python project has deliberate test failure
           never_fail: true
 
-      - name: "Test Python project [Test Failures]"
+      - name: "Test Python project [With Failure]"
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/python-project-test-matrix@main
         # Required, as this Python project has deliberate test failure
