@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2025 The Linux Foundation
 
-# python-project-test-matrix
+# python-project-test-action
 name: "🧪 Python Test"
 description: "Test a Python Project, generate coverage report"
 
@@ -14,7 +14,7 @@ inputs:
     required: true
     type: string
   # Optional
-  PERMIT_TEST_FAIL:
+  PERMIT_FAIL:
     description: "Continue even when a test fails"
     required: false
     type: boolean
@@ -53,11 +53,11 @@ runs:
           echo "${{ inputs.path_prefix }}${{ inputs.tests_path }}"
           exit 1
         fi
-        PERMIT_TEST_FAIL=$(echo "${{ inputs.PERMIT_TEST_FAIL }}" |\
+        PERMIT_FAIL=$(echo "${{ inputs.PERMIT_FAIL }}" |\
         tr '[:upper:]' '[:lower:]')
-        if [ "f$PERMIT_TEST_FAIL" = "ftrue" ]; then
+        if [ "f$PERMIT_FAIL" = "ftrue" ]; then
           echo "Warning: test failures will be permitted ⚠️"
-          echo "PERMIT_TEST_FAIL=true" >> "$GITHUB_ENV"
+          echo "PERMIT_FAIL=true" >> "$GITHUB_ENV"
         fi
 
         # Install modules required for testing
@@ -108,7 +108,7 @@ runs:
       shell: bash
       run: |
         # Run tests and coverage report
-        if [ "${{ env.PERMIT_TEST_FAIL }}" = 'true' ]; then
+        if [ "${{ env.PERMIT_FAIL }}" = 'true' ]; then
           pytest --cov --cov-report=html:coverage_report "$TEST_PATH" || true
         else
           pytest --cov --cov-report=html:coverage_report "$TEST_PATH"
