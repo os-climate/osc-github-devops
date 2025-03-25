@@ -75,14 +75,14 @@ jobs:
 
       - name: "Test Python project [Standard Tests]"
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/python-project-test-matrix@main
+        uses: os-climate/osc-github-devops/.github/actions/python-project-test-action@main
         with:
           python_version: ${{ matrix.python-version }}
           report_artefact: true
 
       - name: "Test Python project [With Failure]"
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/python-project-test-matrix@main
+        uses: os-climate/osc-github-devops/.github/actions/python-project-test-action@main
         with:
           python_version: ${{ matrix.python-version }}
           report_artefact: true
@@ -92,7 +92,7 @@ jobs:
 
       - name: "Test Python project [With Failure]"
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/python-project-test-matrix@main
+        uses: os-climate/osc-github-devops/.github/actions/python-project-test-action@main
         # Required, as this Python project has deliberate test failure
         continue-on-error: true
         with:
@@ -119,7 +119,7 @@ jobs:
 
       - name: "Audit Python project"
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/python-project-audit-matrix@main
+        uses: os-climate/osc-github-devops/.github/actions/python-project-audit-action@main
         with:
           python_version: ${{ matrix.python-version }}
           artefact_path: ${{ needs.python-build.outputs.artefact_path }}
