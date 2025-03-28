@@ -31,7 +31,8 @@ runs:
   steps:
     - name: "Check tag is semantic"
       id: validate
-      uses: lfit/releng-reusable-workflows/.github/actions/tag-validate-semantic-action@main
+      # yamllint disable-line rule:line-length
+      uses: lfreleng-actions/tag-validate-semantic-action@3ddf9a910dba56c93c150578a7c40a60508f9038 # v0.1.0
       with:
         tag: ${{ inputs.tag }}
 

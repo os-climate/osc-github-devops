@@ -73,32 +73,12 @@ jobs:
         with:
           egress-policy: audit
 
-      - name: "Test Python project [Standard Tests]"
+      - name: "Test Python project"
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/python-project-test-action@main
+        uses: lfreleng-actions/python-test-action@18e0f7c7a070bc01b39459d9035e93d78d27671d # v0.1.0
         with:
           python_version: ${{ matrix.python-version }}
           report_artefact: true
-
-      - name: "Test Python project [With Failure]"
-        # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/python-project-test-action@main
-        with:
-          python_version: ${{ matrix.python-version }}
-          report_artefact: true
-          tests_path: "tests-fail"
-          # Required, as this Python project has deliberate test failure
-          never_fail: true
-
-      - name: "Test Python project [With Failure]"
-        # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/python-project-test-action@main
-        # Required, as this Python project has deliberate test failure
-        continue-on-error: true
-        with:
-          python_version: ${{ matrix.python-version }}
-          report_artefact: true
-          tests_path: "tests-fail"
 
   python-audit:
     name: "Python Audit"
@@ -119,7 +99,7 @@ jobs:
 
       - name: "Audit Python project"
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/python-project-audit-action@main
+        uses: lfreleng-actions/python-audit-action@f6ded736889b9dd75ec36a5aa83ff1efc4a6fbc7 # v0.1.0
         with:
           python_version: ${{ matrix.python-version }}
           artefact_path: ${{ needs.python-build.outputs.artefact_path }}

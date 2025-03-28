@@ -99,37 +99,53 @@ jobs:
           attestations: "true"
           sigstore_sign: "true"
 
-  python-test:
-    name: "Test"
-    # yamllint disable-line rule:line-length
-    uses: os-climate/osc-github-devops/.github/workflows/reuse-python-tests.yaml@main
+  python-tests:
+    name: "Python Test"
+    runs-on: "ubuntu-24.04"
     needs:
-      - repository
       - python-build
     # Matrix job
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.python-build.outputs.matrix_json) }}
-    with:
-      python_version: ${{ matrix.python-version }}
     permissions:
       contents: read
+    steps:
+      # Harden the runner used by this workflow
+      - uses: step-security/harden-runner@4d991eb9b905ef189e4c376166672c3f2f230481 # v2.11.0
+        with:
+          egress-policy: audit
+
+      - name: "Test Python project"
+        # yamllint disable-line rule:line-length
+        uses: lfreleng-actions/python-test-action@18e0f7c7a070bc01b39459d9035e93d78d27671d # v0.1.0
+        with:
+          python_version: ${{ matrix.python-version }}
+          report_artefact: true
 
   python-audit:
-    name: "Audit"
-    # yamllint disable-line rule:line-length
-    uses: os-climate/osc-github-devops/.github/workflows/reuse-python-audit.yaml@main
+    name: "Python Audit"
+    runs-on: "ubuntu-24.04"
     needs:
-      - repository
       - python-build
     # Matrix job
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.python-build.outputs.matrix_json) }}
-    with:
-      python_version: ${{ matrix.python-version }}
     permissions:
       contents: read
+    steps:
+      # Harden the runner used by this workflow
+      - uses: step-security/harden-runner@4d991eb9b905ef189e4c376166672c3f2f230481 # v2.11.0
+        with:
+          egress-policy: audit
+
+      - name: "Audit Python project"
+        # yamllint disable-line rule:line-length
+        uses: lfreleng-actions/python-audit-action@f6ded736889b9dd75ec36a5aa83ff1efc4a6fbc7 # v0.1.0
+        with:
+          python_version: ${{ matrix.python-version }}
+          artefact_path: ${{ needs.python-build.outputs.artefact_path }}
 
   notebooks:
     name: "Notebooks"
@@ -154,7 +170,7 @@ jobs:
       - repository
       - python-build
       - python-audit
-      - python-test
+      - python-tests
     runs-on: "ubuntu-24.04"
     permissions:
       contents: read
