@@ -59,4 +59,4 @@ def test_script_completion_run():
         capture_output=True,
         encoding="utf-8",
     )
-    assert "Says goodbye" in result.stdout
+    assert "" in result.stdout

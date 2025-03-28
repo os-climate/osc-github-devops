@@ -41,7 +41,7 @@ Documentation = "https://github.com/os-climate/osc-github-devops/tree/main/docs"
 "Source Code" = "https://github.com/os-climate/osc-github-devops"
 
 [project.scripts]
-osc-github-devops = "devops_reusable_workflows.cli:run"
+osc-github-devops = "osc_github_devops.cli:run"
 
 [build-system]
 requires = ["pdm-backend"]

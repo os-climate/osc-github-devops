@@ -79,39 +79,6 @@ jobs:
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/tox-parse-stanza-action@main
 
-      - name: "Action: tag-validate-semantic-action [semantic tag]"
-        id: tag-validate-semantic-good
-        # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/tag-validate-semantic-action@main
-        with:
-          tag: "v1.2.3"
-
-      - name: "Action: tag-validate-semantic-action [junk tag]"
-        id: tag-validate-semantic-junk
-        # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/tag-validate-semantic-action@main
-        with:
-          tag: "v1.not-valid.3.garbage"
-
-      - name: "Validate: tag-validate-semantic-action"
-        shell: bash
-        run: |
-          # Check output from: tag-validate-semantic-action [semantic/junk]
-          ERRORS="false"
-          if [ "${{ steps.tag-validate-semantic-good.outputs.semantic }}" != "true" ]; then
-            echo "Errors with: tag-validate-semantic v1.2.3"
-            ERRORS="true"
-          fi
-          if [ "${{ steps.tag-validate-semantic-junk.outputs.semantic }}" != "false" ]; then
-            echo "Errors with: semantic-tag-production v1.not-valid.3.garbage"
-            ERRORS="true"
-          fi
-          if [ "$ERRORS" = "true" ]; then
-            echo "ERROR: check semantic tag validation action/code"; exit 1
-          else
-            echo "All tag validation tests passed, no errors found"
-          fi
-
       - name: "Action: repository-tag-current-action"
         id: repository-tag-current-action
         # yamllint disable-line rule:line-length

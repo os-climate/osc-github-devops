@@ -63,7 +63,7 @@ runs:
     - name: "Verify release tag"
       id: tag-validate
       # yamllint disable-line rule:line-length
-      uses: lfit/releng-reusable-workflows/.github/actions/tag-validate-semantic-action@9b845102d5158f0b80bd53405a0b6855b26dc4a0 # v0.2.9
+      uses: lfreleng-actions/tag-validate-semantic-action@3ddf9a910dba56c93c150578a7c40a60508f9038 # v0.1.0
       with:
         tag: ${{ inputs.tag }}
 
