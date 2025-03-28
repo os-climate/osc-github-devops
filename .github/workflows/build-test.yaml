@@ -73,6 +73,8 @@ jobs:
         with:
           egress-policy: audit
 
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
       - name: "Test Python project"
         # yamllint disable-line rule:line-length
         uses: lfreleng-actions/python-test-action@18e0f7c7a070bc01b39459d9035e93d78d27671d # v0.1.0
@@ -96,6 +98,8 @@ jobs:
       - uses: step-security/harden-runner@4d991eb9b905ef189e4c376166672c3f2f230481 # v2.11.0
         with:
           egress-policy: audit
+
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: "Audit Python project"
         # yamllint disable-line rule:line-length
