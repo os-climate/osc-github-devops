@@ -1,0 +1,146 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2025 The Linux Foundation
+
+# python-test-action
+name: "🧪 Python Test"
+description: "Test a Python Project, generate coverage report"
+
+inputs:
+  # Mandatory
+  PYTHON_VERSION:
+    # A matrix Python build version should be passed as input
+    description: "Python version used to run test"
+    required: true
+    type: string
+  # Optional
+  PERMIT_FAIL:
+    description: "Continue even when one or more tests fails"
+    required: false
+    type: boolean
+    default: false
+  REPORT_ARTEFACT:
+    description: "Uploads test/coverage report bundle as artefact"
+    required: false
+    type: boolean
+    default: false
+  PATH_PREFIX:
+    description: "Directory location containing Python project code"
+    type: string
+    required: false
+    default: ""
+  TESTS_PATH:
+    description: "Path relative to the project folder containing tests"
+    required: false
+    type: string
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Setup action/environment"
+      shell: bash
+      run: |
+        # Setup action/environment
+        PATH_PREFIX="${{ inputs.path_prefix }}"
+        if [ -n "$PATH_PREFIX" ] && \
+          [ ! -d "$PATH_PREFIX" ]; then
+          echo "Error: invalid path/prefix to project directory ❌"
+          exit 1
+        fi
+        if [ -n "${{ inputs.tests_path }}" ] && \
+          [ ! -d "${{ inputs.path_prefix }}${{ inputs.tests_path }}" ]; then
+          echo "Error: invalid path/prefix to test directory ❌"
+          echo "${{ inputs.path_prefix }}${{ inputs.tests_path }}"
+          exit 1
+        fi
+        PERMIT_FAIL=$(echo "${{ inputs.PERMIT_FAIL }}" |\
+        tr '[:upper:]' '[:lower:]')
+        if [ "f$PERMIT_FAIL" = "ftrue" ]; then
+          echo "permit_fail=true" >> "$GITHUB_ENV"
+        fi
+
+        # Install modules required for testing
+        echo "Installing test tooling: pytest, pytest-cov ⬇️"
+        python -m pip install --disable-pip-version-check -q pytest pytest-cov
+
+        echo "Installing project and dependencies"
+        if [ -f "$PATH_PREFIXpyproject.toml" ]; then
+          echo "Source: ${PATH_PREFIX%/} ⬇️"
+          echo echo ${@%/}
+          pip install -q ${PATH_PREFIX%/}
+        fi
+        if [ -f "${{ inputs.path_prefix }}requirements.txt" ]; then
+          echo "Source: ${{ inputs.path_prefix }}requirements.txt ⬇️"
+          pip install -q -r "${{ inputs.path_prefix }}requirements.txt"
+        fi
+        if [ -z "${{ inputs.python_version }}" ]; then
+          echo "Error: Python version was not provided ❌"
+          exit 1
+        else
+          echo "Using Python: ${{ inputs.python_version }} 🐍"
+        fi
+
+        # Setup test path
+        if [ -n "${{ inputs.tests_path }}" ]; then
+          TESTS_PATH="${{ inputs.path_prefix }}${{ inputs.tests_path }}"
+        # Otherwise use common locations
+        elif [ -d "${{ inputs.path_prefix }}tests" ]; then
+          TESTS_PATH="${{ inputs.path_prefix }}tests"
+        elif [ -d "${{ inputs.path_prefix }}test" ]; then
+          TESTS_PATH="${{ inputs.path_prefix }}test"
+        else
+          echo "Error: no valid test path was found ❌"
+          exit 1
+        fi
+        echo "tests_path=$TESTS_PATH" >> "$GITHUB_ENV"
+
+    - name: "Set up Python ${{ inputs.python_version }}"
+      # yamllint disable-line rule:line-length
+      uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+      with:
+        python-version: ${{ inputs.python_version }}
+
+    # ToDo: Implement test using TOX
+    # Check for presence of tox.ini
+    # Parse file for test stanza
+    # Use tox if configured for tests
+    # Otherwise proceed to regular method (pytest)
+
+    - name: "Run tests and coverage report"
+      shell: bash
+      run: |
+        # Run tests and coverage report
+          echo "Running tests in: ${{ env.tests_path }} 🧪"
+        if [ "${{ env.permit_fail }}" = 'true' ]; then
+          echo "Warning: flag set to permit test failures ⚠️"
+          pytest --cov --cov-report=html:coverage_report \
+            ${{ env.tests_path }} || true
+        else
+          pytest --cov --cov-report=html:coverage_report ${{ env.tests_path }}
+        fi
+
+    - name: "Create ZIP archive of coverage report"
+      shell: bash
+      run: |
+        # Create ZIP archive of coverage report
+        REPORT_ARTEFACT=$(echo ${{ inputs.REPORT_ARTEFACT }} |\
+        tr '[:upper:]' '[:lower:]')
+        if [ "f$REPORT_ARTEFACT" = "ftrue" ]; then
+          if [ -d coverage_report ]; then
+            echo "Creating ZIP file of HTML coverage report"
+            zip -r test_coverage_report-${{ inputs.python_version }}.zip \
+              coverage_report
+          else
+            echo "No coverage report directory exists"
+          fi
+        fi
+        echo "report_artefact=$REPORT_ARTEFACT" >> "$GITHUB_ENV"
+
+    - name: "Upload test/coverage report"
+      # yamllint disable-line rule:line-length
+      uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
+      if: env.REPORT_ARTEFACT == 'true'
+      with:
+        name: test_coverage_report-${{ inputs.python_version }}.zip
+        path: test_coverage_report-${{ inputs.python_version }}.zip
+        retention-days: 90
