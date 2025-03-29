@@ -41,6 +41,13 @@ runs:
       shell: bash
       run: |
         # Setup action/environment
+        if [ -z "${{ inputs.python_version }}" ]; then
+          echo "Error: Python version was not provided ❌"
+          exit 1
+        else
+          echo "Using Python: ${{ inputs.python_version }} 🐍"
+        fi
+
         PATH_PREFIX="${{ inputs.path_prefix }}"
         if [ -n "$PATH_PREFIX" ] && \
           [ ! -d "$PATH_PREFIX" ]; then
@@ -64,20 +71,19 @@ runs:
         python -m pip install --disable-pip-version-check -q pytest pytest-cov
 
         echo "Installing project and dependencies"
+        # Note: quirks with pip install need careful handling
+
         if [ -f "$PATH_PREFIXpyproject.toml" ]; then
           echo "Source: ${PATH_PREFIX%/} ⬇️"
           echo echo ${@%/}
           pip install -q ${PATH_PREFIX%/}
-        fi
-        if [ -f "${{ inputs.path_prefix }}requirements.txt" ]; then
+        elif [ -z "$PATH_PREFIX" ] && \
+          [ -f pyproject.toml ]; then
+            echo "Source: pyproject.toml ⬇️"
+            pip install -q .
+        elif [ -f "${{ inputs.path_prefix }}requirements.txt" ]; then
           echo "Source: ${{ inputs.path_prefix }}requirements.txt ⬇️"
           pip install -q -r "${{ inputs.path_prefix }}requirements.txt"
-        fi
-        if [ -z "${{ inputs.python_version }}" ]; then
-          echo "Error: Python version was not provided ❌"
-          exit 1
-        else
-          echo "Using Python: ${{ inputs.python_version }} 🐍"
         fi
 
         # Setup test path
