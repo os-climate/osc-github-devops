@@ -41,6 +41,7 @@ runs:
       shell: bash
       run: |
         # Setup action/environment
+        set -vx
         if [ -z "${{ inputs.python_version }}" ]; then
           echo "Error: Python version was not provided ❌"
           exit 1
@@ -48,9 +49,9 @@ runs:
           echo "Using Python: ${{ inputs.python_version }} 🐍"
         fi
 
-        PATH_PREFIX="${{ inputs.path_prefix }}"
-        if [ -n "$PATH_PREFIX" ] && \
-          [ ! -d "$PATH_PREFIX" ]; then
+        path_prefix="${{ inputs.path_prefix }}"
+        if [ -n "$path_prefix" ] && \
+          [ ! -d "$path_prefix" ]; then
           echo "Error: invalid path/prefix to project directory ❌"
           exit 1
         fi
@@ -60,9 +61,9 @@ runs:
           echo "${{ inputs.path_prefix }}${{ inputs.tests_path }}"
           exit 1
         fi
-        PERMIT_FAIL=$(echo "${{ inputs.PERMIT_FAIL }}" |\
+        permit_fail=$(echo "${{ inputs.permit_fail }}" |\
         tr '[:upper:]' '[:lower:]')
-        if [ "f$PERMIT_FAIL" = "ftrue" ]; then
+        if [ "f$permit_fail" = "ftrue" ]; then
           echo "permit_fail=true" >> "$GITHUB_ENV"
         fi
 
@@ -73,11 +74,11 @@ runs:
         echo "Installing project and dependencies"
         # Note: quirks with pip install need careful handling
 
-        if [ -f "$PATH_PREFIXpyproject.toml" ]; then
-          echo "Source: ${PATH_PREFIX%/} ⬇️"
-          echo echo ${@%/}
-          pip install -q ${PATH_PREFIX%/}
-        elif [ -z "$PATH_PREFIX" ] && \
+
+        if [ -f "$path_prefixpyproject.toml" ]; then
+          echo "Source: ${path_prefix%/} ⬇️"
+          pip install -q ${path_prefix%/}
+        elif [ -z "$path_prefix" ] && \
           [ -f pyproject.toml ]; then
             echo "Source: pyproject.toml ⬇️"
             pip install -q .
@@ -129,9 +130,9 @@ runs:
       shell: bash
       run: |
         # Create ZIP archive of coverage report
-        REPORT_ARTEFACT=$(echo ${{ inputs.REPORT_ARTEFACT }} |\
+        report_artefact=$(echo ${{ inputs.report_artefact }} |\
         tr '[:upper:]' '[:lower:]')
-        if [ "f$REPORT_ARTEFACT" = "ftrue" ]; then
+        if [ "f$report_artefact" = "ftrue" ]; then
           if [ -d coverage_report ]; then
             echo "Creating ZIP file of HTML coverage report"
             zip -r test_coverage_report-${{ inputs.python_version }}.zip \
@@ -140,7 +141,7 @@ runs:
             echo "No coverage report directory exists"
           fi
         fi
-        echo "report_artefact=$REPORT_ARTEFACT" >> "$GITHUB_ENV"
+        echo "report_artefact=$report_artefact" >> "$GITHUB_ENV"
 
     - name: "Upload test/coverage report"
       # yamllint disable-line rule:line-length
