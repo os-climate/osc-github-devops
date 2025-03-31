@@ -1,0 +1,89 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2025 The Linux Foundation
+
+# python-audit-action
+name: "🐍 Python Dependency Audit"
+# yamllint disable-line rule:line-length
+description: "Check a Python project's dependencies for known security vulnerabilities"
+
+inputs:
+  # Mandatory
+  PYTHON_VERSION:
+    description: "Python version used to perform audit"
+    required: true
+  # Optional
+  ARTEFACT_NAME:
+    description: "Build artefacts from previous job(s) have this name/label"
+    required: false
+    type: string
+  ARTEFACT_PATH:
+    description: "Build artefacts will be downloaded to this folder/directory"
+    required: true
+    type: string
+    default: "dist"
+  NEVER_FAIL:
+    description: "Continue even when an audit fails"
+    required: false
+    default: false
+  SUMMARY:
+    description: "Whether to generate summary output"
+    type: boolean
+    required: false
+    default: true
+  PATH_PREFIX:
+    description: "Directory location containing project code"
+    type: string
+    required: false
+    default: ""
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Download build artefacts ⬇"
+      # yamllint disable-line rule:line-length
+      uses: actions/download-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      with:
+        name: "${{ inputs.artefact_name }}"
+        path: "${{ inputs.artefact_path }}"
+        if-no-files-found: error
+
+    - name: "Setup Python ${{ inputs.python_version }}"
+      # yamllint disable-line rule:line-length
+      uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+      with:
+        python-version: ${{ inputs.python_version }}
+
+    - name: "Install tooling and build products/dependencies"
+      shell: bash
+      run: |
+        # Install tooling and build products/dependencies
+        echo "Upgrading: pip, pipx, setuptools"
+        python -m pip install -q --upgrade pip pipx setuptools
+        echo "Installing built package(s) and dependencies"
+        for WHEEL in ${{ inputs.artefact_path }}/*.whl; do
+          echo "Installing: $WHEEL"
+          pip install -q "$WHEEL"
+        done
+
+    - name: "Install from Pipfile.lock/requirements.txt"
+      shell: bash
+      run: |
+        # Export/install additional dependencies
+        if [ -f "${{ inputs.path_prefix }}"Pipfile.lock ]; then
+          echo "Exporting dependencies from: Pipfile.lock"
+          pipx run pipfile-requirements ${{ inputs.path_prefix }}Pipfile.lock \
+            > ${{ inputs.path_prefix }}requirements.txt
+        fi
+        if [ -f "${{ inputs.path_prefix }}"requirements.txt ]; then
+          echo "Installing dependencies from: requirements.txt"
+          pip install -q -r requirements.txt
+        fi
+
+    - name: "Auditing with: pypa/gh-action-pip-audit"
+      # yamllint disable-line rule:line-length
+      uses: pypa/gh-action-pip-audit@1220774d901786e6f652ae159f7b6bc8fea6d266 # v1.1.0
+      with:
+        inputs: ${{ inputs.path_prefix }}
+        summary: ${{ inputs.summary }}
+        virtual-environment: env/
