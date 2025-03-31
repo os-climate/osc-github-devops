@@ -78,7 +78,7 @@ jobs:
 
       - name: "Test Python project"
         # yamllint disable-line rule:line-length
-        uses: lfreleng-actions/python-test-action@9954088a7dcbc59c83a81425e959d4680605ac54 # v0.1.1
+        uses: modeseven-lfreleng-actions/test-python-test-action@main # Testing
         with:
           python_version: ${{ matrix.python-version }}
           report_artefact: true
@@ -107,8 +107,6 @@ jobs:
         uses: modeseven-lfreleng-actions/test-python-audit-action@main
         with:
           python_version: ${{ matrix.python-version }}
-          artefact_name: ${{ needs.python-build.outputs.artefact_name }}
-          artefact_path: ${{ needs.python-build.outputs.artefact_path }}
 
   notebooks:
     name: "Jupyter notebooks"
