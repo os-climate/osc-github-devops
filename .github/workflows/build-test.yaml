@@ -36,6 +36,7 @@ jobs:
     runs-on: ubuntu-24.04
     outputs:
       matrix_json: ${{ steps.python-build.outputs.matrix_json }}
+      artefact_name: ${{ steps.python-build.outputs.artefact_name }}
       artefact_path: ${{ steps.python-build.outputs.artefact_path }}
     permissions:
       contents: write
@@ -103,9 +104,10 @@ jobs:
 
       - name: "Audit Python project"
         # yamllint disable-line rule:line-length
-        uses: lfreleng-actions/python-audit-action@f6ded736889b9dd75ec36a5aa83ff1efc4a6fbc7 # v0.1.0
+        uses: os-climate/osc-github-devops/.github/actions/python-audit-action@main
         with:
           python_version: ${{ matrix.python-version }}
+          artefact_name: ${{ needs.python-build.outputs.artefact_name }}
           artefact_path: ${{ needs.python-build.outputs.artefact_path }}
 
   notebooks:

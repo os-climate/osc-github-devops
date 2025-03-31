@@ -41,7 +41,6 @@ runs:
       shell: bash
       run: |
         # Setup action/environment
-        set -vx
         if [ -z "${{ inputs.python_version }}" ]; then
           echo "Error: Python version was not provided ❌"
           exit 1
@@ -74,10 +73,10 @@ runs:
         echo "Installing project and dependencies"
         # Note: quirks with pip install need careful handling
 
-
-        if [ -f "$path_prefixpyproject.toml" ]; then
+        if [ -f "$path_prefix"pyproject.toml ]; then
           echo "Source: ${path_prefix%/} ⬇️"
-          pip install -q ${path_prefix%/}
+          pip install -q "$path_prefix"
+          # pip install -q ${path_prefix%/}
         elif [ -z "$path_prefix" ] && \
           [ -f pyproject.toml ]; then
             echo "Source: pyproject.toml ⬇️"
