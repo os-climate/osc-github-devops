@@ -78,7 +78,7 @@ jobs:
 
       - name: "Test Python project"
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/python-test-action@main
+        uses: lfreleng-actions/python-test-action@9954088a7dcbc59c83a81425e959d4680605ac54 # v0.1.1
         with:
           python_version: ${{ matrix.python-version }}
           report_artefact: true
@@ -104,7 +104,7 @@ jobs:
 
       - name: "Audit Python project"
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/python-audit-action@main
+        uses: modeseven-lfreleng-actions/test-python-audit-action@main
         with:
           python_version: ${{ matrix.python-version }}
           artefact_name: ${{ needs.python-build.outputs.artefact_name }}
