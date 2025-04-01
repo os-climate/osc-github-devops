@@ -46,7 +46,8 @@ repos:
         args: ["--fix=lf"]
       - id: name-tests-test
         args: ["--pytest-test-first"]
-      - id: no-commit-to-branch
+      # Disabled; TOX lint will otherwise fail
+      # - id: no-commit-to-branch
       # - id: pretty-format-json
       - id: requirements-txt-fixer
       - id: sort-simple-yaml

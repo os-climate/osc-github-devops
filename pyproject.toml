@@ -13,12 +13,12 @@ authors = [
 dependencies = ["typer>=0.15.2", "jupyterlab>=4.3.6"]
 requires-python = "<3.13,>=3.11"
 readme = "README.md"
-license = {text = "Apache-2.0"}
+license = "Apache-2.0"
+license-files = ["LICENSES/Apache-2.0.txt"]
 keywords = ["Climate", "Finance"]
 classifiers = [
   "Intended Audience :: Developers",
   "Intended Audience :: Science/Research",
-  "License :: OSI Approved :: Apache Software License",
   "Operating System :: MacOS",
   "Operating System :: Microsoft :: Windows",
   "Operating System :: Unix",
