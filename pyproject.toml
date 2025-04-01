@@ -15,7 +15,7 @@ requires-python = "<3.13,>=3.11"
 readme = "README.md"
 license = "Apache-2.0"
 license-files = ["LICENSES/Apache-2.0.txt"]
-keywords = ["Climate", "Finance"]
+keywords = ["GitHub"]
 classifiers = [
   "Intended Audience :: Developers",
   "Intended Audience :: Science/Research",
@@ -46,7 +46,6 @@ osc-github-devops = "osc_github_devops.cli:run"
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
-
 
 [tool.pdm]
 distribution = true
