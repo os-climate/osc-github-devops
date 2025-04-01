@@ -90,7 +90,8 @@ jobs:
         uses: modeseven-lfreleng-actions/test-python-test-action@main # Testing
         with:
           python_version: ${{ matrix.python-version }}
-          report_artefact: true
+          # Errors occur if this is requested more than once
+          report_artefact: false
 
   python-audit:
     name: "Python Audit"
