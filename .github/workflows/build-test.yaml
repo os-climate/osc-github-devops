@@ -30,7 +30,7 @@ jobs:
       contents: read
 
   python-build:
-    name: "Python build"
+    name: "Python Build"
     needs: repository
     if: needs.repository.outputs.python_project  == 'true'
     runs-on: ubuntu-24.04
@@ -58,7 +58,7 @@ jobs:
           tag: ${{ needs.repository.outputs.build_tag }}
 
   python-tests:
-    name: "Python Test"
+    name: "Python Tests"
     runs-on: "ubuntu-24.04"
     needs:
       - python-build
@@ -76,22 +76,11 @@ jobs:
 
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-      - name: "Test Python project [TOX]"
-        # yamllint disable-line rule:line-length
-        uses: modeseven-lfreleng-actions/test-python-test-action@main # Testing
-        with:
-          python_version: ${{ matrix.python-version }}
-          report_artefact: true
-          tox_tests: true
-          tox_envs: "tests"
-
       - name: "Test Python project [PYTEST]"
         # yamllint disable-line rule:line-length
         uses: modeseven-lfreleng-actions/test-python-test-action@main # Testing
         with:
           python_version: ${{ matrix.python-version }}
-          # Errors occur if this is requested more than once
-          report_artefact: false
 
   python-audit:
     name: "Python Audit"
@@ -119,10 +108,9 @@ jobs:
           python_version: ${{ matrix.python-version }}
 
   notebooks:
-    name: "Jupyter notebooks"
+    name: "Test Jupyter Notebooks"
+    runs-on: "ubuntu-24.04"
     if: needs.repository.outputs.jupyter_notebooks  == 'true'
-    # yamllint disable-line rule:line-length
-    uses: os-climate/osc-github-devops/.github/workflows/reuse-notebook-tests.yaml@main
     needs:
       - repository
       - python-build
@@ -130,7 +118,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.python-build.outputs.matrix_json) }}
-    with:
-      python_version: ${{ matrix.python-version }}
     permissions:
       contents: read
+    steps:
+      # Harden the runner used by this workflow
+      - uses: step-security/harden-runner@4d991eb9b905ef189e4c376166672c3f2f230481 # v2.11.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - uses: modeseven-lfreleng-actions/python-notebook-test-action@initial-update # Testing
+        with:
+          python_version: ${{ matrix.python-version }}
