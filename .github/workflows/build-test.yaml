@@ -53,7 +53,7 @@ jobs:
       - name: "Build Python project"
         id: python-build
         # yamllint disable-line rule:line-length
-        uses: lfreleng-actions/python-build-action@946fc0a8f6dc5b2103d871044f48bda0905a68fa # v0.1.0
+        uses: lfreleng-actions/python-build-action@759476bd3c476c1d16aae50ebddce1512ec290af # v0.1.1
         with:
           tag: ${{ needs.repository.outputs.build_tag }}
 
@@ -78,7 +78,7 @@ jobs:
 
       - name: "Test Python project [PYTEST]"
         # yamllint disable-line rule:line-length
-        uses: modeseven-lfreleng-actions/test-python-test-action@main # Testing
+        uses: lfreleng-actions/python-test-action@133acf37ea40beae68d97d85d18db9096d79ca6b # v0.1.2
         with:
           python_version: ${{ matrix.python-version }}
 
@@ -103,7 +103,7 @@ jobs:
 
       - name: "Audit Python project"
         # yamllint disable-line rule:line-length
-        uses: modeseven-lfreleng-actions/test-python-audit-action@main
+        uses: lfreleng-actions/python-audit-action@f6ded736889b9dd75ec36a5aa83ff1efc4a6fbc7 # v0.1.0
         with:
           python_version: ${{ matrix.python-version }}
 
