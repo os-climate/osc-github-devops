@@ -693,13 +693,13 @@ files = [
 
 [[package]]
 name = "json5"
-version = "0.10.0"
+version = "0.12.0"
 requires_python = ">=3.8.0"
 summary = "A Python implementation of the JSON5 data format."
 groups = ["default"]
 files = [
-    {file = "json5-0.10.0-py3-none-any.whl", hash = "sha256:19b23410220a7271e8377f81ba8aacba2fdd56947fbb137ee5977cbe1f5e8dfa"},
-    {file = "json5-0.10.0.tar.gz", hash = "sha256:e66941c8f0a02026943c52c2eb34ebeb2a6f819a0be05920a6f5243cd30fd559"},
+    {file = "json5-0.12.0-py3-none-any.whl", hash = "sha256:6d37aa6c08b0609f16e1ec5ff94697e2cbbfbad5ac112afa05794da9ab7810db"},
+    {file = "json5-0.12.0.tar.gz", hash = "sha256:0b4b6ff56801a1c7dc817b0241bca4ce474a0e6a163bfef3fc594d3fd263ff3a"},
 ]
 
 [[package]]
@@ -889,8 +889,8 @@ files = [
 
 [[package]]
 name = "jupyterlab"
-version = "4.3.6"
-requires_python = ">=3.8"
+version = "4.4.0"
+requires_python = ">=3.9"
 summary = "JupyterLab computational environment"
 groups = ["default"]
 dependencies = [
@@ -906,14 +906,14 @@ dependencies = [
     "jupyterlab-server<3,>=2.27.1",
     "notebook-shim>=0.2",
     "packaging",
-    "setuptools>=40.8.0",
+    "setuptools>=41.1.0",
     "tomli>=1.2.2; python_version < \"3.11\"",
     "tornado>=6.2.0",
     "traitlets",
 ]
 files = [
-    {file = "jupyterlab-4.3.6-py3-none-any.whl", hash = "sha256:fc9eb0455562a56a9bd6d2977cf090842f321fa1a298fcee9bf8c19de353d5fd"},
-    {file = "jupyterlab-4.3.6.tar.gz", hash = "sha256:2900ffdbfca9ed37c4ad7fdda3eb76582fd945d46962af3ac64741ae2d6b2ff4"},
+    {file = "jupyterlab-4.4.0-py3-none-any.whl", hash = "sha256:61d33991fbb352cc7caac08bd0c34577fea86d8d5d9772600d9d5a6bcbc882c0"},
+    {file = "jupyterlab-4.4.0.tar.gz", hash = "sha256:f1767d5f0104e40f3b4a63bf6892bbef8e4704dcabf0c78408a3bdc411792f04"},
 ]
 
 [[package]]
@@ -1936,13 +1936,13 @@ files = [
 
 [[package]]
 name = "typing-extensions"
-version = "4.13.0"
+version = "4.13.1"
 requires_python = ">=3.8"
 summary = "Backported and Experimental Type Hints for Python 3.8+"
 groups = ["default"]
 files = [
-    {file = "typing_extensions-4.13.0-py3-none-any.whl", hash = "sha256:c8dd92cc0d6425a97c18fbb9d1954e5ff92c1ca881a309c45f06ebc0b79058e5"},
-    {file = "typing_extensions-4.13.0.tar.gz", hash = "sha256:0a4ac55a5820789d87e297727d229866c9650f6521b64206413c4fbada24d95b"},
+    {file = "typing_extensions-4.13.1-py3-none-any.whl", hash = "sha256:4b6cf02909eb5495cfbc3f6e8fd49217e6cc7944e145cdda8caa3734777f9e69"},
+    {file = "typing_extensions-4.13.1.tar.gz", hash = "sha256:98795af00fb9640edec5b8e31fc647597b4691f099ad75f469a2616be1a76dff"},
 ]
 
 [[package]]
