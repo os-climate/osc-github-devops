@@ -129,7 +129,7 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       # yamllint disable-line rule:line-length
-      - uses: modeseven-lfreleng-actions/python-notebook-test-action@add-pytest-cov # Testing
+      - uses: modeseven-lfreleng-actions/python-notebook-test-action@coverage-fixes # Testing
         # yamllint disable-line rule:line-length
         # - uses: lfreleng-actions/python-notebook-test-action@c5e8dd5ee97efa57bdc055fd5aa2710cdc62a6bf # v0.1.0
         with:
