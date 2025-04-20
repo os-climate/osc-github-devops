@@ -9,7 +9,7 @@ version = 1
 path = [
 	 "tests/dist/**",
 	 "img/**",
-	 "pdm.lock",
+	 "*.lock",
      "test_coverage_report*"
 ]
 SPDX-License-Identifier = "Apache-2.0"
