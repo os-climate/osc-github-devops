@@ -66,6 +66,7 @@ distribution = true
 testpaths = [
   "tests/",
 ]
+
 addopts = ["--cov", "--cov-report=html"]
 
 [tool.coverage.run]
