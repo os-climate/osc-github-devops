@@ -4,7 +4,6 @@
 
 name: "CodeQL Scan"
 
-# yamllint disable-line rule:truthy
 on:
   workflow_dispatch:
   push:
@@ -20,8 +19,7 @@ permissions: {}
 jobs:
   scan:
     name: "CodeQL"
-    # yamllint disable-line rule:line-length
-    uses: lfit/releng-reusable-workflows/.github/workflows/reuse-codeql.yaml@main # ToDo: commit SHA
+    uses: os-climate/osc-github-devops/.github/workflows/reuse-codeql.yaml@main
     permissions:
       security-events: write
       # required to fetch internal or private CodeQL packs
