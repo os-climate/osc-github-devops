@@ -72,7 +72,7 @@ jobs:
       - name: "Action: git-commit-message"
         id: git-commit-message
         # yamllint disable-line rule:line-length
-        uses: lfit/releng-reusable-workflows/.github/actions/git-commit-message-action@1d327501514102db5018642036a974e79415ec5a # v0.2.8
+        uses: lfit/releng-reusable-workflows/.github/actions/git-commit-message-action@2a1566a557320810e89d1da3f9692292bb485313 # v0.2.12
 
       - name: "Extract TOX stanza"
         id: tox-parse-stanza-action

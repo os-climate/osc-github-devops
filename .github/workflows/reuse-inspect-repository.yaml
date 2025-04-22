@@ -76,7 +76,7 @@ jobs:
       - name: "Repository metadata"
         id: repository
         # yamllint disable-line rule:line-length
-        uses: lfit/releng-reusable-workflows/.github/actions/repository-metadata-action@9b845102d5158f0b80bd53405a0b6855b26dc4a0 # v0.2.9
+        uses: lfit/releng-reusable-workflows/.github/actions/repository-metadata-action@2a1566a557320810e89d1da3f9692292bb485313 # v0.2.12
 
       - name: "Classify content"
         id: content
