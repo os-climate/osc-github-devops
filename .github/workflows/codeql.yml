@@ -17,8 +17,8 @@ on:
 permissions: {}
 
 jobs:
-  analyze:
-    name: "CodeQL Scan"
+  scan:
+    name: "CodeQL"
     uses: os-climate/osc-github-devops/.github/workflows/reuse-codeql.yaml@main
     permissions:
       security-events: write
