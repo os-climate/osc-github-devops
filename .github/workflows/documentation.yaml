@@ -58,14 +58,14 @@ jobs:
       - name: "Check documentation dependencies"
         id: docs-requirements
         # yamllint disable-line rule:line-length
-        uses: lfreleng-actions/path-check-action@7f728b8ac404d3309cfa576f0ffc54217ade2faa # v0.1.1
+        uses: lfreleng-actions/path-check-action@fb3d34249298b1165071de6a49ef24fc8423208c # v0.1.3
         with:
           path: "docs/requirements.txt"
 
       - name: "Check for TOX configuration"
         id: tox-ini
         # yamllint disable-line rule:line-length
-        uses: lfreleng-actions/path-check-action@7f728b8ac404d3309cfa576f0ffc54217ade2faa # v0.1.1
+        uses: lfreleng-actions/path-check-action@fb3d34249298b1165071de6a49ef24fc8423208c # v0.1.3
         with:
           path: "tox.ini"
 
