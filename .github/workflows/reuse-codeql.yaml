@@ -11,8 +11,8 @@ on:
 permissions: {}
 
 jobs:
-  analyze:
-    name: "CodeQL Scan: ${{ matrix.language }}"
+  scan:
+    name: "Language: ${{ matrix.language }}"
     runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-24.04' }}
     timeout-minutes: ${{ (matrix.language == 'swift' && 120) || 360 }}
     permissions:
