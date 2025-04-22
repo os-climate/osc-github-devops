@@ -23,8 +23,6 @@ permissions: {}
 jobs:
   repository:
     name: "Repository"
-    # Only on push event to the common HEAD branches
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
     # yamllint disable-line rule:line-length
     uses: os-climate/osc-github-devops/.github/workflows/reuse-inspect-repository.yaml@main
     permissions:
