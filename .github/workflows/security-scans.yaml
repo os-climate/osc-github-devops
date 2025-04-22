@@ -29,7 +29,7 @@ jobs:
   sonatype-lifecycle:
     name: "Sonatype Lifecycle"
     # yamllint disable-line rule:line-length
-    uses: lfit/releng-reusable-workflows/.github/workflows/reuse-sonatype-lifecycle.yaml@83e3ea0dcbfb1e8c707b0284ae7e7c376b0e27d4 # v0.2.7
+    uses: lfit/releng-reusable-workflows/.github/workflows/reuse-sonatype-lifecycle.yaml@2a1566a557320810e89d1da3f9692292bb485313 # v0.2.12
     secrets:
       NEXUS_IQ_PASSWORD: ${{ secrets.NEXUS_IQ_PASSWORD }}
 
@@ -37,7 +37,7 @@ jobs:
   sonarqube-cloud:
     name: "SonarQube Cloud"
     # yamllint disable-line rule:line-length
-    uses: lfit/releng-reusable-workflows/.github/workflows/reuse-sonarqube-cloud.yaml@83e3ea0dcbfb1e8c707b0284ae7e7c376b0e27d4 # v0.2.7
+    uses: lfit/releng-reusable-workflows/.github/workflows/reuse-sonarqube-cloud.yaml@2a1566a557320810e89d1da3f9692292bb485313 # v0.2.12
     permissions:
       # Needed to upload the results to code-scanning dashboard.
       security-events: write
