@@ -152,3 +152,5 @@ jobs:
       - name: "Promote draft release"
         # yamllint disable-line rule:line-length
         uses: modeseven-lfreleng-actions/draft-release-promote-action@initial-update # ToDo: Testing
+        with:
+          token: "${{ secrets.GITHUB_TOKEN }}"
