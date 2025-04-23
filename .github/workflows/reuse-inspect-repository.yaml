@@ -87,7 +87,7 @@ jobs:
         id: tag-validate
         if: startsWith(github.ref, 'refs/tags/')
         # yamllint disable-line rule:line-length
-        uses: lfreleng-actions/tag-validate-semantic-action@3ddf9a910dba56c93c150578a7c40a60508f9038 # v0.1.0
+        uses: lfreleng-actions/tag-validate-semantic-action@1af2150b2d083e815b7e7994ca22fc490cf2d76c # v0.1.1
         with:
           tag: ${{ github.ref_name }}
 
