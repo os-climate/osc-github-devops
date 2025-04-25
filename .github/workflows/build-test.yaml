@@ -134,6 +134,6 @@ jobs:
 
       - name: "Notebook tests ${{ matrix.python-version }}"
         # yamllint disable-line rule:line-length
-        uses: lfreleng-actions/python-notebook-test-action@c5e8dd5ee97efa57bdc055fd5aa2710cdc62a6bf # v0.1.0
+        uses: lfreleng-actions/python-notebook-test-action@471123b59d0ef608f95bece4d36a95ebabab0a68 # v0.1.1
         with:
           python_version: ${{ matrix.python-version }}
