@@ -19,7 +19,8 @@ permissions: {}
 jobs:
   scan:
     name: "CodeQL"
-    uses: os-climate/osc-github-devops/.github/workflows/reuse-codeql.yaml@main
+    # yamllint disable-line rule:line-length
+    uses: modeseven-lfit/releng-reusable-workflows/.github/workflowsreuse-python-codeql.yaml@add-codeql-reusable-wf # Testing
     permissions:
       security-events: write
       # required to fetch internal or private CodeQL packs
