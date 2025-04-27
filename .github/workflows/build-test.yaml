@@ -82,9 +82,10 @@ jobs:
 
       - name: "Python tests [pytest] ${{ matrix.python-version }}"
         # yamllint disable-line rule:line-length
-        uses: lfreleng-actions/python-test-action@b06828bf94ae4beef00d49cddc06839eca2d8f05 # v0.1.6
+        uses: modeseven-lfreleng-actions/python-test-action@update-action # Testing
         with:
           python_version: ${{ matrix.python-version }}
+          codecov_report: true
 
   python-audit:
     name: "Python Audit"
