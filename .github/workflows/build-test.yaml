@@ -86,6 +86,7 @@ jobs:
         with:
           python_version: ${{ matrix.python-version }}
           codecov_report: true
+          codecov_token: "test"
 
   python-audit:
     name: "Python Audit"
