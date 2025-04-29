@@ -32,9 +32,9 @@ runs:
     - name: "Check tag is semantic"
       id: validate
       # yamllint disable-line rule:line-length
-      uses: lfreleng-actions/tag-validate-semantic-action@3ddf9a910dba56c93c150578a7c40a60508f9038 # v0.1.0
+      uses: lfreleng-actions/tag-validate-semantic-action@0371424cc6cf23c5f84ab11faf675c969014706d # v0.2.0
       with:
-        tag: ${{ inputs.tag }}
+        string: "${{ inputs.tag }}"
 
     - name: "Abort when tag is NOT semantic"
       if: ${{ steps.outputs.validate.semantic }} == 'false'
