@@ -83,13 +83,14 @@ jobs:
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/repository-scan-content-action@main
 
-      - name: "Verify pushed tag"
+      - name: "Verify pushed tag 🏷️"
         id: tag-validate
         if: startsWith(github.ref, 'refs/tags/')
         # yamllint disable-line rule:line-length
-        uses: lfreleng-actions/tag-validate-semantic-action@0371424cc6cf23c5f84ab11faf675c969014706d # v0.2.0
+        uses: modeseven-lfreleng-actions/tag-push-verify-action@initial-update # ToDo: Testing
         with:
-          string: ${{ github.ref_name }}
+          versioning: "semver"
+          exit_on_fail: "true"
 
       - name: "Pushed tag"
         if: startsWith(github.ref, 'refs/tags/')
@@ -98,15 +99,7 @@ jobs:
           # Pushed tag values
           if [ ${{ steps.tag-validate.outputs.valid }} == 'true' ]; then
             pushed_tag="${{ github.ref_name }}"
-            echo "Pushed semantic tag: $pushed_tag ✅"
-            echo "Pushed semantic tag: $pushed_tag ✅" >> "$GITHUB_STEP_SUMMARY"
             echo "pushed_tag=$pushed_tag" >> "$GITHUB_ENV"
-            echo "pushed_tag=$pushed_tag" >> "$GITHUB_OUTPUT"
-          else
-            echo "The pushed tag was NOT semantic: ${{ github.ref_name }} ❌"
-            echo "The pushed tag was NOT semantic: ${{ github.ref_name }} ❌" \
-              >> "$GITHUB_STEP_SUMMARY"
-            exit 1
           fi
 
       - name: "Get current repository tag"
