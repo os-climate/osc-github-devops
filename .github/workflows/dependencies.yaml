@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2025 The Linux Foundation
 
-# Updates Python dependencies and raise a pull request
-name: "Python Dependencies"
+# Updates Python dependencies and raises a pull request with changes
+name: "Python Dependencies Update ♻️"
 
 # yamllint disable-line rule:truthy
 on:

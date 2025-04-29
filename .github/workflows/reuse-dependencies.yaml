@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2025 The Linux Foundation
 
-# Updates Python dependencies and raises a pull request
-name: "[R] Update Dependencies"
+# Updates Python dependencies and raises a pull request with changes
+name: "[R] Python Dependencies Update ♻️"
 
 on:
   workflow_call:
@@ -11,20 +11,8 @@ on:
 permissions: {}
 
 jobs:
-  repository:
-    name: "Repository Checks"
-    if: startsWith(github.ref, 'dep/update-pdm-lock') != true
-    # yamllint disable-line rule:line-length
-    uses: os-climate/osc-github-devops/.github/workflows/reuse-inspect-repository.yaml@main
-    permissions:
-      contents: read
-
   python-dependencies:
     name: "Update Python Dependencies"
-    needs:
-      - repository
-    # Only run if Python code is present in repository
-    if: needs.repository.outputs.python_project  == 'true'
     runs-on: "ubuntu-24.04"
     permissions:
       # IMPORTANT: mandatory to raise the PR
@@ -39,6 +27,6 @@ jobs:
           egress-policy: audit
 
       # yamllint disable-line rule:line-length
-      - uses: modeseven-lfreleng-actions/python-dependencies-update-action@initial-update # Testing
+      - uses: lfreleng-actions/python-dependencies-update-action@3b2b40361716c4f940eaf6876aa9e4841c58b146 # v0.1.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
