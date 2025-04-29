@@ -24,6 +24,7 @@ jobs:
 
   one-password:
     name: "1Password"
+    # yamllint disable-line rule:line-length
     uses: os-climate/osc-github-devops/.github/workflows/reuse-one-password.yaml@main
     # Do NOT run until change is merged; secrets will NOT be available and workflow WILL fail
     if: github.event_name != 'pull_request'
@@ -38,7 +39,8 @@ jobs:
 
   repository:
     name: "Repository Content"
-    uses: os-climate/osc-github-devops/.github/workflows/reuse-inspect-repository.yaml@main
+    # yamllint disable-line rule:line-length
+    uses: os-climate/osc-github-devops/.github/workflows/reuse-inspect-repository.yaml@3c25c3344deb02b833237916345b6024777e979e # Pre v0.1.30
     permissions:
       contents: read
 
@@ -55,6 +57,7 @@ jobs:
           egress-policy: audit
 
       - name: "Checkout repository"
+        # yamllint disable-line rule:line-length
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
         with:
