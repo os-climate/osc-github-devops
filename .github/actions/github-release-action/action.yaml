@@ -81,7 +81,7 @@ runs:
           echo "GITHUB_TOKEN=${{ inputs.token }}" >> "$GITHUB_ENV"
         fi
         # Build tag values
-        if [ ${{ steps.tag-validate.outputs.semantic }} == 'true' ]; then
+        if [ ${{ steps.tag-validate.outputs.valid }} == 'true' ]; then
           pushed_tag="${{ inputs.tag }}"
         else
           echo "Release tag NOT semantic: ${{ inputs.tag }} ❌"

@@ -25,7 +25,7 @@ outputs:
     value: ${{ steps.latest.outputs.numeric_tag }}
   SEMANTIC:
     description: "Set true if current tag is semantic"
-    value: ${{ steps.validate.outputs.semantic }}
+    value: ${{ steps.validate.outputs.valid }}
 
 runs:
   using: "composite"
@@ -104,7 +104,7 @@ runs:
       shell: bash
       run: |
         # Set flag if semantic
-        if [ "${{ steps.validate.outputs.semantic }}" = "true" ]; then
+        if [ "${{ steps.validate.outputs.valid }}" = "true" ]; then
           echo "Current/latest repository tag is semantic ✅" >> "$GITHUB_STEP_SUMMARY"
         else
           echo "Current/latest repository tag is NOT semantic ❌" >> "$GITHUB_STEP_SUMMARY"
