@@ -35,8 +35,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          # Requires the type to be capitlized, but accept any of the standard
-          # types
+          # Requires the type to be capitalised,
+          # but accept any of the standard types
           types: |
             Fix
             Feat
@@ -56,5 +56,8 @@ jobs:
     name: "Verify"
     permissions:
       contents: read
-    # yamllint disable-line rule:line-length
-    uses: lfit/releng-reusable-workflows/.github/workflows/reuse-standalone-linting.yaml@b20d15799ca2b9a492b61c4dde4081f0bc96baa7 # v0.2.13
+    runs-on: ubuntu-24.04
+    steps:
+      # yamllint disable-line rule:line-length
+      - name: 'Standlone linting checks"'
+        uses: modeseven-lfreleng-actions/standalone-linting-action@initial-branch # ToDo
