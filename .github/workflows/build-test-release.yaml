@@ -7,10 +7,10 @@ name: "Python Build/Test/Release"
 
 # yamllint disable-line rule:truthy
 on:
+  # Trigger on tag push events
   push:
     tags:
-      # Triggered only by semantic tags push
-      - "v[0-9]+.[0-9]+.[0-9]+"
+      - "**"
 
 env:
   # Uncomment the variable below to disable PyPI publishing
@@ -28,12 +28,14 @@ jobs:
     permissions:
       contents: read
 
-  validate-tag:
+  tag-validate:
     name: "Validate tag push"
     needs: repository
     runs-on: ubuntu-24.04
     permissions:
       contents: read
+    outputs:
+      tag: ${{ steps.tag-validate.outputs.tag }}
     steps:
       # Harden the runner used by this workflow
       - uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
@@ -41,6 +43,7 @@ jobs:
           egress-policy: audit
 
       - name: "Verify Pushed Tag"
+        id: tag-validate
         # yamllint disable-line rule:line-length
         uses: modeseven-lfreleng-actions/tag-push-verify-action@initial-update # Testing
         with:
@@ -50,7 +53,7 @@ jobs:
     name: "Python Build"
     needs:
       - repository
-      - validate-tag
+      - tag-validate
     if: needs.repository.outputs.python_project  == 'true'
     runs-on: ubuntu-24.04
     outputs:
@@ -74,7 +77,7 @@ jobs:
         # yamllint disable-line rule:line-length
         uses: lfreleng-actions/python-build-action@f3b78ac710af9dca46c5c4562f53ac3660f2ea59 # v0.1.7
         with:
-          tag: ${{ needs.repository.outputs.build_tag }}
+          tag: "${{ needs.tag-validate.outputs.tag }}"
 
   python-tests:
     name: "Python Tests"
