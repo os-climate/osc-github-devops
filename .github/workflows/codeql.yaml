@@ -24,7 +24,7 @@ jobs:
   scan:
     name: "CodeQL"
     # yamllint disable-line rule:line-length
-    uses: modeseven-lfit/releng-reusable-workflows/.github/workflows/reuse-python-codeql.yaml@add-codeql-reusable-wf # Testing
+    uses: lfit/releng-reusable-workflows/.github/workflows/reuse-python-codeql.yaml@b20d15799ca2b9a492b61c4dde4081f0bc96baa7 # v0.2.13
     permissions:
       security-events: write
       # required to fetch internal or private CodeQL packs
