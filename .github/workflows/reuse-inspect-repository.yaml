@@ -87,7 +87,7 @@ jobs:
         id: tag-validate
         if: startsWith(github.ref, 'refs/tags/')
         # yamllint disable-line rule:line-length
-        uses: modeseven-lfreleng-actions/tag-push-verify-action@initial-update # ToDo: Testing
+        uses: lfreleng-actions/tag-push-verify-action@f9c6e753870c6405883be2ba18af05d075aaffe8 # v0.1.0
         with:
           versioning: "semver"
           exit_on_fail: "true"
