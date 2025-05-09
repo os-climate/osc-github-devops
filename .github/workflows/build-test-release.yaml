@@ -72,6 +72,8 @@ jobs:
         uses: lfreleng-actions/python-build-action@f3b78ac710af9dca46c5c4562f53ac3660f2ea59 # v0.1.7
         with:
           tag: "${{ needs.tag-validate.outputs.tag }}"
+          sigstore_sign: true
+          attestations: true
 
   python-tests:
     name: "Python Tests"
@@ -159,6 +161,7 @@ jobs:
       - notebooks
     permissions:
       contents: read
+      id-token: write # IMPORTANT: this permission is mandatory for trusted publishing
     steps:
       # Harden the runner used by this workflow
       - uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
