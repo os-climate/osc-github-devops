@@ -159,6 +159,8 @@ jobs:
       - python-tests
       - python-audit
       - notebooks
+    environment:
+      name: development
     permissions:
       contents: read
       id-token: write # IMPORTANT: this permission is mandatory for trusted publishing
@@ -181,6 +183,8 @@ jobs:
     runs-on: 'ubuntu-24.04'
     needs:
       - test-pypi
+    environment:
+      name: production
     permissions:
       contents: read
       id-token: write # IMPORTANT: this permission is mandatory for trusted publishing
