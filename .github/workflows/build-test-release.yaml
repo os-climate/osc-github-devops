@@ -56,6 +56,8 @@ jobs:
       artefact_path: "${{ steps.python-build.outputs.artefact_path }}"
     permissions:
       contents: write
+      id-token: write       # Needed for attestations
+      attestations: write   # Needed for attestations
     env:
       GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
     steps:
