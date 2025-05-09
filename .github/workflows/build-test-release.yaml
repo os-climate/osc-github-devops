@@ -3,61 +3,61 @@
 # SPDX-FileCopyrightText: 2025 The Linux Foundation
 
 # Runs on a new pull request, performs build and runs tests
-name: "Python Build/Test/Release"
+name: 'Python Build/Test/Release'
 
 # yamllint disable-line rule:truthy
 on:
   # Trigger on tag push events
   push:
     tags:
-      - "**"
+      - '**'
 
 permissions: {}
 
 jobs:
   repository:
-    name: "Repository"
+    name: 'Repository'
     # yamllint disable-line rule:line-length
     uses: os-climate/osc-github-devops/.github/workflows/reuse-inspect-repository.yaml@50a55963fb815139987f49c15f7380eb5d028974 # Pre v0.1.30
     permissions:
       contents: read
 
   tag-validate:
-    name: "Validate tag push"
+    name: 'Validate tag push'
     needs: repository
-    runs-on: ubuntu-24.04
+    runs-on: 'ubuntu-24.04'
     permissions:
       contents: read
     outputs:
-      tag: ${{ steps.tag-validate.outputs.tag }}
+      tag: "${{ steps.tag-validate.outputs.tag }}"
     steps:
       # Harden the runner used by this workflow
       - uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
         with:
           egress-policy: audit
 
-      - name: "Verify Pushed Tag"
+      - name: 'Verify Pushed Tag'
         id: tag-validate
         # yamllint disable-line rule:line-length
         uses: lfreleng-actions/tag-push-verify-action@f9c6e753870c6405883be2ba18af05d075aaffe8 # v0.1.0
         with:
-          versioning: "semver"
+          versioning: 'semver'
 
   python-build:
-    name: "Python Build"
+    name: 'Python Build'
     needs:
       - repository
       - tag-validate
     if: needs.repository.outputs.python_project  == 'true'
-    runs-on: ubuntu-24.04
+    runs-on: 'ubuntu-24.04'
     outputs:
-      matrix_json: ${{ steps.python-build.outputs.matrix_json }}
-      artefact_name: ${{ steps.python-build.outputs.artefact_name }}
-      artefact_path: ${{ steps.python-build.outputs.artefact_path }}
+      matrix_json: "${{ steps.python-build.outputs.matrix_json }}"
+      artefact_name: "${{ steps.python-build.outputs.artefact_name }}"
+      artefact_path: "${{ steps.python-build.outputs.artefact_path }}"
     permissions:
       contents: write
     env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
     steps:
       # Harden the runner used by this workflow
       - uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
@@ -66,7 +66,7 @@ jobs:
 
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-      - name: "Build Python project"
+      - name: 'Build Python project'
         id: python-build
         # yamllint disable-line rule:line-length
         uses: lfreleng-actions/python-build-action@f3b78ac710af9dca46c5c4562f53ac3660f2ea59 # v0.1.7
@@ -76,14 +76,14 @@ jobs:
           attestations: true
 
   python-tests:
-    name: "Python Tests"
-    runs-on: "ubuntu-24.04"
+    name: 'Python Tests'
+    runs-on: 'ubuntu-24.04'
     needs:
       - python-build
     # Matrix job
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(needs.python-build.outputs.matrix_json) }}
+      matrix: "${{ fromJson(needs.python-build.outputs.matrix_json) }}"
     permissions:
       contents: read
     steps:
@@ -94,21 +94,21 @@ jobs:
 
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-      - name: "Test Python project [PYTEST]"
+      - name: 'Test Python project [PYTEST]'
         # yamllint disable-line rule:line-length
         uses: lfreleng-actions/python-test-action@b06828bf94ae4beef00d49cddc06839eca2d8f05 # v0.1.6
         with:
-          python_version: ${{ matrix.python-version }}
+          python_version: "${{ matrix.python-version }}"
 
   python-audit:
-    name: "Python Audit"
-    runs-on: "ubuntu-24.04"
+    name: 'Python Audit'
+    runs-on: 'ubuntu-24.04'
     needs:
       - python-build
     # Matrix job
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(needs.python-build.outputs.matrix_json) }}
+      matrix: "${{ fromJson(needs.python-build.outputs.matrix_json) }}"
     permissions:
       contents: read
     steps:
@@ -119,15 +119,15 @@ jobs:
 
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-      - name: "Audit Python project"
+      - name: 'Audit Python project'
         # yamllint disable-line rule:line-length
         uses: lfreleng-actions/python-audit-action@4c51bc76f9876b4f294f8afa4bb002b0b89aec68 # v0.1.3
         with:
-          python_version: ${{ matrix.python-version }}
+          python_version: "${{ matrix.python-version }}"
 
   notebooks:
-    name: "Test Jupyter Notebooks"
-    runs-on: "ubuntu-24.04"
+    name: 'Test Jupyter Notebooks'
+    runs-on: 'ubuntu-24.04'
     if: needs.repository.outputs.jupyter_notebooks  == 'true'
     needs:
       - repository
@@ -135,7 +135,7 @@ jobs:
     # Matrix job
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(needs.python-build.outputs.matrix_json) }}
+      matrix: "${{ fromJson(needs.python-build.outputs.matrix_json) }}"
     permissions:
       contents: read
     steps:
@@ -149,11 +149,11 @@ jobs:
       # yamllint disable-line rule:line-length
       - uses: lfreleng-actions/python-notebook-test-action@471123b59d0ef608f95bece4d36a95ebabab0a68 # v0.1.1
         with:
-          python_version: ${{ matrix.python-version }}
+          python_version: "${{ matrix.python-version }}"
 
-  pypi:
-    name: "Release PyPI Package"
-    runs-on: "ubuntu-24.04"
+  test-pypi:
+    name: 'Release PyPI Package'
+    runs-on: 'ubuntu-24.04'
     needs:
       - repository
       - python-tests
@@ -171,26 +171,42 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       # yamllint disable-line rule:line-length
-      - name: "Test PyPI publishing"
+      - name: 'Test PyPI publishing'
         uses: lfreleng-actions/pypi-publish-action@7a434074b9b8e5bf3426cc4a931c15834e0ef057 # v0.1.0
         with:
-          environment: "development"
+          environment: 'development'
+
+  pypi:
+    name: 'Release PyPI Package'
+    runs-on: 'ubuntu-24.04'
+    needs:
+      - test-pypi
+    permissions:
+      contents: read
+      id-token: write # IMPORTANT: this permission is mandatory for trusted publishing
+    steps:
+      # Harden the runner used by this workflow
+      - uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       # yamllint disable-line rule:line-length
-      - name: "PyPI release"
+      - name: 'PyPI release'
         uses: lfreleng-actions/pypi-publish-action@7a434074b9b8e5bf3426cc4a931c15834e0ef057 # v0.1.0
         with:
-          environment: "production"
+          environment: 'production'
           attestations: true
 
   promote-release:
-    name: "Promote Draft Release"
+    name: 'Promote Draft Release'
     # yamllint disable-line rule:line-length
     if: startsWith(github.ref, 'refs/tags/') || contains(github.event.head_commit.message, '[release]')
     needs:
       - tag-validate
       - pypi
-    runs-on: "ubuntu-24.04"
+    runs-on: 'ubuntu-24.04'
     permissions:
       contents: write
       # id-token: write
@@ -204,7 +220,7 @@ jobs:
       # yamllint disable-line rule:line-length
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-      - name: "Promote draft release"
+      - name: 'Promote draft release'
         # yamllint disable-line rule:line-length
         uses: lfreleng-actions/draft-release-promote-action@0392844e1e08a0539b63ba1940a7a2bfa2bda077 # v0.1.1
         with:
