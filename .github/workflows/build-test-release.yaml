@@ -152,7 +152,7 @@ jobs:
           python_version: "${{ matrix.python-version }}"
 
   test-pypi:
-    name: 'Release PyPI Package'
+    name: 'Test PyPI Publishing'
     runs-on: 'ubuntu-24.04'
     needs:
       - repository
