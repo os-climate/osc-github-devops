@@ -61,4 +61,4 @@ jobs:
     steps:
       # yamllint disable-line rule:line-length
       - name: 'Standlone linting checks"'
-        uses: modeseven-lfreleng-actions/standalone-linting-action@initial-branch # ToDo
+        uses: modeseven-lfreleng-actions/standalone-linting-action@initial-update
