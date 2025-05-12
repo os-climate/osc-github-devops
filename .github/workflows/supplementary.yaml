@@ -1,0 +1,51 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2025 The Linux Foundation
+
+name: 'Supplementary Linting'
+
+# yamllint disable-line rule:truthy
+on: ['push', 'pull_request']
+
+jobs:
+  commit-message:
+    runs-on: 'ubuntu-24.04'
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: 'Semantic commit messages'
+        # yamllint disable-line rule:line-length
+        uses: amannn/action-semantic-pull-request@0723387faaf9b38adef4775cd42cfd5155ed6017 # v5.5.3
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        with:
+          # Requires the type to be capitlized, but accept any of the standard
+          # types
+          types: |
+            Fix
+            Feat
+            Chore
+            Docs
+            Style
+            Refactor
+            Perf
+            Test
+            Revert
+            CI
+            Build
+          validateSingleCommit: true
+          validateSingleCommitMatchesPrTitle: true
+
+      - name: 'Checkout repository'
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          # checkout at the last commit
+          ref: "${{ github.event.pull_request.head.sha }}"
+          # get all history
+          fetch-depth: 0
+
+      - name: 'Install/run gitlint'
+        shell: bash
+        run: |
+          # Install/run gitlint
+          python -m pip install gitlint
+          gitlint --commits "${{ github.event.pull_request.base.sha }}..HEAD"

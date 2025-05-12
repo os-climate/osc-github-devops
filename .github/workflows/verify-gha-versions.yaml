@@ -10,15 +10,15 @@ on:
   workflow_dispatch:
   pull_request:
     branches:
-      - main
-      - master
-    paths: [".github/**"]
-
-permissions: {}
+      - 'main'
+      - 'master'
+    paths: ['.github/**']
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: "${{ github.workflow }}-${{ github.ref }}"
   cancel-in-progress: true
+
+permissions: {}
 
 jobs:
   verify:
