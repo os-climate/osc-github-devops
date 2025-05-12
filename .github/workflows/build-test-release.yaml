@@ -176,9 +176,9 @@ jobs:
 
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-      # yamllint disable-line rule:line-length
       - name: 'Test PyPI publishing'
-        uses: lfreleng-actions/pypi-publish-action@7a434074b9b8e5bf3426cc4a931c15834e0ef057 # v0.1.0
+        # yamllint disable-line rule:line-length
+        uses: modeseven-lfreleng-actions/pypi-publish-action@patch-gh-action-pypi-publish # Testing v0.1.1
         with:
           environment: 'development'
 
@@ -200,9 +200,9 @@ jobs:
 
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-      # yamllint disable-line rule:line-length
       - name: 'PyPI release'
-        uses: lfreleng-actions/pypi-publish-action@7a434074b9b8e5bf3426cc4a931c15834e0ef057 # v0.1.0
+        # yamllint disable-line rule:line-length
+        uses: modeseven-lfreleng-actions/pypi-publish-action@patch-gh-action-pypi-publish # Testing v0.1.1
         with:
           environment: 'production'
           attestations: true
