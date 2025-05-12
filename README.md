@@ -1,3 +1,8 @@
+<!--
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2025 The Linux Foundation
+-->
+
 # OS-Climate GitHub Actions and Reusable Workflows
 
 <!-- prettier-ignore-start -->
@@ -43,11 +48,6 @@ In the meantime, here is some general documentation covering the relevant topics
 - [How to start using reusable workflows with GitHub Actions](https://github.blog/2022-02-10-using-reusable-workflows-github-actions/)
 - [Create reusable workflows in GitHub Actions](https://resources.github.com/learn/pathways/automation/intermediate/create-reusable-workflows-in-github-actions/)
 - [The Ultimate Guide to GitHub Reusable Workflows](https://www.dhiwise.com/post/the-ultimate-guide-to-github-reusable-workflows-maximize-efficiency-and-collaboration)
-
-<!--
-# SPDX-License-Identifier: Apache-2.0
-# SPDX-FileCopyrightText: 2024 The Linux Foundation
--->
 
 <!--
 # The section below renders the badges displayed at the top of the page

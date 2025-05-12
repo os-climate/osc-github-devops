@@ -3,7 +3,18 @@
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
 ci:
-  autofix_commit_msg: "Chore: pre-commit.ci automated update"
+  autofix_commit_msg: |
+    Chore: pre-commit.ci automated linting tools update
+
+    Signed-off-by: pre-commit-ci[bot] <pre-commit-ci[bot]@pre-commit.ci>
+
+    Changes in this pull request are as follows:
+  autoupdate_commit_msg: |
+    Chore: pre-commit.ci automated linting tools update
+
+    Signed-off-by: pre-commit-ci[bot] <pre-commit-ci[bot]@pre-commit.ci>
+
+    Changes in this pull request are as follows:
 
 exclude: |
   (?x)(
@@ -65,7 +76,7 @@ repos:
     rev: acc9d9de6369b76d22cb4167029d2035e8730b98 # frozen: v0.19.1
     hooks:
       - id: gitlint
-        args: ["-c body-max-line-length=120", "-c title-max-length=120"]
+        # args: ["-c body-max-line-length=120", "-c title-max-length=120"]
 
   - repo: https://github.com/openstack/bashate
     rev: 5798d24d571676fc407e81df574c1ef57b520f23 # frozen: 2.1.1

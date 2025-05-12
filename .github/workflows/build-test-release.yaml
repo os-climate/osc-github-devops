@@ -159,6 +159,7 @@ jobs:
     name: 'Test PyPI Publishing'
     runs-on: 'ubuntu-24.04'
     needs:
+      - tag-validate
       - repository
       - python-tests
       - python-audit
@@ -181,11 +182,13 @@ jobs:
         uses: modeseven-lfreleng-actions/pypi-publish-action@patch-gh-action-pypi-publish # Testing v0.1.1
         with:
           environment: 'development'
+          tag: "${{ needs.tag-validate.outputs.tag }}"
 
   pypi:
     name: 'Release PyPI Package'
     runs-on: 'ubuntu-24.04'
     needs:
+      - tag-validate
       - test-pypi
     environment:
       name: production
@@ -206,6 +209,7 @@ jobs:
         with:
           environment: 'production'
           attestations: true
+          tag: "${{ needs.tag-validate.outputs.tag }}"
 
   promote-release:
     name: 'Promote Draft Release'
