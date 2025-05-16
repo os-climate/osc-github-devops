@@ -159,3 +159,13 @@ repos:
   #   hooks:
   #     - id: pyupgrade
   #       args: ['--py37-plus']
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: "f40886d54c729f533f864ed6ce584e920feb0af7" # frozen: v1.15.0
+    hooks:
+      - id: mypy
+        verbose: true
+        args: ["--show-error-codes", "--install-types", "--non-interactive"]
+        additional_dependencies:
+          - "pytest"
+          - "types-requests"
