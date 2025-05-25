@@ -23,7 +23,7 @@ jobs:
       contents: read
 
   tag-validate:
-    name: 'Validate tag push'
+    name: 'Validate Tag Push'
     needs: repository
     runs-on: 'ubuntu-24.04'
     permissions:
