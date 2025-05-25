@@ -302,14 +302,12 @@ jobs:
         with:
           egress-policy: audit
 
-      # Note: should not need a checkout step
+      # Note: does not need a checkout step
 
-      - name: 'Attach artefacts to release'
+      - name: 'Attach build artefacts to release'
         # yamllint disable-line rule:line-length
-        uses: modeseven-lfreleng-actions/release-attach-artefacts-action@initial-update # Testing
+        uses: alexellis/upload-assets@13926a61cdb2cb35f5fdef1c06b8b591523236d3 # 0.4.1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         with:
-          # Probably only need one of these in the implementation; decide later
-          tag: "${{ needs.tag-validate.outputs.tag }}"
-          release_url: "${{ needs.promote-release.outputs.release_url }}"
-          artefact_name: "${{ needs.python-build.outputs.artefact_name }}"
-          artefact_path: "${{ needs.python-build.outputs.artefact_path }}"
+          asset_paths: "${{ needs.python-build.outputs.artefact_path }}"
