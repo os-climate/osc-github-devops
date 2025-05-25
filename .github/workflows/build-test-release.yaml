@@ -302,7 +302,14 @@ jobs:
         with:
           egress-policy: audit
 
-      # Note: does not need a checkout step
+      # Note: no need for a checkout step in this job
+
+      - name: '⬇ Download build artefacts'
+        # yamllint disable-line rule:line-length
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: "${{ needs.python-build.outputs.artefact_name }}"
+          path: "${{ needs.python-build.outputs.artefact_path }}"
 
       - name: 'Attach build artefacts to release'
         # yamllint disable-line rule:line-length
