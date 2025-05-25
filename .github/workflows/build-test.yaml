@@ -42,6 +42,7 @@ jobs:
       dynamic_version: ${{ steps.dynamic-version.outputs.dynamic_version }}
     permissions:
       contents: read
+    timeout-minutes: 1
     steps:
       # Harden the runner used by this workflow
       - uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
@@ -68,6 +69,7 @@ jobs:
       artefact_path: ${{ steps.python-build.outputs.artefact_path }}
     permissions:
       contents: write
+    timeout-minutes: 12
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -102,6 +104,7 @@ jobs:
       matrix: ${{ fromJson(needs.python-build.outputs.matrix_json) }}
     permissions:
       contents: read
+    timeout-minutes: 12
     steps:
       # Harden the runner used by this workflow
       - uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
@@ -112,7 +115,9 @@ jobs:
 
       - name: "Python tests [pytest] ${{ matrix.python-version }}"
         # yamllint disable-line rule:line-length
-        uses: lfreleng-actions/python-test-action@b06828bf94ae4beef00d49cddc06839eca2d8f05 # v0.1.6
+        uses: modeseven-lfreleng-actions/python-test-action@update-action # Testing
+        # yamllint disable-line rule:line-length
+        # uses: lfreleng-actions/python-test-action@b06828bf94ae4beef00d49cddc06839eca2d8f05 # v0.1.6
         with:
           python_version: ${{ matrix.python-version }}
 
@@ -127,6 +132,7 @@ jobs:
       matrix: ${{ fromJson(needs.python-build.outputs.matrix_json) }}
     permissions:
       contents: read
+    timeout-minutes: 10
     steps:
       # Harden the runner used by this workflow
       - uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
@@ -154,6 +160,7 @@ jobs:
       matrix: ${{ fromJson(needs.python-build.outputs.matrix_json) }}
     permissions:
       contents: read
+    timeout-minutes: 10
     steps:
       # Harden the runner used by this workflow
       - uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
