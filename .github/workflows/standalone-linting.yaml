@@ -40,16 +40,27 @@ jobs:
           # but accept any of the standard types
           types: |
             Fix
+            fix
             Feat
+            feat
             Chore
+            chore
             Docs
+            docs
             Style
+            style
             Refactor
+            refactor
             Perf
+            perf
             Test
+            test
             Revert
+            revert
             CI
+            ci
             Build
+            build
           validateSingleCommit: true
           validateSingleCommitMatchesPrTitle: true
 
