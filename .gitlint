@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2025 The Linux Foundation
+
+[general]
+
+### Configuring rules ###
+
+# It's the 21st century, titles can be 120 chars long!
+[title-max-length]
+line-length=120
+
+[body-max-line-length]
+line-length=160
