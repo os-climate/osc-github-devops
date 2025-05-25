@@ -310,4 +310,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
-          asset_paths: "${{ needs.python-build.outputs.artefact_path }}"
+          asset_paths: '["${{ needs.python-build.outputs.artefact_path }}/**"]'
