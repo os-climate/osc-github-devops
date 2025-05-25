@@ -28,6 +28,7 @@ jobs:
     runs-on: 'ubuntu-24.04'
     permissions:
       contents: read
+    timeout-minutes: 1
     outputs:
       tag: "${{ steps.tag-validate.outputs.tag }}"
     steps:
@@ -52,6 +53,7 @@ jobs:
       dynamic_version: ${{ steps.dynamic-version.outputs.dynamic_version }}
     permissions:
       contents: read
+    timeout-minutes: 1
     steps:
       # Harden the runner used by this workflow
       - uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
@@ -81,6 +83,7 @@ jobs:
       contents: write
       id-token: write       # Needed for attestations
       attestations: write   # Needed for attestations
+    timeout-minutes: 12
     env:
       GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
     steps:
@@ -117,6 +120,7 @@ jobs:
       matrix: "${{ fromJson(needs.python-build.outputs.matrix_json) }}"
     permissions:
       contents: read
+    timeout-minutes: 12
     steps:
       # Harden the runner used by this workflow
       - uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
@@ -127,7 +131,9 @@ jobs:
 
       - name: 'Test Python project [PYTEST]'
         # yamllint disable-line rule:line-length
-        uses: lfreleng-actions/python-test-action@b06828bf94ae4beef00d49cddc06839eca2d8f05 # v0.1.6
+        uses: modeseven-lfreleng-actions/python-test-action@update-action # Testing
+        # yamllint disable-line rule:line-length
+        # uses: lfreleng-actions/python-test-action@b06828bf94ae4beef00d49cddc06839eca2d8f05 # v0.1.6
         with:
           python_version: "${{ matrix.python-version }}"
 
@@ -142,6 +148,7 @@ jobs:
       matrix: "${{ fromJson(needs.python-build.outputs.matrix_json) }}"
     permissions:
       contents: read
+    timeout-minutes: 10
     steps:
       # Harden the runner used by this workflow
       - uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
@@ -169,6 +176,7 @@ jobs:
       matrix: "${{ fromJson(needs.python-build.outputs.matrix_json) }}"
     permissions:
       contents: read
+    timeout-minutes: 10
     steps:
       # Harden the runner used by this workflow
       - uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
@@ -196,6 +204,7 @@ jobs:
     permissions:
       contents: read
       id-token: write # IMPORTANT: this permission is mandatory for trusted publishing
+    timeout-minutes: 5
     steps:
       # Harden the runner used by this workflow
       - uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
@@ -222,6 +231,7 @@ jobs:
     permissions:
       contents: read
       id-token: write # IMPORTANT: this permission is mandatory for trusted publishing
+    timeout-minutes: 5
     steps:
       # Harden the runner used by this workflow
       - uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
@@ -241,7 +251,7 @@ jobs:
   promote-release:
     name: 'Promote Draft Release'
     # yamllint disable-line rule:line-length
-    if: startsWith(github.ref, 'refs/tags/') || contains(github.event.head_commit.message, '[release]')
+    if: startsWith(github.ref, 'refs/tags/')
     needs:
       - tag-validate
       - pypi
@@ -249,6 +259,9 @@ jobs:
     permissions:
       contents: write
       # id-token: write
+    timeout-minutes: 2
+    outputs:
+      release_url: "${{ steps.promote-release.outputs.release_url }}"
     steps:
       # Harden the runner used by this workflow
       # yamllint disable-line rule:line-length
@@ -260,9 +273,43 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: 'Promote draft release'
+        id: promote-release
         # yamllint disable-line rule:line-length
-        uses: lfreleng-actions/draft-release-promote-action@0392844e1e08a0539b63ba1940a7a2bfa2bda077 # v0.1.1
+        uses: modeseven-lfreleng-actions/draft-release-promote-action@output-release-url # Testing
+        # yamllint disable-line rule:line-length
+        # uses: lfreleng-actions/draft-release-promote-action@0392844e1e08a0539b63ba1940a7a2bfa2bda077 # v0.1.1
         with:
           token: "${{ secrets.GITHUB_TOKEN }}"
           tag: "${{ needs.tag-validate.outputs.tag }}"
           latest: true
+
+  # Need to attach build artefacts to the release
+  # This step could potentially be moved
+  # (May be better to when/where the release is still in draft state)
+  attach-artefacts:
+    name: 'Attach Artefacts to Release'
+    runs-on: 'ubuntu-24.04'
+    needs:
+      - tag-validate
+      - python-build
+      - promote-release
+    permissions:
+      contents: write
+    timeout-minutes: 5
+    steps:
+      # Harden the runner used by this workflow
+      - uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+        with:
+          egress-policy: audit
+
+      # Note: should not need a checkout step
+
+      - name: 'Attach artefacts to release'
+        # yamllint disable-line rule:line-length
+        uses: modeseven-lfreleng-actions/release-attach-artefacts-action@initial-update # Testing
+        with:
+          # Probably only need one of these in the implementation; decide later
+          tag: "${{ needs.tag-validate.outputs.tag }}"
+          release_url: "${{ needs.promote-release.outputs.release_url }}"
+          artefact_name: "${{ needs.python-build.outputs.artefact_name }}"
+          artefact_path: "${{ needs.python-build.outputs.artefact_path }}"
