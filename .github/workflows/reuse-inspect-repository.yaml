@@ -105,11 +105,21 @@ jobs:
       - name: "Get current repository tag"
         id: current-tag
         if: startsWith(github.ref, 'refs/tags/') != true
+        # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/repository-tag-current-action@main
+
+      - name: "Generate initial build tag"
+        id: initial-tag
+        if:  env.tag_count == '0'
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/repository-tag-next-action@main
+        with:
+          tag: "v0.1.0"
 
       - name: "Generate build tag"
         id: development-tag
-        if: startsWith(github.ref, 'refs/tags/') != true
+        if: startsWith(github.ref, 'refs/tags/') != true && env.tag_count == '0'
+        # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/repository-tag-next-action@main
         with:
           tag: "${{ steps.current-tag.outputs.tag }}"
