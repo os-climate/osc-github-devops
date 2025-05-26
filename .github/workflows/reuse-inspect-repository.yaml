@@ -118,7 +118,7 @@ jobs:
 
       - name: "Generate build tag"
         id: development-tag
-        if: startsWith(github.ref, 'refs/tags/') != true && env.tag_count == '0'
+        if: startsWith(github.ref, 'refs/tags/') != true && env.tag_count != '0'
         # yamllint disable-line rule:line-length
         uses: os-climate/osc-github-devops/.github/actions/repository-tag-next-action@main
         with:
