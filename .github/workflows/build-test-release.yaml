@@ -15,16 +15,8 @@ on:
 permissions: {}
 
 jobs:
-  repository:
-    name: 'Repository'
-    # yamllint disable-line rule:line-length
-    uses: os-climate/osc-github-devops/.github/workflows/reuse-inspect-repository.yaml@3fdcf80d6477cf7c4b0b59e01d070ce0876897c4 # v0.1.36
-    permissions:
-      contents: read
-
   tag-validate:
     name: 'Validate Tag Push'
-    needs: repository
     runs-on: 'ubuntu-24.04'
     permissions:
       contents: read
@@ -35,10 +27,10 @@ jobs:
       # Harden the runner used by this workflow
       - uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
         with:
-          egress-policy: audit
+          egress-policy: 'audit'
 
       - name: 'Verify Pushed Tag'
-        id: tag-validate
+        id: 'tag-validate'
         # yamllint disable-line rule:line-length
         uses: lfreleng-actions/tag-push-verify-action@f9c6e753870c6405883be2ba18af05d075aaffe8 # v0.1.0
         with:
@@ -46,10 +38,7 @@ jobs:
 
   python-build:
     name: 'Python Build'
-    needs:
-      - repository
-      - tag-validate
-    if: needs.repository.outputs.python_project  == 'true'
+    needs: 'tag-validate'
     runs-on: 'ubuntu-24.04'
     outputs:
       matrix_json: "${{ steps.python-build.outputs.matrix_json }}"
@@ -66,12 +55,12 @@ jobs:
       # Harden the runner used by this workflow
       - uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
         with:
-          egress-policy: audit
+          egress-policy: 'audit'
 
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: 'Build Python project'
-        id: python-build
+        id: 'python-build'
         # yamllint disable-line rule:line-length
         uses: modeseven-lfreleng-actions/python-build-action@update-action # Testing
         # yamllint disable-line rule:line-length
@@ -83,8 +72,7 @@ jobs:
   python-tests:
     name: 'Python Tests'
     runs-on: 'ubuntu-24.04'
-    needs:
-      - python-build
+    needs: 'python-build'
     # Matrix job
     strategy:
       fail-fast: false
@@ -96,7 +84,7 @@ jobs:
       # Harden the runner used by this workflow
       - uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
         with:
-          egress-policy: audit
+          egress-policy: 'audit'
 
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
@@ -109,8 +97,7 @@ jobs:
   python-audit:
     name: 'Python Audit'
     runs-on: 'ubuntu-24.04'
-    needs:
-      - python-build
+    needs: 'python-build'
     # Matrix job
     strategy:
       fail-fast: false
@@ -122,7 +109,7 @@ jobs:
       # Harden the runner used by this workflow
       - uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
         with:
-          egress-policy: audit
+          egress-policy: 'audit'
 
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
@@ -135,10 +122,7 @@ jobs:
   notebooks:
     name: 'Test Jupyter Notebooks'
     runs-on: 'ubuntu-24.04'
-    if: needs.repository.outputs.jupyter_notebooks  == 'true'
-    needs:
-      - repository
-      - python-build
+    needs: 'python-build'
     # Matrix job
     strategy:
       fail-fast: false
@@ -150,7 +134,7 @@ jobs:
       # Harden the runner used by this workflow
       - uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
         with:
-          egress-policy: audit
+          egress-policy: 'audit'
 
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
@@ -163,13 +147,12 @@ jobs:
     name: 'Test PyPI Publishing'
     runs-on: 'ubuntu-24.04'
     needs:
-      - tag-validate
-      - repository
-      - python-tests
-      - python-audit
-      - notebooks
+      - 'tag-validate'
+      - 'python-tests'
+      - 'python-audit'
+      - 'notebooks'
     environment:
-      name: development
+      name: 'development'
     permissions:
       contents: read
       id-token: write # IMPORTANT: this permission is mandatory for trusted publishing
@@ -178,7 +161,7 @@ jobs:
       # Harden the runner used by this workflow
       - uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
         with:
-          egress-policy: audit
+          egress-policy: 'audit'
 
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
@@ -193,10 +176,10 @@ jobs:
     name: 'Release PyPI Package'
     runs-on: 'ubuntu-24.04'
     needs:
-      - tag-validate
-      - test-pypi
+      - 'tag-validate'
+      - 'test-pypi'
     environment:
-      name: production
+      name: 'production'
     permissions:
       contents: read
       id-token: write # IMPORTANT: this permission is mandatory for trusted publishing
@@ -205,7 +188,7 @@ jobs:
       # Harden the runner used by this workflow
       - uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
         with:
-          egress-policy: audit
+          egress-policy: 'audit'
 
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
@@ -222,8 +205,8 @@ jobs:
     # yamllint disable-line rule:line-length
     if: startsWith(github.ref, 'refs/tags/')
     needs:
-      - tag-validate
-      - pypi
+      - 'tag-validate'
+      - 'pypi'
     runs-on: 'ubuntu-24.04'
     permissions:
       contents: write
@@ -236,13 +219,13 @@ jobs:
       # yamllint disable-line rule:line-length
       - uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
         with:
-          egress-policy: audit
+          egress-policy: 'audit'
 
       # yamllint disable-line rule:line-length
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: 'Promote draft release'
-        id: promote-release
+        id: 'promote-release'
         # yamllint disable-line rule:line-length
         uses: lfreleng-actions/draft-release-promote-action@d7e7df12e32fa26b28dbc2f18a12766482785399 # v0.1.2
         with:
@@ -257,9 +240,9 @@ jobs:
     name: 'Attach Artefacts to Release'
     runs-on: 'ubuntu-24.04'
     needs:
-      - tag-validate
-      - python-build
-      - promote-release
+      - 'tag-validate'
+      - 'python-build'
+      - 'promote-release'
     permissions:
       contents: write
     timeout-minutes: 5
@@ -267,7 +250,7 @@ jobs:
       # Harden the runner used by this workflow
       - uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
         with:
-          egress-policy: audit
+          egress-policy: 'audit'
 
       # Note: no need for a checkout step in this job
 
@@ -282,6 +265,6 @@ jobs:
         # yamllint disable-line rule:line-length
         uses: alexellis/upload-assets@13926a61cdb2cb35f5fdef1c06b8b591523236d3 # 0.4.1
         env:
-          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: "${{ github.token }}"
         with:
           asset_paths: '["${{ needs.python-build.outputs.artefact_path }}/**"]'
