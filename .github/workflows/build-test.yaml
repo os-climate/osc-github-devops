@@ -33,34 +33,10 @@ jobs:
     permissions:
       contents: read
 
-  dynamic-version-check:
-    name: "Dynamic Version Check"
-    runs-on: ubuntu-24.04
-    needs: repository
-    if: needs.repository.outputs.python_project == 'true'
-    outputs:
-      dynamic_version: ${{ steps.dynamic-version.outputs.dynamic_version }}
-    permissions:
-      contents: read
-    timeout-minutes: 1
-    steps:
-      # Harden the runner used by this workflow
-      - uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
-        with:
-          egress-policy: audit
-
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-
-      - name: "Check for dynamic versioning"
-        id: dynamic-version
-        # yamllint disable-line rule:line-length
-        uses: lfreleng-actions/python-dynamic-version-action@757278a7dce3add2c777305e7ec61d9e2b97ed7e # v0.1.6
-
   python-build:
     name: "Python Build"
     needs:
       - repository
-      - dynamic-version-check
     if: needs.repository.outputs.python_project  == 'true'
     runs-on: ubuntu-24.04
     outputs:
@@ -83,13 +59,9 @@ jobs:
       - name: "Build Python project"
         id: python-build
         # yamllint disable-line rule:line-length
-        uses: lfreleng-actions/python-build-action@a9d0ef8a2324ac76e798ad6dc306f08b83b5b213 # v0.1.11
-        with:
-          # Only pass tag if NOT using dynamic versioning
-          # yamllint disable-line rule:line-length
-          tag: ${{ needs.dynamic-version-check.outputs.dynamic_version == 'true' && '' || needs.repository.outputs.build_tag }}
-          # Skip version patching when using dynamic versioning
-          skip_version_patch: ${{ needs.dynamic-version-check.outputs.dynamic_version == 'true' }}
+        uses: modeseven-lfreleng-actions/python-build-action@update-action # Testing
+        # yamllint disable-line rule:line-length
+        # uses: lfreleng-actions/python-build-action@a9d0ef8a2324ac76e798ad6dc306f08b83b5b213 # v0.1.11
 
   python-tests:
     name: "Python Tests"
