@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2025 The Linux Foundation
 
-name: "Standalone Linting"
+name: 'Standalone Linting'
 
 # yamllint disable-line rule:truthy
 on:
@@ -18,11 +18,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  semantic-pull-request:
-    name: "Semantic Pull Request"
+  linting:
+    name: 'Checks'
     permissions:
       contents: read
-    runs-on: ubuntu-24.04
+    runs-on: 'ubuntu-latest'
     steps:
       # Harden the runner used by this workflow
       # yamllint disable-line rule:line-length
@@ -30,7 +30,7 @@ jobs:
         with:
           egress-policy: audit
 
-      - name: "Validate pull request title"
+      - name: "Pull request"
         # yamllint disable-line rule:line-length
         uses: amannn/action-semantic-pull-request@0723387faaf9b38adef4775cd42cfd5155ed6017 # v5.5.3
         env:
@@ -63,13 +63,7 @@ jobs:
           validateSingleCommit: true
           validateSingleCommitMatchesPrTitle: true
 
-  standalone-linting:
-    name: 'Pre-commit'
-    permissions:
-      contents: read
-    runs-on: 'ubuntu-latest'
-    steps:
-      - name: 'Standlone linting checks'
+      - name: 'Pre-commit'
         # yamllint disable-line rule:line-length
         uses: lfreleng-actions/standalone-linting-action@cd0e39a5420ae667ad3efe5c14aa39d7d2a159db # v0.1.0
         with:
