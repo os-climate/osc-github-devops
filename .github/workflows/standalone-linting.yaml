@@ -36,8 +36,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          # Requires the type to be capitalised,
-          # but accept any of the standard types
+          # Don't care about capitalisation of commit types
           types: |
             Fix
             fix
@@ -64,12 +63,16 @@ jobs:
           validateSingleCommit: true
           validateSingleCommitMatchesPrTitle: true
 
-  standalone-linting:
-    name: "Verify"
-    permissions:
-      contents: read
-    runs-on: ubuntu-24.04
-    steps:
-      # yamllint disable-line rule:line-length
-      - name: 'Standlone linting checks"'
-        uses: modeseven-lfreleng-actions/standalone-linting-action@initial-update
+      - name: 'Standlone linting checks'
+        # yamllint disable-line rule:line-length
+        uses: lfreleng-actions/standalone-linting-action@cd0e39a5420ae667ad3efe5c14aa39d7d2a159db # v0.1.0
+        with:
+          # yamllint disable-line rule:line-length
+          config_url: 'https://raw.githubusercontent.com/os-climate/ITR-examples/refs/heads/main/resources/standalone-linting/.pre-commit-config.yaml'
+
+      - name: 'Install/run gitlint'
+        shell: bash
+        run: |
+          # Install/run gitlint
+          python -m pip install gitlint
+          gitlint --commits "${{ github.event.pull_request.base.sha }}..HEAD"
