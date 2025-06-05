@@ -3,7 +3,7 @@
 # SPDX-FileCopyrightText: 2025 The Linux Foundation
 
 # Publishes documentation to GitHub Pages
-name: "Documentation Update"
+name: "Rebuild documentation"
 
 # Note: The initial publish may fail, see the documentation here:
 # https://github.com/peaceiris/actions-gh-pages
