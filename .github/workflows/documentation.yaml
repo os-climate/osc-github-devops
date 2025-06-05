@@ -3,7 +3,7 @@
 # SPDX-FileCopyrightText: 2025 The Linux Foundation
 
 # Publishes documentation to GitHub Pages
-name: "Rebuild documentation"
+name: "Rebuild Documentation"
 
 # Note: The initial publish may fail, see the documentation here:
 # https://github.com/peaceiris/actions-gh-pages
@@ -29,7 +29,7 @@ permissions: {}
 
 jobs:
   build_and_deploy:
-    name: "Rebuild documentation"
+    name: "Rebuild Documentation"
     runs-on: "ubuntu-24.04"
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
