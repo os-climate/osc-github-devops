@@ -53,7 +53,7 @@ In the meantime, here is some general documentation covering the relevant topics
 # The section below renders the badges displayed at the top of the page
 -->
 
-[🧪 GitHub Actions CI/CD workflow tests badge]: https://github.com/os-climate/osc-github-devops/actions/workflows/build-test-release.yaml/badge.svg?event=push
-[GHA workflow runs list]: https://github.com/os-climate/osc-github-devops/actions/workflows/build-test-release.yaml
+[🧪 GitHub Actions CI/CD workflow tests badge]: https://github.com/os-climate/osc-github-devops/actions/workflows/build-test.yaml/badge.svg?event=push
+[GHA workflow runs list]: https://github.com/os-climate/osc-github-devops/actions/workflows/build-test.yaml
 [pre-commit.ci results page]: https://results.pre-commit.ci/latest/github/os-climate/osc-github-devops/main
 [pre-commit.ci status badge]: https://results.pre-commit.ci/badge/github/os-climate/osc-github-devops/main.svg
