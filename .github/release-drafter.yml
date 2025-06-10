@@ -6,6 +6,17 @@ name-template: "v$RESOLVED_VERSION"
 tag-template: "v$RESOLVED_VERSION"
 change-template: "- $TITLE @$AUTHOR (#$NUMBER)"
 sort-direction: ascending
+version-resolver:
+  major:
+    labels:
+      - 'major'
+  minor:
+    labels:
+      - 'minor'
+  patch:
+    labels:
+      - 'patch'
+  default: patch
 categories:
   - title: ":boom: Breaking Change :boom:"
     labels:
@@ -38,28 +49,28 @@ categories:
 autolabeler:
   - label: "breaking-change"
     title:
-      - "/!:/i"
+      - "/!/i"
   - label: "feature"
     title:
-      - "/feat:/i"
+      - "/feat/i"
   - label: "bug"
     title:
-      - "/fix:/i"
+      - "/fix/i"
   - label: "refactor"
     title:
-      - "/refactor:/i"
+      - "/refactor/i"
   - label: "code-quality"
     title:
-      - "/test:/i"
+      - "/test/i"
   - label: "CI"
     title:
-      - "/ci:/i"
+      - "/ci/i"
   - label: "chore"
     title:
-      - "/chore:/i"
+      - "/chore/i"
   - label: "documentation"
     title:
-      - "/docs:/i"
+      - "/docs/i"
 # yamllint disable rule:line-length
 template: |
   [![Downloads for this release](https://img.shields.io/github/downloads/os-climate/osc-github-devops/v$RESOLVED_VERSION/total.svg)](https://github.com/os-climate/osc-github-devops/releases/v$RESOLVED_VERSION)
