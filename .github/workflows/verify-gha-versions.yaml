@@ -24,6 +24,6 @@ jobs:
   verify:
     name: Verify
     # yamllint disable-line rule:line-length
-    uses: lfit/releng-reusable-workflows/.github/workflows/reuse-verify-github-actions.yaml@fdcd10bc0fe174fe7d8834b2ba3a30159b4bf0bf # v0.2.14
+    uses: lfit/releng-reusable-workflows/.github/workflows/reuse-verify-github-actions.yaml@b9ad414863182bd1f633be67191e49f5e64ebec2 # v0.2.17
     permissions:
       contents: read
