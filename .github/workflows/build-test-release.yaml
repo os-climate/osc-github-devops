@@ -139,7 +139,7 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       # yamllint disable-line rule:line-length
-      - uses: lfreleng-actions/python-notebook-test-action@471123b59d0ef608f95bece4d36a95ebabab0a68 # v0.1.1
+      - uses: lfreleng-actions/python-notebook-test-action@3387386550d89ce9e9e5864aa793c67f9774b71f # v0.1.2
         with:
           python_version: "${{ matrix.python-version }}"
 
