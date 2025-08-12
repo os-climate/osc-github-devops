@@ -43,8 +43,9 @@ jobs:
       - uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
         with:
           egress-policy: audit
-
       # yamllint disable-line rule:line-length
-      - uses: lfreleng-actions/python-dependencies-update-action@3b2b40361716c4f940eaf6876aa9e4841c58b146 # v0.1.1
+      - uses: modeseven-lfreleng-actions/python-dependencies-update-action@update-action # Testing
+      # yamllint disable-line rule:line-length
+      #- uses: lfreleng-actions/python-dependencies-update-action@3b2b40361716c4f940eaf6876aa9e4841c58b146 # v0.1.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
