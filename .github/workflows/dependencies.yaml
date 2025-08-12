@@ -44,8 +44,6 @@ jobs:
         with:
           egress-policy: audit
       # yamllint disable-line rule:line-length
-      - uses: modeseven-lfreleng-actions/python-dependencies-update-action@update-action # Testing
-      # yamllint disable-line rule:line-length
-      #- uses: lfreleng-actions/python-dependencies-update-action@3b2b40361716c4f940eaf6876aa9e4841c58b146 # v0.1.1
+      - uses: lfreleng-actions/python-dependencies-update-action@3b2b40361716c4f940eaf6876aa9e4841c58b146 # v0.1.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
