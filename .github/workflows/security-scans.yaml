@@ -6,7 +6,9 @@
 # by a third-party and are governed by separate terms of service, privacy
 # policy, and support documentation.
 
-name: "Security Scans"
+name: 'Security Scans'
+
+# yamllint disable-line rule:truthy
 on:
   workflow_dispatch:
   # For Branch-Protection check. Only the default branch is supported. See
@@ -15,27 +17,28 @@ on:
   # To guarantee Maintained check is occasionally updated. See
   # https://github.com/ossf/scorecard/blob/main/docs/checks.md#maintained
   schedule:
-    - cron: "31 3 * * 0"
+    - cron: '31 3 * * 0'
   push:
-    branches: ["main", "master"]
+    branches:
+      - 'main'
     paths:
-      - "**"
-      - "!.github/**"
+      - '**'
+      - '!**/.github/**'
 
 # Declare default permissions as none.
 permissions: {}
 
 jobs:
   sonatype-lifecycle:
-    name: "Sonatype Lifecycle"
+    name: 'Sonatype Lifecycle'
     # yamllint disable-line rule:line-length
     uses: lfit/releng-reusable-workflows/.github/workflows/reuse-sonatype-lifecycle.yaml@8c3cf221da0e47955647647c9a254c1f807081ce # v0.2.18
     secrets:
-      NEXUS_IQ_PASSWORD: ${{ secrets.NEXUS_IQ_PASSWORD }}
+      NEXUS_IQ_PASSWORD: "${{ secrets.NEXUS_IQ_PASSWORD }}"
 
   # Scan results are found at: https://sonarcloud.io/login
   sonarqube-cloud:
-    name: "SonarQube Cloud"
+    name: 'SonarQube Cloud'
     # yamllint disable-line rule:line-length
     uses: lfit/releng-reusable-workflows/.github/workflows/reuse-sonarqube-cloud.yaml@8c3cf221da0e47955647647c9a254c1f807081ce # v0.2.18
     permissions:
@@ -47,4 +50,4 @@ jobs:
       # contents: read
       # actions: read
     secrets:
-      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      SONAR_TOKEN: "${{ secrets.SONAR_TOKEN }}"
