@@ -1,17 +1,18 @@
+---
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2025 The Linux Foundation
 
 version: 2
 updates:
-  - package-ecosystem: "github-actions"
-    directory: "/"
+  - package-ecosystem: 'github-actions'
+    directory: '/'
     schedule:
-      interval: "daily"
+      interval: 'daily'
     commit-message:
-      prefix: "Chore"
-  - package-ecosystem: "pip"
-    directory: "/"
+      prefix: 'Chore'
+  - package-ecosystem: 'pip'
+    directory: '/'
     schedule:
-      interval: "daily"
+      interval: 'daily'
     commit-message:
-      prefix: "Chore"
+      prefix: 'Chore'
