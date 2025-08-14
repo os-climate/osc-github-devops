@@ -42,7 +42,10 @@ jobs:
         shell: bash
         run: |
           # Reject Development Tags
-          echo "Development tag pushed; aborting release workflow 🛑"; exit 1
+          echo "Development tag pushed; aborting release workflow 🛑"
+          echo "Development tag pushed; aborting release workflow 🛑" \
+            >> "$GITHUB_STEP_SUMMARY"
+          exit 1
 
   python-build:
     name: 'Python Build'
