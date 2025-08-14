@@ -48,6 +48,10 @@ build-backend = "pdm.backend"
 [tool.pdm]
 distribution = true
 
+# Required for dynamic versioning support
+[tool.pdm.version]
+source = "scm"
+
 #[tool.pdm.scripts]
 #test = "pytest"
 #tox = "tox"
