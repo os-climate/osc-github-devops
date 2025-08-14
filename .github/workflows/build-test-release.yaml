@@ -37,6 +37,13 @@ jobs:
         with:
           versioning: 'semver'
 
+      - name: 'Reject Development Tags'
+        if: steps.tag-validate.outputs.dev_version == 'true'
+        shell: bash
+        run: |
+          # Reject Development Tags
+          echo "Development tag pushed; aborting release workflow 🛑"; exit 1
+
   python-build:
     name: 'Python Build'
     needs: 'tag-validate'
