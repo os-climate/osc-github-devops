@@ -28,7 +28,7 @@ permissions: {}
 jobs:
   python-build:
     name: 'Python Build'
-    runs-on: 'ubuntu-24.04'
+    runs-on: 'ubuntu-latest'
     outputs:
       matrix_json: "${{ steps.python-build.outputs.matrix_json }}"
       artefact_name: "${{ steps.python-build.outputs.artefact_name }}"
@@ -55,7 +55,7 @@ jobs:
 
   python-tests:
     name: 'Python Tests'
-    runs-on: 'ubuntu-24.04'
+    runs-on: 'ubuntu-latest'
     needs: 'python-build'
     # Matrix job
     strategy:
@@ -82,7 +82,7 @@ jobs:
 
   python-audit:
     name: 'Python Audit'
-    runs-on: 'ubuntu-24.04'
+    runs-on: 'ubuntu-latest'
     needs: 'python-build'
     # Matrix job
     strategy:
@@ -109,7 +109,7 @@ jobs:
 
   notebooks:
     name: 'Test Jupyter Notebooks'
-    runs-on: 'ubuntu-24.04'
+    runs-on: 'ubuntu-latest'
     needs: 'python-build'
     # Matrix job
     strategy:

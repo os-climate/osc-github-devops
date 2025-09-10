@@ -21,8 +21,7 @@ on:
       - '!pdm.lock'
       - '!tox.ini'
 
-env:
-  python-version: 3.11
+# Python version derived from pyproject.toml via setup-python step
 
 permissions: {}
 
@@ -46,4 +45,4 @@ jobs:
       # yamllint disable-line rule:line-length
       - uses: lfreleng-actions/python-dependencies-update-action@f81d67225c672cddbe56d8234b69868a797c75e7  # v0.1.3
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: "${{ secrets.GITHUB_TOKEN }}"
