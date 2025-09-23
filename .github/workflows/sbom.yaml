@@ -47,12 +47,12 @@ jobs:
         # yamllint disable-line rule:line-length
         uses: modeseven-lfreleng-actions/python-sbom-action@initial-update
         with:
-          python-version: "3.12"
-          include-dev: "false"
-          sbom-format: "both"
-          sbom-spec-version: "1.5"
-          output-filename: "sbom-cyclonedx"
-          fail-on-error: "true"
+          python_version: "3.12"
+          include_dev: "false"
+          sbom_format: "both"
+          sbom_spec_version: "1.5"
+          filename_prefix: "sbom-cyclonedx"
+          fail_on_error: "true"
 
       - name: "SBOM Generation Summary"
         shell: bash
@@ -60,10 +60,10 @@ jobs:
         run: |
           {
             echo "## 📋 SBOM Generation Results"
-            echo "**Dependency Manager:** ${{ steps.generate-sbom.outputs.dependency-manager }}"
-            echo "**Components Found:** ${{ steps.generate-sbom.outputs.component-count }}"
-            echo "**JSON SBOM:** [sbom-cyclonedx.json](${{ steps.generate-sbom.outputs.sbom-json-path }})"
-            echo "**XML SBOM:** [sbom-cyclonedx.xml](${{ steps.generate-sbom.outputs.sbom-xml-path }})"
+            echo "**Dependency Manager:** ${{ steps.generate-sbom.outputs.dependency_manager }}"
+            echo "**Components Found:** ${{ steps.generate-sbom.outputs.component_count }}"
+            echo "**JSON SBOM:** [sbom-cyclonedx.json](${{ steps.generate-sbom.outputs.sbom_json_path }})"
+            echo "**XML SBOM:** [sbom-cyclonedx.xml](${{ steps.generate-sbom.outputs.sbom_xml_path }})"
           } >> "$GITHUB_STEP_SUMMARY"
         # yamllint disable rule:line-length
 
@@ -136,7 +136,7 @@ jobs:
                 echo "- **Current SBOM**: $current_count components"
                 echo "- **Net Change**: $((current_count - previous_count)) components"
                 echo "- **Tool**:"
-                echo "${{ steps.generate-sbom.outputs.dependency-manager }}"
+                echo "${{ steps.generate-sbom.outputs.dependency_manager }}"
               } >> sbom-diff-report.md
 
               # Clean up temporary files
