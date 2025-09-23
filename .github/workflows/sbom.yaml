@@ -1,33 +1,11 @@
 ---
-# yamllint disable rule:line-length
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2025 The Linux Foundation
-#
-# Software Bill of Materials (SBOM) generation workflow.
-# Generates CycloneDX (JSON + XML) SBOMs for the resolved (locked) runtime
-# dependency graph. Artifacts are uploaded for every run and, when the
-# workflow is triggered by a tag push, they may also be attached to the
-# corresponding GitHub Release (optional step is provided but disabled
-# by default).
-#
-# Wave 2 Modernization Item:
-#  - Introduce SBOM + audit workflow (now implemented here).
-#
-# Notes:
-#  - Uses the existing uv.lock to ensure SBOM matches the exact, reproducible
-#    dependency set (runtime only; dev/test extras intentionally excluded).
-#  - If uv.lock changes, re-run this workflow (it will on push).
-#  - You can extend this with additional formats (SPDX) or integrate
-#    with external compliance systems later.
-#
-# Future Enhancements (non-blocking):
-#  - Add dependency diff against last successful run.
-#  - Add license policy checks.
-#  - Add vulnerability gating (currently handled in audit workflows).
-#  - Attach artifacts automatically to releases (uncomment final step).
 
 name: "SBOM (CycloneDX)"
+# Python Software Bill of Materials (SBOM) generation
 
+# yamllint disable-line rule:truthy
 "on":
   workflow_dispatch:
   push:
@@ -36,7 +14,9 @@ name: "SBOM (CycloneDX)"
       - master
     paths:
       - "pyproject.toml"
-      - "uv.lock"
+      - "*.lock"
+      - "requirements*.txt"
+      - "Pipfile.lock"
       - ".github/workflows/sbom.yaml"
   schedule:
     # Weekly (Monday 04:15 UTC) – adjust as desired
@@ -50,70 +30,46 @@ jobs:
   sbom:
     name: "Generate CycloneDX SBOM"
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-    env:
-      UV_NO_SYNC_PROGRESS: "1"
+    timeout-minutes: 15
     steps:
       - name: "Harden Runner"
+        # yamllint disable-line rule:line-length
         uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
         with:
           egress-policy: audit
 
       - name: "Checkout"
+      # yamllint disable-line rule:line-length
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
-      - name: "Install uv"
-        shell: bash
-        run: |
-            set -euo pipefail
-            curl -LsSf https://astral.sh/uv/install.sh | sh
-            echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-            uv --version
+      - name: "Generate SBOM with Python SBOM Action"
+        id: generate-sbom
+        # yamllint disable-line rule:line-length
+        uses: modeseven-lfreleng-actions/python-sbom-action@initial-update
+        with:
+          python-version: "3.12"
+          include-dev: "false"
+          sbom-format: "both"
+          sbom-spec-version: "1.5"
+          output-filename: "sbom-cyclonedx"
+          fail-on-error: "true"
 
-      - name: "Sync (runtime dependencies only)"
+      - name: "SBOM Generation Summary"
         shell: bash
-        run: |
-          set -euo pipefail
-          # Use the lockfile; exclude dev/test extras for a pure runtime SBOM
-          uv sync --locked --no-dev
-
-      - name: "Install cyclonedx-bom tool"
-        shell: bash
-        run: |
-          set -euo pipefail
-          # Installed into the uv-managed virtual environment
-          uv pip install --no-cache-dir cyclonedx-bom
-
-      - name: "Generate SBOM (CycloneDX JSON)"
-        shell: bash
-        run: |
-          set -euo pipefail
-          uv run cyclonedx-py environment \
-            --of JSON \
-            -o sbom-cyclonedx.json \
-            --sv 1.5
-
-      - name: "Generate SBOM (CycloneDX XML)"
-        shell: bash
-        run: |
-          set -euo pipefail
-          uv run cyclonedx-py environment \
-            --of XML \
-            -o sbom-cyclonedx.xml \
-            --sv 1.5
-
-      - name: "Summarize"
-        shell: bash
+        # yamllint disable rule:line-length
         run: |
           {
-            echo "Generated CycloneDX SBOM artifacts:"
-            echo ""
-            echo "* sbom-cyclonedx.json"
-            echo "* sbom-cyclonedx.xml"
+            echo "## 📋 SBOM Generation Results"
+            echo "**Dependency Manager:** ${{ steps.generate-sbom.outputs.dependency-manager }}"
+            echo "**Components Found:** ${{ steps.generate-sbom.outputs.component-count }}"
+            echo "**JSON SBOM:** [sbom-cyclonedx.json](${{ steps.generate-sbom.outputs.sbom-json-path }})"
+            echo "**XML SBOM:** [sbom-cyclonedx.xml](${{ steps.generate-sbom.outputs.sbom-xml-path }})"
           } >> "$GITHUB_STEP_SUMMARY"
+        # yamllint disable rule:line-length
 
       - name: "Download Previous SBOM (for diff)"
         if: github.event_name != 'workflow_dispatch'
+        # yamllint disable-line rule:line-length
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: sbom-cyclonedx-previous
@@ -141,7 +97,8 @@ jobs:
                 previous-sbom/sbom-cyclonedx.json | sort > previous-deps.txt
 
               # Find added dependencies
-              if added_deps=$(comm -13 previous-deps.txt current-deps.txt); then
+              if added_deps=$(comm -13 previous-deps.txt \
+                current-deps.txt); then
                 if [[ -n "$added_deps" ]]; then
                   {
                     echo "### ➕ Added Dependencies"
@@ -154,7 +111,8 @@ jobs:
               fi
 
               # Find removed dependencies
-              if removed_deps=$(comm -23 previous-deps.txt current-deps.txt); then
+              if removed_deps=$(comm -23 previous-deps.txt \
+                current-deps.txt); then
                 if [[ -n "$removed_deps" ]]; then
                   {
                     echo "### ➖ Removed Dependencies"
@@ -177,6 +135,8 @@ jobs:
                 echo "- **Previous SBOM**: $previous_count components"
                 echo "- **Current SBOM**: $current_count components"
                 echo "- **Net Change**: $((current_count - previous_count)) components"
+                echo "- **Tool**:"
+                echo "${{ steps.generate-sbom.outputs.dependency-manager }}"
               } >> sbom-diff-report.md
 
               # Clean up temporary files
@@ -189,7 +149,8 @@ jobs:
             {
               echo "## SBOM Diff Report"
               echo ""
-              echo "No previous SBOM found for comparison. This may be the first run or artifacts may have expired."
+              echo "No previous SBOM found for comparison."
+              echo "This may be the first run or artifacts may have expired."
             } >> sbom-diff-report.md
           fi
 
@@ -199,6 +160,7 @@ jobs:
           fi
 
       - name: "Upload SBOM Artifacts"
+        # yamllint disable-line rule:line-length
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: sbom-cyclonedx
@@ -210,6 +172,7 @@ jobs:
           retention-days: 90
 
       - name: "Upload Previous SBOM (for next run)"
+        # yamllint disable-line rule:line-length
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: sbom-cyclonedx-previous
@@ -219,12 +182,12 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-      # OPTIONAL: Attach to a release when triggered by a tag.
-      # Uncomment to enable.
-      # - name: "Attach SBOM to Release"
-      #   if: startsWith(github.ref, 'refs/tags/')
-      #   uses: alexellis/upload-assets@13926a61cdb2cb35f5fdef1c06b8b591523236d3 # 0.4.1
-      #   env:
-      #     GITHUB_TOKEN: "${{ github.token }}"
-      #   with:
-      #     asset_paths: '["sbom-cyclonedx.json","sbom-cyclonedx.xml"]'
+        # OPTIONAL: Attach to a release when triggered by a tag.
+        # Uncomment to enable.
+        # - name: "Attach SBOM to Release"
+        #   if: startsWith(github.ref, 'refs/tags/')
+        #   uses: alexellis/upload-assets@13926a61cdb2cb35f5fdef1c06b8b591523236d3 # 0.4.1
+        #   env:
+        #     GITHUB_TOKEN: "${{ github.token }}"
+        #   with:
+        #     asset_paths: '["sbom-cyclonedx.json","sbom-cyclonedx.xml"]'
