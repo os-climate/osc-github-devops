@@ -106,3 +106,44 @@ jobs:
         uses: lfreleng-actions/python-audit-action@bab5316468c108870eb759ef0de622bae9239aad # v0.2.2
         with:
           python_version: "${{ matrix.python-version }}"
+
+  sbom:
+    name: 'Generate SBOM'
+    runs-on: ubuntu-latest
+    needs: 'python-build'
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      # yamllint disable-line rule:line-length
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # v5.0.0
+
+      - name: "Generate SBOM"
+        id: sbom
+        # yamllint disable-line rule:line-length
+        uses: lfreleng-actions/python-sbom-action@ae4aca2ef28d7da4ec95049cc78be43e632d322a  # v0.1.0
+        with:
+          include_dev: "false"
+          sbom_format: "both"
+
+      - name: "Upload SBOM artifacts"
+        # yamllint disable-line rule:line-length
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: sbom-files
+          path: |
+            sbom-cyclonedx.json
+            sbom-cyclonedx.xml
+          retention-days: 45
+
+      - name: "Security scan with Grype"
+        # yamllint disable-line rule:line-length
+        uses: anchore/scan-action@f6601287cdb1efc985d6b765bbf99cb4c0ac29d8  # v7.0.0
+        with:
+          sbom: "${{ steps.sbom.outputs.sbom_json_path }}"
+
+      - name: "Summary step"
+        run: |
+            # Summary step
+            echo "SBOM count: ${{ steps.sbom.outputs.component_count }}"
+            echo "Tool used: ${{ steps.sbom.outputs.dependency_manager }}"
