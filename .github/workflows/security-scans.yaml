@@ -38,9 +38,9 @@ jobs:
 
   # Scan results are found at: https://sonarcloud.io/login
   sonarqube-cloud:
-    name: 'SonarQube Cloud'
-    # yamllint disable-line rule:line-length
-    uses: lfit/releng-reusable-workflows/.github/workflows/reuse-sonarqube-cloud.yaml@353a06e737c950cb297b3138784729ebd24e4861 # v0.2.22
+    name: "SonarQube Cloud"
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
     permissions:
       # Needed to upload the results to code-scanning dashboard.
       security-events: write
@@ -49,5 +49,19 @@ jobs:
       # Uncomment the permissions below if installing in a private repository.
       # contents: read
       # actions: read
-    secrets:
-      SONAR_TOKEN: "${{ secrets.SONAR_TOKEN }}"
+    steps:
+      - name: 'Checkout repository'
+        # yamllint disable-line rule:line-length
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          # Disabling shallow clones is recommended
+          # This improves the relevancy of reporting output
+          fetch-depth: 0
+
+      - name: "SonarQube Cloud Scan"
+        # yamllint disable-line rule:line-length
+        uses: modeseven-lfreleng-actions/sonarqube-cloud-scan-action@add-sonar-params-output # Testing
+        with:
+          sonar_token: ${{ secrets.SONAR_TOKEN }}
+          no_checkout: 'true'
+          debug: 'false'
