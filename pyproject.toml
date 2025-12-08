@@ -9,7 +9,7 @@ authors = [
     {name = "Matthew Watkins", email = "93649628+ModeSevenIndustrialSolutions@users.noreply.github.com" },
 ]
 dependencies = ["typer>=0.15.2", "jupyterlab>=4.3.6"]
-requires-python = "<3.13,>=3.11"
+requires-python = ">=3.11"
 readme = "README.md"
 license = "Apache-2.0"
 license-files = ["LICENSES/Apache-2.0.txt"]
@@ -23,6 +23,8 @@ classifiers = [
   "Programming Language :: Python",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.11",
   "Topic :: Office/Business :: Financial",

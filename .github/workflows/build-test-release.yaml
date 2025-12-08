@@ -102,7 +102,9 @@ jobs:
       - name: 'Build Python project'
         id: 'python-build'
         # yamllint disable-line rule:line-length
-        uses: lfreleng-actions/python-build-action@48381cece78a990a6ba93bd5924bcd40bf0d1a7d  # v0.1.20
+        # uses: lfreleng-actions/python-build-action@48381cece78a990a6ba93bd5924bcd40bf0d1a7d  # v0.1.20
+        # yamllint disable-line rule:line-length
+        uses: lfreleng-actions/python-build-action@main # Testing
         with:
           sigstore_sign: true
           attestations: true
@@ -130,7 +132,9 @@ jobs:
 
       - name: 'Test Python project [PYTEST]'
         # yamllint disable-line rule:line-length
-        uses: lfreleng-actions/python-test-action@b997656111c9b547f8458b18baf6be139e2d2c6c  # v0.1.12
+        # uses: lfreleng-actions/python-test-action@b997656111c9b547f8458b18baf6be139e2d2c6c  # v0.1.12
+        # yamllint disable-line rule:line-length
+        uses: lfreleng-actions/python-test-action@main # Testing
         with:
           python_version: "${{ matrix.python-version }}"
 
@@ -157,7 +161,9 @@ jobs:
 
       - name: 'Audit Python project'
         # yamllint disable-line rule:line-length
-        uses: lfreleng-actions/python-audit-action@d2a271bdbf08572dbd8addd3358e5e937ab3739b  # v0.2.3
+        # uses: lfreleng-actions/python-audit-action@d2a271bdbf08572dbd8addd3358e5e937ab3739b  # v0.2.3
+        # yamllint disable-line rule:line-length
+        uses: lfreleng-actions/python-audit-action@main # Testing
         with:
           python_version: "${{ matrix.python-version }}"
 
